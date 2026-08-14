@@ -6,4 +6,9 @@
   border: 1px solid #ffffff22;
   border-top: 1px solid #ffffff44;
   border-right: 1px solid #ffffff33;
+  .__header {
+    height: 50px;
+    width: 100%;
+    -webkit-app-region: drag;
+  }
 }
