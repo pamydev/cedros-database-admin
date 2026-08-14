@@ -2,17 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Hello World!</title>
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Cedros Database Admin</title>
   </head>
   <body>
-    <h1>💖 Hello World!</h1>
-    <p>Hello World!</p>
+    <div id="app"></div>
     <script type="module" src="/src/renderer.ts"></script>
   </body>
-  <script>
-    (async () => {
-      const res = await window.ipc.log();
-      console.log(res);
-    })();
-  </script>
 </html>

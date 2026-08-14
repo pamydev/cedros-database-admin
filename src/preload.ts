@@ -8,7 +8,3 @@ const ipc = {
 };
 
 contextBridge.exposeInMainWorld("ipc", ipc);
-
-//   font-family:
-//     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-//     sans-serif;

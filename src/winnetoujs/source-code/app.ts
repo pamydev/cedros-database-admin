@@ -1,4 +1,4 @@
-console.log("Hello from winnetoujs");
-
-// on page loaded
-window.addEventListener("DOMContentLoaded", () => {});
+import { LeftMenu } from "./left-menu/left-menu";
+window.addEventListener("DOMContentLoaded", () => {
+  new LeftMenu().render();
+});

@@ -15,8 +15,8 @@ ipcMain.handle("channel:log", async () => {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 600,
-    height: 200,
+    width: 900,
+    height: 600,
 
     titleBarStyle: "hiddenInset",
     trafficLightPosition: {

@@ -1,5 +1,28 @@
-body {
-  background: red;
+.left-menu {
+  width: 200px;
+  height: auto;
+  background-color: #000000;
+}
+
+body,
+html {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 /*# sourceMappingURL=index.css.map */
