@@ -6,8 +6,8 @@ export class LeftMenu {
       class: "left-menu",
     }).create("#app").ids.div;
 
-    new $div({
-      content: "Left Menu",
-    }).create(output);
+    // new $div({
+    //   content: "Left Menu",
+    // }).create(output);
   }
 }

@@ -313,9 +313,6 @@ var LeftMenu = class {
     const output = new $div({
       class: "left-menu"
     }).create("#app").ids.div;
-    new $div({
-      content: "Left Menu"
-    }).create(output);
   }
 };
 
