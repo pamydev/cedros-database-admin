@@ -1,19 +1,15 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
-import express from "express";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
-// create simple express server to serve static files
-const server = express();
-server.set("views", __dirname + "/backend/Views");
-server.listen(8686, () => {
-  console.log("Server is running on http://localhost:8686");
-  console.log({ __dirname });
+ipcMain.handle("channel:log", async () => {
+  console.log("Hello from the main process!");
+  return "Logged from the main process!";
 });
 
 const createWindow = () => {
@@ -38,10 +34,19 @@ const createWindow = () => {
     },
   });
 
-  mainWindow.loadFile(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  // mainWindow.loadFile(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+
+  // and load the index.html of the app.
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    mainWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
+  }
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

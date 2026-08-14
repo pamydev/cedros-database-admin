@@ -9,4 +9,10 @@
     <p>Hello World!</p>
     <script type="module" src="/src/renderer.ts"></script>
   </body>
+  <script>
+    (async () => {
+      const res = await window.ipc.log();
+      console.log(res);
+    })();
+  </script>
 </html>
