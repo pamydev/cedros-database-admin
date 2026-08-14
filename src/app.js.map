@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["winnetoujs/source-code/app.ts"],
+  "sourcesContent": ["console.log(\"Hello from winnetoujs\");\n\n// on page loaded\nwindow.addEventListener(\"DOMContentLoaded\", () => {});\n"],
+  "mappings": ";AAAA,QAAQ,IAAI,uBAAuB;AAGnC,OAAO,iBAAiB,oBAAoB,MAAM;AAAC,CAAC;",
+  "names": []
+}

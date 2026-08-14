@@ -1,0 +1,16 @@
+{
+  "name": "winnetoujs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "node wbr --bundleRelease --watch --verbose",
+    "start:prod": "node wbr --bundleRelease --production"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "winnetoujs": "^3.1.18"
+  }
+}
