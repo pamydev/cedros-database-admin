@@ -2,7 +2,7 @@
   width: 220px;
   height: 100%;
   padding: 6px 8px 14px;
-  background: var(--mac-sidebar-bg);
+  // background: var(--mac-sidebar-bg);
   border: 1px solid var(--mac-separator-soft);
   border-right: 1px solid var(--mac-separator);
   border-top: 1px solid var(--mac-separator);
@@ -28,6 +28,7 @@
     background: transparent;
     color: var(--mac-text);
     font: inherit;
+    font-weight: 400;
     text-align: left;
     cursor: default;
     -webkit-app-region: no-drag;
@@ -45,7 +46,7 @@
     }
 
     &.is-active {
-      background: var(--mac-accent);
+      background: color-mix(in srgb, var(--mac-accent) 50%, transparent);
       color: white;
     }
   }

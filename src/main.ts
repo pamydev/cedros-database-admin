@@ -41,7 +41,7 @@ const createWindow = () => {
     vibrancy: "sidebar",
     visualEffectState: "active",
 
-    backgroundColor: "#ff0000",
+    // backgroundColor: "#ff0000",
 
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),

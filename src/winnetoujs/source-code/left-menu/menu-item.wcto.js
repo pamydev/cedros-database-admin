@@ -40,7 +40,7 @@ export class $menuItem extends Constructos {
     type="button"
     aria-label="${props?.ariaLabel || ""}"
     onclick="${props?.onclick || ""}">
-    <span class="left-menu__icon" aria-hidden="true">${props?.icon || ""}</span>
+    ${props?.icon || ""}
     <span class="left-menu__label">${props?.label || ""}</span>
   </button>
 `;

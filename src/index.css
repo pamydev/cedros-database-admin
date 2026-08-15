@@ -2,7 +2,6 @@
   width: 220px;
   height: 100%;
   padding: 6px 8px 14px;
-  background: var(--mac-sidebar-bg);
   border: 1px solid var(--mac-separator-soft);
   border-right: 1px solid var(--mac-separator);
   border-top: 1px solid var(--mac-separator);
@@ -27,6 +26,7 @@
   background: transparent;
   color: var(--mac-text);
   font: inherit;
+  font-weight: 400;
   text-align: left;
   cursor: default;
   -webkit-app-region: no-drag;
@@ -40,7 +40,7 @@
   outline-offset: 1px;
 }
 .left-menu__item.is-active {
-  background: var(--mac-accent);
+  background: color-mix(in srgb, var(--mac-accent) 50%, transparent);
   color: white;
 }
 .left-menu__icon {
@@ -61,6 +61,21 @@
   white-space: nowrap;
 }
 
+.__icon__ {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--mac-text) -30%, var(--mac-accent) 50%);
+  box-shadow: 0px 0px 1px 1px color-mix(in srgb, var(--mac-accent) 30%, var(--mac-window-bg));
+}
+.__icon__ svg {
+  stroke-width: 3px;
+  width: 24px;
+  height: 24px;
+}
+
 :root {
   --mac-accent: #0a84ff;
   --mac-window-bg: #f5f5f7;
@@ -73,7 +88,7 @@
   --mac-font:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;
-  --font-size: 13px;
+  --font-size: 14px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -105,7 +120,6 @@ html {
 
 body {
   color: var(--mac-text);
-  background: var(--mac-window-bg);
 }
 
 #app {

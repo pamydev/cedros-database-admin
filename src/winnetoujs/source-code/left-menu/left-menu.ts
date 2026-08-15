@@ -2,6 +2,7 @@ import { $div } from "../common/common.wcto";
 import { W } from "../../node_modules/winnetoujs/dist/core/winnetou.js";
 import { createElement, Info, Plus } from "lucide";
 import { $menuItem } from "./menu-item.wcto";
+import { createIcon } from "../helpers/icons.helper";
 
 export class LeftMenu {
   render() {
@@ -22,14 +23,14 @@ export class LeftMenu {
 
     new $menuItem({
       ariaLabel: "Add connection",
-      icon: createElement(Plus, { size: 17, strokeWidth: 2.2 }).outerHTML,
+      icon: createIcon(Plus),
       label: "Add connection",
       onclick: activateItem,
     }).create(output);
 
     new $menuItem({
       ariaLabel: "About",
-      icon: createElement(Info, { size: 17, strokeWidth: 2.2 }).outerHTML,
+      icon: createIcon(Info),
       label: "About",
       onclick: activateItem,
     }).create(output);

@@ -397,7 +397,7 @@ var $menuItem = class _$menuItem extends Constructos {
     type="button"
     aria-label="${(props == null ? void 0 : props.ariaLabel) || ""}"
     onclick="${(props == null ? void 0 : props.onclick) || ""}">
-    <span class="left-menu__icon" aria-hidden="true">${(props == null ? void 0 : props.icon) || ""}</span>
+    ${(props == null ? void 0 : props.icon) || ""}
     <span class="left-menu__label">${(props == null ? void 0 : props.label) || ""}</span>
   </button>
 `;
@@ -430,6 +430,14 @@ var $menuItem = class _$menuItem extends Constructos {
   }
 };
 
+// source-code/helpers/icons.helper.ts
+var createIcon = (icon) => {
+  return new $div({
+    class: "__icon__",
+    content: createElement(icon).outerHTML
+  }).constructoString();
+};
+
 // source-code/left-menu/left-menu.ts
 var LeftMenu = class {
   render() {
@@ -445,13 +453,13 @@ var LeftMenu = class {
     }, "this");
     new $menuItem({
       ariaLabel: "Add connection",
-      icon: createElement(Plus, { size: 17, strokeWidth: 2.2 }).outerHTML,
+      icon: createIcon(Plus),
       label: "Add connection",
       onclick: activateItem
     }).create(output);
     new $menuItem({
       ariaLabel: "About",
-      icon: createElement(Info, { size: 17, strokeWidth: 2.2 }).outerHTML,
+      icon: createIcon(Info),
       label: "About",
       onclick: activateItem
     }).create(output);
