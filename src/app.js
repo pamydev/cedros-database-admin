@@ -350,6 +350,13 @@ var ChevronLeft = [["path", { d: "m15 18-6-6 6-6" }]];
 // ../../node_modules/lucide/dist/esm/icons/chevron-right.mjs
 var ChevronRight = [["path", { d: "m9 18 6-6-6-6" }]];
 
+// ../../node_modules/lucide/dist/esm/icons/info.mjs
+var Info = [
+  ["circle", { cx: "12", cy: "12", r: "10" }],
+  ["path", { d: "M12 16v-4" }],
+  ["path", { d: "M12 8h.01" }]
+];
+
 // ../../node_modules/lucide/dist/esm/icons/plus.mjs
 var Plus = [
   ["path", { d: "M5 12h14" }],
@@ -437,6 +444,299 @@ var createIcon = (icon) => {
   }).constructoString();
 };
 
+// node_modules/winnetoujs/dist/modules/router.js
+var WinnetouRouter_ = class {
+  constructor() {
+    this.routes = {};
+    this.paramRoutes = [];
+    this.routesOptions = {};
+    this.addListeners();
+  }
+  addListeners() {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" || event.which === 27) {
+        history.go(-1);
+      }
+    });
+    if (window.history) {
+      window.onpopstate = (event) => {
+        var _a;
+        event.preventDefault();
+        if (event.state == null) {
+          if (this.routes["/"]) {
+            this.routes["/"]();
+          } else {
+            console.error(
+              `WinnetouJs Error, id: CR00a67
+Default route "/" is not defined. Please define a default route.`
+            );
+          }
+        } else {
+          try {
+            this.callRoute(event.state);
+          } catch (e) {
+            console.error(
+              `WinnetouJs Error, id: CR002
+Given route is not available "${event.state}". Please verify given route. Original Error: ${e}`
+            );
+          }
+        }
+        if ((_a = this.routesOptions) == null ? void 0 : _a.onBack) {
+          try {
+            this.routesOptions.onBack(event.state || "/");
+          } catch (e) {
+            console.error(
+              `Winnetou Error, id: CR001
+The onBack option in createRoutes() is not valid. Please use a function. 
+
+Original Error: `,
+              e
+            );
+          }
+        }
+      };
+    }
+  }
+  createRoutes(obj, options) {
+    this.routes = obj;
+    this.routesOptions = options || {};
+    Object.keys(this.routes).forEach((route) => {
+      const segment = route.split("/");
+      const size = segment.length;
+      this.paramRoutes.push({
+        root: route,
+        size
+      });
+    });
+  }
+  navigate(url, pushState = true) {
+    var _a;
+    if (window.history) {
+      this.callRoute(url);
+      pushState && this.pushState(url);
+      if ((_a = this.routesOptions) == null ? void 0 : _a.onGo) {
+        try {
+          this.routesOptions.onGo(url || "/");
+        } catch (e) {
+          console.error(
+            `Winnetou Error, id: CR001
+The onGo option in createRoutes() is not valid. Please use a function. 
+
+Original Error: `,
+            e
+          );
+        }
+      }
+    }
+  }
+  pass(route) {
+    var _a;
+    if (window.history) {
+      this.callRoute(route);
+      this.pushStateInteraction(route);
+      if ((_a = this.routesOptions) == null ? void 0 : _a.onGo) {
+        try {
+          this.routesOptions.onGo(route || "/");
+        } catch (e) {
+          console.error(
+            `Winnetou Error, id: CR001
+The onGo option in createRoutes() is not valid. Please use a function. 
+
+Original Error: `,
+            e
+          );
+        }
+      }
+    }
+  }
+  pushStateInteraction(func) {
+    history.pushState(func, "");
+  }
+  callRoute(url) {
+    try {
+      const splittedUrl = url.split("/");
+      const size = splittedUrl.length;
+      const filter = this.paramRoutes.filter((data) => data.size === size);
+      if (filter.length === 0) {
+        this.notFound();
+      }
+      for (let i = 0; i < filter.length; i++) {
+        const root = filter[i].root.split("/");
+        let correctMatch = true;
+        const paramStore = [];
+        for (let j = 0; j < root.length; j++) {
+          if (root[j] !== splittedUrl[j]) {
+            correctMatch = false;
+            if (root[j].includes(":")) {
+              correctMatch = true;
+              paramStore.push(splittedUrl[j]);
+            } else {
+              correctMatch = false;
+              break;
+            }
+          }
+        }
+        if (correctMatch) {
+          this.routes[filter[i].root](...paramStore);
+          return;
+        } else if (i === filter.length - 1) {
+          this.notFound();
+        }
+      }
+    } catch (e) {
+      console.log(e);
+      this.notFound();
+    }
+  }
+  notFound() {
+    try {
+      this.routes["/404"]();
+    } catch (e) {
+      document.body.innerHTML = `<p onclick="Winnetou.select('.winnetouNotFoundDefault').hide()" style="width:100%;padding:15px;color:white;background-color:red;cursor:pointer;" class='winnetouNotFoundDefault'>Page not found. Click to close.</p>` + document.body.innerHTML;
+    }
+  }
+  pushState(url) {
+    try {
+      history.pushState(url, "", url);
+    } catch (e) {
+      history.pushState(url, "");
+    }
+  }
+};
+var Router = new WinnetouRouter_();
+
+// source-code/screens/screen.ts
+var Screen = class {
+  exists(identifier) {
+    var _a;
+    const el = `div-win-${identifier}`;
+    const exists = document.getElementById(el) !== null;
+    if (exists) {
+      (_a = document.getElementById(el)) == null ? void 0 : _a.style.setProperty("display", "block");
+    }
+    return exists;
+  }
+  createScreenHeader(args0) {
+    const header = new $div({
+      class: "screen-header"
+    }).create(args0.output).ids.div;
+    const navigation = new $div({
+      class: "__navigation"
+    }).create(header).ids.div;
+    new $div({
+      class: "__icon __icon-left",
+      onclick: W.fx(() => {
+        window.history.back();
+      }),
+      content: createElement(ChevronLeft, { size: 17, strokeWidth: 2.2 }).outerHTML
+    }).create(navigation);
+    new $div({
+      class: "__icon-separator",
+      content: " "
+    }).create(navigation);
+    new $div({
+      class: "__icon __icon-right",
+      onclick: W.fx(() => {
+        window.history.forward();
+      }),
+      content: createElement(ChevronRight, { size: 17, strokeWidth: 2.2 }).outerHTML
+    }).create(navigation);
+    new $div({
+      class: "__title",
+      content: args0.title
+    }).create(header);
+  }
+  createScreenContent(args0) {
+    const content = new $div({
+      class: "screen-content",
+      content: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lorem Ipsum.p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>"
+    }).create(args0.output).ids.div;
+  }
+};
+
+// source-code/screens/select-project/select-project.ts
+var SelectProjectScreen = class extends Screen {
+  render() {
+    if (this.exists("select-project-screen")) return;
+    const output = new $div(
+      {
+        class: "screen"
+      },
+      { identifier: "select-project-screen" }
+    ).create("#app").ids.div;
+    this.createScreenHeader({
+      output,
+      title: "Select Project"
+    });
+    this.createScreenContent({
+      output
+    });
+  }
+};
+
+// source-code/screens/about/about.ts
+var AboutScreen = class extends Screen {
+  render() {
+    if (this.exists("about-screen")) return;
+    const output = new $div(
+      {
+        class: "screen"
+      },
+      { identifier: "about-screen" }
+    ).create("#app").ids.div;
+    this.createScreenHeader({
+      output,
+      title: "About"
+    });
+  }
+};
+
+// source-code/router/router.ts
+var MyRouter = class {
+  constructor() {
+    this.createRoutes();
+  }
+  routes = {};
+  hideScreens() {
+    document.querySelectorAll(".screen").forEach((item) => {
+      var _a;
+      (_a = document.getElementById(item.id)) == null ? void 0 : _a.style.setProperty("display", "none");
+    });
+  }
+  methods = {
+    selectProject: {
+      go: () => Router.navigate("/select-project"),
+      set: () => {
+        this.routes["/select-project"] = () => {
+          this.hideScreens();
+          new SelectProjectScreen().render();
+        };
+      }
+    },
+    about: {
+      go: () => Router.navigate("/about"),
+      set: () => {
+        this.routes["/about"] = () => {
+          this.hideScreens();
+          new AboutScreen().render();
+        };
+      }
+    }
+  };
+  createRoutes() {
+    Object.keys(this.methods).forEach((key) => {
+      this.methods[key].set();
+    });
+    Router.createRoutes(this.routes, {
+      onGo(route) {
+      },
+      onBack(route) {
+      }
+    });
+  }
+};
+var appRouter = new MyRouter();
+
 // source-code/left-menu/left-menu.ts
 var LeftMenu = class {
   render() {
@@ -446,62 +746,35 @@ var LeftMenu = class {
     new $div({
       class: "__header"
     }).create(output);
-    const activateItem = W.fx((self) => {
+    const activateItem = (self) => {
       document.querySelectorAll(".left-menu__item").forEach((item) => item.classList.remove("is-active"));
       self.classList.add("is-active");
-    }, "this");
+    };
     new $menuItem({
       ariaLabel: "Add Project",
       icon: createIcon(Plus),
       label: "Add Project",
-      onclick: activateItem
+      onclick: W.fx((self) => {
+        activateItem(self);
+        appRouter.methods.selectProject.go();
+      }, "this")
     }).create(output);
-  }
-};
-
-// source-code/helpers/screen-header.helper.ts
-var createScreenHeader = (args0) => {
-  const header = new $div({
-    class: "screen-header"
-  }).create(args0.output).ids.div;
-  const navigation = new $div({
-    class: "__navigation"
-  }).create(header).ids.div;
-  new $div({
-    class: "__icon __icon-left",
-    content: createElement(ChevronLeft, { size: 17, strokeWidth: 2.2 }).outerHTML
-  }).create(navigation);
-  new $div({
-    class: "__icon-separator",
-    content: " "
-  }).create(navigation);
-  new $div({
-    class: "__icon __icon-right",
-    content: createElement(ChevronRight, { size: 17, strokeWidth: 2.2 }).outerHTML
-  }).create(navigation);
-  new $div({
-    class: "__title",
-    content: args0.title
-  }).create(header);
-};
-
-// source-code/screens/select-project/select-project.ts
-var SelectProject = class {
-  render() {
-    const output = new $div({
-      class: "screen"
-    }).create("#app").ids.div;
-    createScreenHeader({
-      output,
-      title: "Select Project"
-    });
+    new $menuItem({
+      ariaLabel: "About",
+      icon: createIcon(Info),
+      label: "About",
+      onclick: W.fx((self) => {
+        activateItem(self);
+        appRouter.methods.about.go();
+      }, "this")
+    }).create(output);
   }
 };
 
 // source-code/app.ts
 window.addEventListener("DOMContentLoaded", () => {
   new LeftMenu().render();
-  new SelectProject().render();
+  appRouter.methods.selectProject.go();
 });
 /*! Bundled license information:
 
@@ -509,6 +782,7 @@ lucide/dist/esm/defaultAttributes.mjs:
 lucide/dist/esm/createElement.mjs:
 lucide/dist/esm/icons/chevron-left.mjs:
 lucide/dist/esm/icons/chevron-right.mjs:
+lucide/dist/esm/icons/info.mjs:
 lucide/dist/esm/icons/plus.mjs:
 lucide/dist/esm/lucide.mjs:
   (**

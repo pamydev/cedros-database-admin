@@ -1,6 +1,7 @@
 import { LeftMenu } from "./left-menu/left-menu";
-import { SelectProject } from "./screens/select-project/select-project";
+import { appRouter } from "./router/router";
+import { SelectProjectScreen } from "./screens/select-project/select-project";
 window.addEventListener("DOMContentLoaded", () => {
   new LeftMenu().render();
-  new SelectProject().render();
+  appRouter.methods.selectProject.go();
 });

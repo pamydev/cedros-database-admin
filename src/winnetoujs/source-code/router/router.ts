@@ -1,20 +1,28 @@
 // router.ts
 import { Router } from "winnetoujs/modules/router";
+import { SelectProjectScreen } from "../screens/select-project/select-project";
+import { AboutScreen } from "../screens/about/about";
 
-export class MyRouter {
+class MyRouter {
   constructor() {
     this.createRoutes();
   }
 
   private routes = {};
 
+  private hideScreens() {
+    document.querySelectorAll<HTMLElement>(".screen").forEach((item) => {
+      document.getElementById(item.id)?.style.setProperty("display", "none");
+    });
+  }
+
   public methods = {
-    home: {
-      go: () => Router.navigate("/home"),
+    selectProject: {
+      go: () => Router.navigate("/select-project"),
       set: () => {
-        this.routes["/home"] = () => {
-          console.log("Home route called");
-          // Your route logic here
+        this.routes["/select-project"] = () => {
+          this.hideScreens();
+          new SelectProjectScreen().render();
         };
       },
     },
@@ -22,17 +30,8 @@ export class MyRouter {
       go: () => Router.navigate("/about"),
       set: () => {
         this.routes["/about"] = () => {
-          console.log("About route called");
-          // Your route logic here
-        };
-      },
-    },
-    settings: {
-      go: () => Router.navigate("/settings"),
-      set: () => {
-        this.routes["/settings"] = () => {
-          console.log("Settings route called");
-          // Your route logic here
+          this.hideScreens();
+          new AboutScreen().render();
         };
       },
     },
@@ -46,12 +45,10 @@ export class MyRouter {
 
     // Create the router with lifecycle hooks
     Router.createRoutes(this.routes, {
-      onGo(route) {
-        console.log("Navigating to:", route);
-      },
-      onBack(route) {
-        console.log("Going back to:", route);
-      },
+      onGo(route) {},
+      onBack(route) {},
     });
   }
 }
+
+export const appRouter = new MyRouter();

@@ -1,24 +1,20 @@
 import { $div } from "@common";
 import { Screen } from "../screen";
 
-export class SelectProjectScreen extends Screen {
+export class AboutScreen extends Screen {
   render() {
-    if (this.exists("select-project-screen")) return;
+    if (this.exists("about-screen")) return;
 
     const output = new $div(
       {
         class: "screen",
       },
-      { identifier: "select-project-screen" },
+      { identifier: "about-screen" },
     ).create("#app").ids.div;
 
     this.createScreenHeader({
       output: output,
-      title: "Select Project",
-    });
-
-    this.createScreenContent({
-      output: output,
+      title: "About",
     });
   }
 }
