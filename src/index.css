@@ -81,11 +81,6 @@
 }
 
 .screen-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: rgba(34, 34, 34, 0.6);
-  backdrop-filter: blur(50px);
   display: flex;
   align-items: center;
   justify-content: start;
@@ -142,10 +137,11 @@
 }
 
 .screen-content {
+  padding: 10px;
+  padding-left: 20px;
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  padding: 10px;
   background: transparent;
 }
 
@@ -189,6 +185,7 @@ html {
   user-select: none;
   font-family: var(--mac-font);
   font-size: var(--font-size);
+  scrollbar-color: var(--mac-separator) transparent;
 }
 
 body {

@@ -44,6 +44,9 @@ html {
   user-select: none;
   font-family: var(--mac-font);
   font-size: var(--font-size);
+  // scrollbars
+
+  scrollbar-color: var(--mac-separator) transparent;
 }
 
 body {
