@@ -2,6 +2,7 @@
 import { Router } from "winnetoujs/modules/router";
 import { SelectProjectScreen } from "../screens/select-project/select-project";
 import { AboutScreen } from "../screens/about/about";
+import { manualMenuEffect } from "../left-menu/left-menu";
 
 class MyRouter {
   constructor() {
@@ -22,6 +23,7 @@ class MyRouter {
       set: () => {
         this.routes["/add-project"] = () => {
           this.hideScreens();
+          manualMenuEffect("add-project");
           // Implement the logic for the Add Project screen here
         };
       },
@@ -32,6 +34,7 @@ class MyRouter {
       set: () => {
         this.routes["/select-project"] = () => {
           this.hideScreens();
+          manualMenuEffect("select-project");
           new SelectProjectScreen().render();
         };
       },
@@ -42,6 +45,7 @@ class MyRouter {
       set: () => {
         this.routes["/about"] = () => {
           this.hideScreens();
+          manualMenuEffect("about");
           new AboutScreen().render();
         };
       },

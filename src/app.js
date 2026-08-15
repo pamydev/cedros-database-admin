@@ -834,7 +834,10 @@ var SelectProjectScreen = class extends Screen {
     }).create(this.output).ids.div;
     new $buttonPrimary({
       content: createIcon(Plus) + " Create New Project",
-      onclick: "",
+      onclick: W.fx(() => {
+        manualMenuEffect("add-project");
+        appRouter.methods.addProject.go();
+      }),
       style: " margin-top: 10px;"
     }).create(panel);
   }
@@ -873,6 +876,7 @@ var MyRouter = class {
       set: () => {
         this.routes["/add-project"] = () => {
           this.hideScreens();
+          manualMenuEffect("add-project");
         };
       }
     },
@@ -881,6 +885,7 @@ var MyRouter = class {
       set: () => {
         this.routes["/select-project"] = () => {
           this.hideScreens();
+          manualMenuEffect("select-project");
           new SelectProjectScreen().render();
         };
       }
@@ -890,6 +895,7 @@ var MyRouter = class {
       set: () => {
         this.routes["/about"] = () => {
           this.hideScreens();
+          manualMenuEffect("about");
           new AboutScreen().render();
         };
       }
@@ -941,14 +947,17 @@ var LeftMenu = class {
       },
       { identifier: "select-project" }
     ).create(output);
-    new $menuItem({
-      ariaLabel: "About",
-      icon: createIcon(Info),
-      label: "About",
-      onclick: W.fx((self) => {
-        appRouter.methods.about.go();
-      }, "this")
-    }).create(output);
+    new $menuItem(
+      {
+        ariaLabel: "About",
+        icon: createIcon(Info),
+        label: "About",
+        onclick: W.fx((self) => {
+          appRouter.methods.about.go();
+        }, "this")
+      },
+      { identifier: "about" }
+    ).create(output);
     this.buttonEffect();
   }
   buttonEffect() {
@@ -960,6 +969,15 @@ var LeftMenu = class {
         item.classList.add("is-active");
       });
     });
+  }
+};
+var manualMenuEffect = (identifier) => {
+  document.querySelectorAll(".left-menu button").forEach((item) => {
+    item.classList.remove("is-active");
+  });
+  const el = document.getElementById(`menuItem-win-${identifier}`);
+  if (el) {
+    el.classList.add("is-active");
   }
 };
 

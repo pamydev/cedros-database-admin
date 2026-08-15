@@ -41,14 +41,17 @@ export class LeftMenu {
       { identifier: "select-project" },
     ).create(output);
 
-    new $menuItem({
-      ariaLabel: "About",
-      icon: createIcon(Info),
-      label: "About",
-      onclick: W.fx((self: HTMLElement) => {
-        appRouter.methods.about.go();
-      }, "this"),
-    }).create(output);
+    new $menuItem(
+      {
+        ariaLabel: "About",
+        icon: createIcon(Info),
+        label: "About",
+        onclick: W.fx((self: HTMLElement) => {
+          appRouter.methods.about.go();
+        }, "this"),
+      },
+      { identifier: "about" },
+    ).create(output);
     this.buttonEffect();
   }
 
@@ -67,3 +70,15 @@ export class LeftMenu {
       });
   }
 }
+
+export const manualMenuEffect = (identifier: string) => {
+  document
+    .querySelectorAll<HTMLElement>(".left-menu button")
+    .forEach((item) => {
+      item.classList.remove("is-active");
+    });
+  const el = document.getElementById(`menuItem-win-${identifier}`);
+  if (el) {
+    el.classList.add("is-active");
+  }
+};
