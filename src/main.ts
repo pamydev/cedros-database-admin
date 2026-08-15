@@ -2,6 +2,9 @@ import { app, BrowserWindow, ipcMain, systemPreferences } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { setApplicationMenu } from "./mac-menu";
+import { ipcChannels } from "./ipc.channels";
+import { database } from "../types/ipc";
+import { databaseIPCApi } from "./database/database";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -10,12 +13,7 @@ if (started) {
 
 app.setName("Cedros Database Admin");
 
-ipcMain.handle("channel:log", async () => {
-  console.log("Hello from the main process!");
-  return "Logged from the main process!";
-});
-
-ipcMain.handle("system:get-accent-color", () => {
+ipcMain.handle(ipcChannels.system_accent_color, () => {
   if (process.platform !== "darwin") {
     return "#0a84ff";
   }
@@ -28,6 +26,8 @@ ipcMain.handle("system:get-accent-color", () => {
     return "#0a84ff";
   }
 });
+
+databaseIPCApi();
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({

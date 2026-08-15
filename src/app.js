@@ -376,6 +376,257 @@ var $buttonPrimary = class _$buttonPrimary extends Constructos {
     return this.component;
   }
 };
+var $inputForm = class _$inputForm extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.label]  
+   * @param {any} [elements.description]  
+   * @param {any} [elements.type]  
+   * @param {any} [elements.placeholder]  
+   * @param {any} [elements.value]  
+   * @param {any} [elements.onchange]  
+   * @param {any} [elements.required]  
+   * @param {any} [elements.style]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `inputForm-win-${this.identifier}`,
+      elements,
+      options,
+      _$inputForm
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <form onsubmit="return false;" id="inputForm-win-${this.identifier}">
+    <label for="input-win-${this.identifier}">
+      ${(props == null ? void 0 : props.label) || ""}
+      <span class="__description-text">${(props == null ? void 0 : props.description) || ""}</span>
+    </label>
+
+    <input       id="input-win-${this.identifier}"
+      type="${(props == null ? void 0 : props.type) || ""}"
+      placeholder="${(props == null ? void 0 : props.placeholder) || ""}"
+      value="${(props == null ? void 0 : props.value) || ""}"
+      onchange="${(props == null ? void 0 : props.onchange) || ""}"
+      required="${(props == null ? void 0 : props.required) || ""}"
+      style="${(props == null ? void 0 : props.style) || ""}" >
+  </form>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        inputForm: `inputForm-win-${this.identifier}`,
+        input: `input-win-${this.identifier}`,
+        input: `input-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $textareaForm = class _$textareaForm extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.label]  
+   * @param {any} [elements.description]  
+   * @param {any} [elements.placeholder]  
+   * @param {any} [elements.onchange]  
+   * @param {any} [elements.required]  
+   * @param {any} [elements.style]  
+   * @param {any} [elements.value]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `textareaForm-win-${this.identifier}`,
+      elements,
+      options,
+      _$textareaForm
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <form onsubmit="return false;" id="textareaForm-win-${this.identifier}">
+    <label for="textarea-win-${this.identifier}">
+      ${(props == null ? void 0 : props.label) || ""}
+      <span class="__description-text">${(props == null ? void 0 : props.description) || ""}</span>
+    </label>
+
+    <textarea       id="textarea-win-${this.identifier}"
+      placeholder="${(props == null ? void 0 : props.placeholder) || ""}"
+      onchange="${(props == null ? void 0 : props.onchange) || ""}"
+      required="${(props == null ? void 0 : props.required) || ""}"
+      style="${(props == null ? void 0 : props.style) || ""}">
+${(props == null ? void 0 : props.value) || ""}</textarea>
+  </form>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        textareaForm: `textareaForm-win-${this.identifier}`,
+        textarea: `textarea-win-${this.identifier}`,
+        textarea: `textarea-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $fileForm = class _$fileForm extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.label]  
+   * @param {any} [elements.description]  
+   * @param {any} [elements.onchange]  
+   * @param {any} [elements.required]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `fileForm-win-${this.identifier}`,
+      elements,
+      options,
+      _$fileForm
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <form onsubmit="return false;" id="fileForm-win-${this.identifier}">
+    <label for="file-win-${this.identifier}">
+      ${(props == null ? void 0 : props.label) || ""}
+      <span class="__description-text">${(props == null ? void 0 : props.description) || ""}</span>
+    </label>
+
+    <div       class="input-file-div"
+      onclick="document.getElementById('file-win-${this.identifier}').click()">
+      <span>Choose File</span>
+      <span id="resourceName-win-${this.identifier}"></span>
+    </div>
+
+    <input       id="file-win-${this.identifier}"
+      type="file"
+      onchange="let fileName = document.getElementById('file-win-${this.identifier}').files[0]?.name; document.getElementById('resourceName-win-${this.identifier}').innerText = fileName ? fileName : ''; ${(props == null ? void 0 : props.onchange) || ""}"
+      required="${(props == null ? void 0 : props.required) || ""}"
+      style="display: none" >
+  </form>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        fileForm: `fileForm-win-${this.identifier}`,
+        file: `file-win-${this.identifier}`,
+        file: `file-win-${this.identifier}`,
+        resourceName: `resourceName-win-${this.identifier}`,
+        file: `file-win-${this.identifier}`,
+        file: `file-win-${this.identifier}`,
+        resourceName: `resourceName-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
 
 // ../../node_modules/lucide/dist/esm/defaultAttributes.mjs
 var defaultAttributes = {
@@ -858,6 +1109,58 @@ var AboutScreen = class extends Screen {
   }
 };
 
+// source-code/screens/new-project/new-project.ts
+var NewProjectScreen = class extends Screen {
+  output;
+  render() {
+    this.output = this.buildScreen({
+      output: "screen",
+      title: "New Project",
+      identifier: "new-project"
+    });
+    this.createForm();
+  }
+  createForm() {
+    const panel = new $div({
+      class: "PANEL"
+    }).create(this.output).ids.div;
+    new $inputForm({
+      label: "Project Name",
+      description: "A project is a container for your database configurations and settings, saved queries, and other related resources.",
+      type: "text",
+      placeholder: "Enter project name",
+      required: true
+    }).create(panel);
+    new $textareaForm({
+      label: "Project Description",
+      placeholder: "Enter project description",
+      description: "Provide a brief description of the project, its purpose, and any other relevant information.",
+      required: false
+    }).create(panel);
+    new $fileForm({
+      label: "Project File",
+      description: "Upload a project file to import existing configurations and settings.",
+      required: false
+    }).create(panel);
+    const divRight = new $div({
+      class: "DIV-RIGHT"
+    }).create(panel).ids.div;
+    new $buttonPrimary({
+      content: createIcon(Plus) + " Create Project",
+      onclick: W.fx(() => {
+        this.send();
+      })
+    }).create(divRight);
+  }
+  async send() {
+    window.database.createNewProject({
+      name: "Test Project"
+    }).then((result) => {
+      alert("Project created successfully!");
+    });
+  }
+};
+
 // source-code/router/router.ts
 var MyRouter = class {
   constructor() {
@@ -877,6 +1180,7 @@ var MyRouter = class {
         this.routes["/add-project"] = () => {
           this.hideScreens();
           manualMenuEffect("add-project");
+          new NewProjectScreen().render();
         };
       }
     },
@@ -985,8 +1289,8 @@ var manualMenuEffect = (identifier) => {
 window.addEventListener("DOMContentLoaded", () => {
   var _a;
   new LeftMenu().render();
-  (_a = document.getElementById("menuItem-win-select-project")) == null ? void 0 : _a.classList.add("is-active");
-  appRouter.methods.selectProject.go();
+  (_a = document.getElementById("menuItem-win-new-project")) == null ? void 0 : _a.classList.add("is-active");
+  appRouter.methods.addProject.go();
 });
 /*! Bundled license information:
 

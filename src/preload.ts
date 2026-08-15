@@ -1,16 +1,16 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { ipcChannels } from "./ipc.channels";
+import { database, systemApi } from "../types/ipc";
 
-const ipc = {
-  log: async () => {
-    const res = await ipcRenderer.invoke("channel:log");
-    return res;
-  },
-};
-
-const systemAPI = {
+const systemAPI: systemApi = {
   getAccentColor: (): Promise<string> =>
-    ipcRenderer.invoke("system:get-accent-color"),
+    ipcRenderer.invoke(ipcChannels.system_accent_color),
 };
 
-contextBridge.exposeInMainWorld("ipc", ipc);
+const database: database = {
+  createNewProject: (args): Promise<boolean> =>
+    ipcRenderer.invoke(ipcChannels.create_new_project, args),
+};
+
 contextBridge.exposeInMainWorld("systemAPI", systemAPI);
+contextBridge.exposeInMainWorld("database", database);

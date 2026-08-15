@@ -12,5 +12,6 @@
       "@common": ["./source-code/common/common.wcto"]
     }
   },
-  "exclude": ["node_modules", "**/node_modules/*"]
+  "exclude": ["node_modules", "**/node_modules/*"],
+  "include": ["../../types/*.d.ts", "./**/*.ts", "./**/*.js"]
 }

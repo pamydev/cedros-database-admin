@@ -11,13 +11,14 @@
   --mac-text: rgba(0, 0, 0, 0.88);
   --mac-secondary-text: rgba(0, 0, 0, 0.54);
   --mac-separator: rgba(0, 0, 0, 0.3);
-  --mac-separator-soft: rgba(0, 0, 0, 0.2);
+  --mac-separator-soft: rgba(0, 0, 0, 0.1);
   --mac-font:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;
   --font-size: 14px;
   --font-size-small: 12px;
   --font-size-smaller: 10px;
+  --mac-divider: rgba(100, 100, 100, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,7 +29,7 @@
     --mac-text: rgba(255, 255, 255, 0.92);
     --mac-secondary-text: rgba(255, 255, 255, 0.56);
     --mac-separator: rgba(255, 255, 255, 0.3);
-    --mac-separator-soft: rgba(255, 255, 255, 0.2);
+    --mac-separator-soft: rgba(255, 255, 255, 0.1);
   }
 }
 

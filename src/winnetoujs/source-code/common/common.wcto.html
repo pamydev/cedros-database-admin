@@ -27,3 +27,61 @@
     {{icon?}} {{content?}}
   </button>
 </winnetou>
+
+<winnetou d="input">
+  <form onsubmit="return false;" id="[[inputForm]]">
+    <label for="[[input]]">
+      {{label?}}
+      <span class="__description-text">{{description?}}</span>
+    </label>
+
+    <input
+      id="[[input]]"
+      type="{{type?}}"
+      placeholder="{{placeholder?}}"
+      value="{{value?}}"
+      onchange="{{onchange?}}"
+      required="{{required?}}"
+      style="{{style?}}" />
+  </form>
+</winnetou>
+
+<winnetou d="textarea">
+  <form onsubmit="return false;" id="[[textareaForm]]">
+    <label for="[[textarea]]">
+      {{label?}}
+      <span class="__description-text">{{description?}}</span>
+    </label>
+
+    <textarea
+      id="[[textarea]]"
+      placeholder="{{placeholder?}}"
+      onchange="{{onchange?}}"
+      required="{{required?}}"
+      style="{{style?}}">
+{{value?}}</textarea>
+  </form>
+</winnetou>
+
+<winnetou d="file">
+  <form onsubmit="return false;" id="[[fileForm]]">
+    <label for="[[file]]">
+      {{label?}}
+      <span class="__description-text">{{description?}}</span>
+    </label>
+
+    <div
+      class="input-file-div"
+      onclick="document.getElementById('[[file]]').click()">
+      <span>Choose File</span>
+      <span id="[[resourceName]]"></span>
+    </div>
+
+    <input
+      id="[[file]]"
+      type="file"
+      onchange="let fileName = document.getElementById('[[file]]').files[0]?.name; document.getElementById('[[resourceName]]').innerText = fileName ? fileName : ''; {{onchange?}}"
+      required="{{required?}}"
+      style="display: none" />
+  </form>
+</winnetou>

@@ -4,7 +4,7 @@ import { SelectProjectScreen } from "./screens/select-project/select-project";
 window.addEventListener("DOMContentLoaded", () => {
   new LeftMenu().render();
   document
-    .getElementById("menuItem-win-select-project")
+    .getElementById("menuItem-win-new-project")
     ?.classList.add("is-active");
-  appRouter.methods.selectProject.go();
+  appRouter.methods.addProject.go();
 });

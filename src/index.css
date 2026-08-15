@@ -144,7 +144,7 @@
 
 .screen-content {
   padding: 10px;
-  padding-left: 20px;
+  padding-left: 10px;
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -155,7 +155,7 @@
   width: 100%;
   padding: 10px;
   background: var(--mac-window-bg);
-  border-radius: 5px;
+  border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--mac-separator-soft);
   color: var(--mac-text);
@@ -163,28 +163,109 @@
   font-size: var(--font-size-small);
 }
 
+.DIV-RIGHT {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
 button {
   font-family: var(--mac-font);
   font-size: var(--font-size);
-  padding: 6px 12px;
+  padding: 4px 12px;
   border-radius: 8px;
   border: none;
   cursor: default;
   display: flex;
   align-items: center;
   gap: 11px;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: var(--font-size-small);
 }
 button.primary {
   background: var(--mac-accent);
   color: #fff;
 }
+button.primary svg {
+  width: 12px !important;
+  height: 12px !important;
+  stroke-width: 4px !important;
+  opacity: 1 !important;
+  stroke: var(--mac-text) !important;
+}
 button.secondary {
   background: var(--mac-window-bg);
   color: var(--mac-text);
 }
+button.secondary svg {
+  width: 12px !important;
+  height: 12px !important;
+  stroke-width: 4px !important;
+  opacity: 1 !important;
+  stroke: var(--mac-text) !important;
+}
 button:active {
   background: color-mix(in srgb, var(--mac-accent) 60%, var(--mac-window-bg));
+}
+
+form {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--mac-divider);
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+form label {
+  max-width: 40%;
+  font-family: var(--mac-font);
+  font-size: var(--font-size-small);
+  color: var(--mac-text);
+}
+form label .__description-text {
+  display: block;
+  font-size: var(--font-size-smaller);
+  color: var(--mac-secondary-text);
+}
+form input[type=text] {
+  width: 60%;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--mac-separator-soft);
+  background: var(--mac-window-bg);
+  color: var(--mac-text);
+  font-family: var(--mac-font);
+  font-size: var(--font-size);
+}
+form .input-file-div {
+  width: 60%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--mac-separator-soft);
+  background: var(--mac-window-bg);
+  color: var(--mac-text);
+  font-family: var(--mac-font);
+  font-size: var(--font-size);
+}
+form .input-file-div input[type=file] {
+  display: none;
+}
+form textarea {
+  width: 60%;
+  height: 60px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--mac-separator-soft);
+  background: var(--mac-window-bg);
+  color: var(--mac-text);
+  font-family: var(--mac-font);
+  font-size: var(--font-size);
 }
 
 :root {
@@ -195,13 +276,14 @@ button:active {
   --mac-text: rgba(0, 0, 0, 0.88);
   --mac-secondary-text: rgba(0, 0, 0, 0.54);
   --mac-separator: rgba(0, 0, 0, 0.3);
-  --mac-separator-soft: rgba(0, 0, 0, 0.2);
+  --mac-separator-soft: rgba(0, 0, 0, 0.1);
   --mac-font:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;
   --font-size: 14px;
   --font-size-small: 12px;
   --font-size-smaller: 10px;
+  --mac-divider: rgba(100, 100, 100, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -212,7 +294,7 @@ button:active {
     --mac-text: rgba(255, 255, 255, 0.92);
     --mac-secondary-text: rgba(255, 255, 255, 0.56);
     --mac-separator: rgba(255, 255, 255, 0.3);
-    --mac-separator-soft: rgba(255, 255, 255, 0.2);
+    --mac-separator-soft: rgba(255, 255, 255, 0.1);
   }
 }
 body,
