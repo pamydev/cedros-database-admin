@@ -307,6 +307,75 @@ var $div = class _$div extends Constructos {
     return this.component;
   }
 };
+var $buttonPrimary = class _$buttonPrimary extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.onclick]  
+   * @param {any} [elements.style]  
+   * @param {any} [elements.icon]  
+   * @param {any} [elements.content]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `buttonPrimary-win-${this.identifier}`,
+      elements,
+      options,
+      _$buttonPrimary
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <button     id="buttonPrimary-win-${this.identifier}"
+    class="primary"
+    onclick="${(props == null ? void 0 : props.onclick) || ""}"
+    style="${(props == null ? void 0 : props.style) || ""}">
+    ${(props == null ? void 0 : props.icon) || ""} ${(props == null ? void 0 : props.content) || ""}
+  </button>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        buttonPrimary: `buttonPrimary-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
 
 // ../../node_modules/lucide/dist/esm/defaultAttributes.mjs
 var defaultAttributes = {
@@ -349,6 +418,19 @@ var ChevronLeft = [["path", { d: "m15 18-6-6 6-6" }]];
 
 // ../../node_modules/lucide/dist/esm/icons/chevron-right.mjs
 var ChevronRight = [["path", { d: "m9 18 6-6-6-6" }]];
+
+// ../../node_modules/lucide/dist/esm/icons/folder-kanban.mjs
+var FolderKanban = [
+  [
+    "path",
+    {
+      d: "M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+    }
+  ],
+  ["path", { d: "M8 10v4" }],
+  ["path", { d: "M12 10v2" }],
+  ["path", { d: "M16 10v6" }]
+];
 
 // ../../node_modules/lucide/dist/esm/icons/info.mjs
 var Info = [
@@ -424,6 +506,66 @@ var $menuItem = class _$menuItem extends Constructos {
     return {
       ids: {
         menuItem: `menuItem-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $menuSeparator = class _$menuSeparator extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `menuSeparator-win-${this.identifier}`,
+      elements,
+      options,
+      _$menuSeparator
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <div id="menuSeparator-win-${this.identifier}" class="__separator"></div>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        menuSeparator: `menuSeparator-win-${this.identifier}`
       }
     };
   }
@@ -607,6 +749,26 @@ var Router = new WinnetouRouter_();
 
 // source-code/screens/screen.ts
 var Screen = class {
+  render() {
+    throw new Error("Method not implemented.");
+  }
+  buildScreen(args0) {
+    if (this.exists(args0.identifier)) return;
+    const output = new $div(
+      {
+        class: "screen"
+      },
+      { identifier: args0.identifier }
+    ).create("#app").ids.div;
+    this.createScreenHeader({
+      output,
+      title: args0.title
+    });
+    const content = this.createScreenContent({
+      output
+    });
+    return content;
+  }
   exists(identifier) {
     var _a;
     const el = `div-win-${identifier}`;
@@ -648,46 +810,48 @@ var Screen = class {
   }
   createScreenContent(args0) {
     const content = new $div({
-      class: "screen-content",
-      content: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lorem Ipsum.p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>"
+      class: "screen-content"
     }).create(args0.output).ids.div;
+    return content;
   }
 };
 
 // source-code/screens/select-project/select-project.ts
 var SelectProjectScreen = class extends Screen {
+  output;
   render() {
-    if (this.exists("select-project-screen")) return;
-    const output = new $div(
-      {
-        class: "screen"
-      },
-      { identifier: "select-project-screen" }
-    ).create("#app").ids.div;
-    this.createScreenHeader({
-      output,
-      title: "Select Project"
+    this.output = this.buildScreen({
+      output: "screen",
+      title: "Select Project",
+      identifier: "select-project"
     });
-    this.createScreenContent({
-      output
-    });
+    this.emptyProjects();
+  }
+  emptyProjects() {
+    const panel = new $div({
+      class: "PANEL",
+      content: "No projects available."
+    }).create(this.output).ids.div;
+    new $buttonPrimary({
+      content: createIcon(Plus) + " Create New Project",
+      onclick: "",
+      style: " margin-top: 10px;"
+    }).create(panel);
   }
 };
 
 // source-code/screens/about/about.ts
 var AboutScreen = class extends Screen {
   render() {
-    if (this.exists("about-screen")) return;
-    const output = new $div(
-      {
-        class: "screen"
-      },
-      { identifier: "about-screen" }
-    ).create("#app").ids.div;
-    this.createScreenHeader({
-      output,
-      title: "About"
+    const content = this.buildScreen({
+      output: "screen",
+      title: "About",
+      identifier: "about"
     });
+    new $div({
+      class: "about-screen",
+      content: "About Screen Content"
+    }).create(content);
   }
 };
 
@@ -704,6 +868,14 @@ var MyRouter = class {
     });
   }
   methods = {
+    addProject: {
+      go: () => Router.navigate("/add-project"),
+      set: () => {
+        this.routes["/add-project"] = () => {
+          this.hideScreens();
+        };
+      }
+    },
     selectProject: {
       go: () => Router.navigate("/select-project"),
       set: () => {
@@ -746,34 +918,56 @@ var LeftMenu = class {
     new $div({
       class: "__header"
     }).create(output);
-    const activateItem = (self) => {
-      document.querySelectorAll(".left-menu__item").forEach((item) => item.classList.remove("is-active"));
-      self.classList.add("is-active");
-    };
-    new $menuItem({
-      ariaLabel: "Add Project",
-      icon: createIcon(Plus),
-      label: "Add Project",
-      onclick: W.fx((self) => {
-        activateItem(self);
-        appRouter.methods.selectProject.go();
-      }, "this")
-    }).create(output);
+    new $menuItem(
+      {
+        ariaLabel: "Add Project",
+        icon: createIcon(Plus),
+        label: "Add Project",
+        onclick: W.fx((self) => {
+          appRouter.methods.addProject.go();
+        }, "this")
+      },
+      { identifier: "add-project" }
+    ).create(output);
+    new $menuSeparator().create(output);
+    new $menuItem(
+      {
+        ariaLabel: "Select Project",
+        icon: createIcon(FolderKanban),
+        label: "Select Project",
+        onclick: W.fx((self) => {
+          appRouter.methods.selectProject.go();
+        }, "this")
+      },
+      { identifier: "select-project" }
+    ).create(output);
     new $menuItem({
       ariaLabel: "About",
       icon: createIcon(Info),
       label: "About",
       onclick: W.fx((self) => {
-        activateItem(self);
         appRouter.methods.about.go();
       }, "this")
     }).create(output);
+    this.buttonEffect();
+  }
+  buttonEffect() {
+    document.querySelectorAll(".left-menu button").forEach((item) => {
+      item.addEventListener("pointerdown", () => {
+        document.querySelectorAll(".left-menu button").forEach((btn) => {
+          btn.classList.remove("is-active");
+        });
+        item.classList.add("is-active");
+      });
+    });
   }
 };
 
 // source-code/app.ts
 window.addEventListener("DOMContentLoaded", () => {
+  var _a;
   new LeftMenu().render();
+  (_a = document.getElementById("menuItem-win-select-project")) == null ? void 0 : _a.classList.add("is-active");
   appRouter.methods.selectProject.go();
 });
 /*! Bundled license information:
@@ -782,6 +976,7 @@ lucide/dist/esm/defaultAttributes.mjs:
 lucide/dist/esm/createElement.mjs:
 lucide/dist/esm/icons/chevron-left.mjs:
 lucide/dist/esm/icons/chevron-right.mjs:
+lucide/dist/esm/icons/folder-kanban.mjs:
 lucide/dist/esm/icons/info.mjs:
 lucide/dist/esm/icons/plus.mjs:
 lucide/dist/esm/lucide.mjs:

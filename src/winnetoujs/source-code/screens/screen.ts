@@ -2,6 +2,35 @@ import { $div } from "@common";
 import { createElement, ChevronLeft, ChevronRight } from "lucide";
 import { W } from "winnetoujs";
 export class Screen {
+  protected render() {
+    throw new Error("Method not implemented.");
+  }
+
+  protected buildScreen(args0: {
+    output: string;
+    title: string;
+    identifier: string;
+  }) {
+    if (this.exists(args0.identifier)) return;
+
+    const output = new $div(
+      {
+        class: "screen",
+      },
+      { identifier: args0.identifier },
+    ).create("#app").ids.div;
+
+    this.createScreenHeader({
+      output: output,
+      title: args0.title,
+    });
+
+    const content = this.createScreenContent({
+      output: output,
+    });
+    return content;
+  }
+
   protected exists(identifier: string): boolean {
     const el = `div-win-${identifier}`;
     const exists = document.getElementById(el) !== null;
@@ -52,8 +81,7 @@ export class Screen {
   protected createScreenContent(args0: { output: string }) {
     const content = new $div({
       class: "screen-content",
-      content:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lorem Ipsum.p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>p<p>",
     }).create(args0.output).ids.div;
+    return content;
   }
 }

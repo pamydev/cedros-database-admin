@@ -1,5 +1,5 @@
 .left-menu {
-  width: 220px;
+  flex: 0;
   height: 100%;
   padding: 6px 8px 14px;
   border: 1px solid var(--mac-separator-soft);
@@ -26,7 +26,7 @@
   background: transparent;
   color: var(--mac-text);
   font: inherit;
-  font-weight: 400;
+  font-weight: 600;
   text-align: left;
   cursor: default;
   -webkit-app-region: no-drag;
@@ -37,7 +37,7 @@
   outline-offset: 1px;
 }
 .left-menu__item.is-active {
-  background: color-mix(in srgb, var(--mac-accent) 50%, transparent);
+  background: color-mix(in srgb, var(--mac-accent) 100%, transparent);
   color: white;
 }
 .left-menu__icon {
@@ -57,6 +57,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.left-menu .__separator {
+  width: 100%;
+  height: 1px;
+  margin: 6px 0;
+  background: var(--mac-separator-soft);
+}
 
 .__icon__ {
   display: flex;
@@ -65,7 +71,7 @@
   padding: 3px;
   border-radius: 8px;
   background: linear-gradient(180deg, var(--mac-text) -30%, var(--mac-accent) 50%);
-  box-shadow: 0px 0px 1px 1px color-mix(in srgb, var(--mac-accent) 30%, var(--mac-window-bg));
+  box-shadow: 0px 0px 1px 1px color-mix(in srgb, var(--mac-accent) 60%, var(--mac-window-bg));
 }
 .__icon__ svg {
   stroke-width: 3px;
@@ -145,6 +151,42 @@
   background: transparent;
 }
 
+.PANEL {
+  width: 100%;
+  padding: 10px;
+  background: var(--mac-window-bg);
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--mac-separator-soft);
+  color: var(--mac-text);
+  font-family: var(--mac-font);
+  font-size: var(--font-size-small);
+}
+
+button {
+  font-family: var(--mac-font);
+  font-size: var(--font-size);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-weight: 500;
+}
+button.primary {
+  background: var(--mac-accent);
+  color: #fff;
+}
+button.secondary {
+  background: var(--mac-window-bg);
+  color: var(--mac-text);
+}
+button:active {
+  background: color-mix(in srgb, var(--mac-accent) 60%, var(--mac-window-bg));
+}
+
 :root {
   --mac-accent: #0a84ff;
   --mac-window-bg: #f5f5f7;
@@ -158,6 +200,8 @@
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;
   --font-size: 14px;
+  --font-size-small: 12px;
+  --font-size-smaller: 10px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -199,15 +243,6 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
 }
 
 /*# sourceMappingURL=index.css.map */

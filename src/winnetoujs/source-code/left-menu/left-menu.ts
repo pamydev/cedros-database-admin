@@ -1,7 +1,7 @@
 import { $div } from "../common/common.wcto";
-import { W } from "../../node_modules/winnetoujs/dist/core/winnetou.js";
-import { createElement, Info, Plus } from "lucide";
-import { $menuItem } from "./menu-item.wcto";
+import { W } from "winnetoujs";
+import { createElement, Info, Plus, FolderKanban } from "lucide";
+import { $menuItem, $menuSeparator } from "./menu-item.wcto";
 import { createIcon } from "../helpers/icons.helper";
 import { appRouter } from "../router/router";
 
@@ -15,31 +15,55 @@ export class LeftMenu {
       class: "__header",
     }).create(output);
 
-    const activateItem = (self: HTMLElement) => {
-      document
-        .querySelectorAll<HTMLElement>(".left-menu__item")
-        .forEach((item) => item.classList.remove("is-active"));
-      self.classList.add("is-active");
-    };
+    new $menuItem(
+      {
+        ariaLabel: "Add Project",
+        icon: createIcon(Plus),
+        label: "Add Project",
+        onclick: W.fx((self: HTMLElement) => {
+          appRouter.methods.addProject.go();
+        }, "this"),
+      },
+      { identifier: "add-project" },
+    ).create(output);
 
-    new $menuItem({
-      ariaLabel: "Add Project",
-      icon: createIcon(Plus),
-      label: "Add Project",
-      onclick: W.fx((self: HTMLElement) => {
-        activateItem(self);
-        appRouter.methods.selectProject.go();
-      }, "this"),
-    }).create(output);
+    new $menuSeparator().create(output);
+
+    new $menuItem(
+      {
+        ariaLabel: "Select Project",
+        icon: createIcon(FolderKanban),
+        label: "Select Project",
+        onclick: W.fx((self: HTMLElement) => {
+          appRouter.methods.selectProject.go();
+        }, "this"),
+      },
+      { identifier: "select-project" },
+    ).create(output);
 
     new $menuItem({
       ariaLabel: "About",
       icon: createIcon(Info),
       label: "About",
       onclick: W.fx((self: HTMLElement) => {
-        activateItem(self);
         appRouter.methods.about.go();
       }, "this"),
     }).create(output);
+    this.buttonEffect();
+  }
+
+  private buttonEffect() {
+    document
+      .querySelectorAll<HTMLElement>(".left-menu button")
+      .forEach((item) => {
+        item.addEventListener("pointerdown", () => {
+          document
+            .querySelectorAll<HTMLElement>(".left-menu button")
+            .forEach((btn) => {
+              btn.classList.remove("is-active");
+            });
+          item.classList.add("is-active");
+        });
+      });
   }
 }

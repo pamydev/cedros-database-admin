@@ -1,5 +1,5 @@
 .left-menu {
-  width: 220px;
+  flex: 0;
   height: 100%;
   padding: 6px 8px 14px;
   // background: var(--mac-sidebar-bg);
@@ -28,7 +28,7 @@
     background: transparent;
     color: var(--mac-text);
     font: inherit;
-    font-weight: 400;
+    font-weight: 600;
     text-align: left;
     cursor: default;
     -webkit-app-region: no-drag;
@@ -46,7 +46,7 @@
     }
 
     &.is-active {
-      background: color-mix(in srgb, var(--mac-accent) 50%, transparent);
+      background: color-mix(in srgb, var(--mac-accent) 100%, transparent);
       color: white;
     }
   }
@@ -69,5 +69,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .__separator {
+    width: 100%;
+    height: 1px;
+    margin: 6px 0;
+    background: var(--mac-separator-soft);
   }
 }

@@ -1,24 +1,29 @@
-import { $div } from "@common";
+import { $buttonPrimary, $div } from "@common";
 import { Screen } from "../screen";
+import { createIcon } from "@icons";
+import { Plus } from "lucide";
 
 export class SelectProjectScreen extends Screen {
+  private output: string;
   render() {
-    if (this.exists("select-project-screen")) return;
-
-    const output = new $div(
-      {
-        class: "screen",
-      },
-      { identifier: "select-project-screen" },
-    ).create("#app").ids.div;
-
-    this.createScreenHeader({
-      output: output,
+    this.output = this.buildScreen({
+      output: "screen",
       title: "Select Project",
+      identifier: "select-project",
     });
+    this.emptyProjects();
+  }
+  private emptyProjects(): void {
+    // Implementation for emptying projects
+    const panel = new $div({
+      class: "PANEL",
+      content: "No projects available.",
+    }).create(this.output).ids.div;
 
-    this.createScreenContent({
-      output: output,
-    });
+    new $buttonPrimary({
+      content: createIcon(Plus) + " Create New Project",
+      onclick: "",
+      style: " margin-top: 10px;",
+    }).create(panel);
   }
 }

@@ -17,6 +17,16 @@ class MyRouter {
   }
 
   public methods = {
+    addProject: {
+      go: () => Router.navigate("/add-project"),
+      set: () => {
+        this.routes["/add-project"] = () => {
+          this.hideScreens();
+          // Implement the logic for the Add Project screen here
+        };
+      },
+    },
+
     selectProject: {
       go: () => Router.navigate("/select-project"),
       set: () => {
@@ -26,6 +36,7 @@ class MyRouter {
         };
       },
     },
+
     about: {
       go: () => Router.navigate("/about"),
       set: () => {

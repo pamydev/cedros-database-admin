@@ -1,6 +1,7 @@
 @use "../../src/winnetoujs/source-code/left-menu/left-menu.scss";
 @use "../../src/winnetoujs/source-code/helpers/icons.helper.scss";
 @use "../../src/winnetoujs/source-code/screens/screen.scss";
+@use "./design-system.scss";
 
 :root {
   --mac-accent: #0a84ff;
@@ -15,6 +16,8 @@
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;
   --font-size: 14px;
+  --font-size-small: 12px;
+  --font-size-smaller: 10px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -63,11 +66,11 @@ body {
   overflow: hidden;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
-}
+// @media (prefers-reduced-motion: reduce) {
+//   *,
+//   *::before,
+//   *::after {
+//     transition-duration: 0.01ms !important;
+//     animation-duration: 0.01ms !important;
+//   }
+// }
