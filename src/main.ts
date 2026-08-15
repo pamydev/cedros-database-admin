@@ -1,11 +1,14 @@
 import { app, BrowserWindow, ipcMain, systemPreferences } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
+import { setApplicationMenu } from "./mac-menu";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
+
+app.setName("Cedros Database Admin");
 
 ipcMain.handle("channel:log", async () => {
   console.log("Hello from the main process!");
@@ -27,28 +30,24 @@ ipcMain.handle("system:get-accent-color", () => {
 });
 
 const createWindow = () => {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 600,
-
     titleBarStyle: "hiddenInset",
     trafficLightPosition: {
       x: 18,
       y: 18,
     },
-
     vibrancy: "sidebar",
     visualEffectState: "active",
-
-    // backgroundColor: "#ff0000",
-
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
+
+  setApplicationMenu();
 
   // mainWindow.loadFile(MAIN_WINDOW_VITE_DEV_SERVER_URL);
 

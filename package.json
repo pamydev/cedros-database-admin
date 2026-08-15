@@ -1,6 +1,6 @@
 {
   "name": "cedros-database-admin",
-  "productName": "cedros-database-admin",
+  "productName": "Cedros Database Admin",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
