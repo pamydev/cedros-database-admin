@@ -76,6 +76,68 @@
   height: 20px;
 }
 
+.screen-header {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 10px;
+  padding: 0px;
+  width: 100%;
+  background: transparent;
+  -webkit-app-region: drag;
+}
+.screen-header .__navigation {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  background: color-mix(in srgb, var(--mac-window-bg) 80%, transparent);
+  border-radius: 22px;
+  padding: 2px 5px;
+  border: 1px solid var(--mac-separator);
+}
+.screen-header .__navigation .__icon-separator {
+  width: 1px;
+  height: 18px;
+  background: var(--mac-separator);
+}
+.screen-header .__navigation .__icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background: transparent;
+  transition: background 120ms ease, color 120ms ease;
+}
+.screen-header .__navigation .__icon:hover {
+  background: var(--mac-control-hover-bg);
+}
+.screen-header .__navigation .__icon:active {
+  background: color-mix(in srgb, var(--mac-control-hover-bg) 40%, transparent);
+}
+.screen-header .__navigation .__icon svg {
+  width: 25px;
+  height: 25px;
+  stroke-width: 1.5px;
+}
+.screen-header .__navigation .__icon-left svg {
+  margin-left: -2px;
+}
+.screen-header .__title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--mac-text);
+}
+
+.screen {
+  width: 100%;
+  background: transparent;
+}
+
 :root {
   --mac-accent: #0a84ff;
   --mac-window-bg: #f5f5f7;

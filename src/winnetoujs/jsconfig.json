@@ -4,9 +4,12 @@
     "target": "es2022",
     "checkJs": true,
     "resolveJsonModule": true,
+    "strict": false,
     "paths": {
       "@libs/*": ["./libs/*"],
-      "@strings": ["./src/strings"]
+      "@strings": ["./src/strings"],
+      "@icons": ["./source-code/helpers/icons.helper.ts"],
+      "@common": ["./source-code/common/common.wcto"]
     }
   },
   "exclude": ["node_modules", "**/node_modules/*"]

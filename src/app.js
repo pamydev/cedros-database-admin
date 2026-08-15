@@ -344,12 +344,11 @@ var createElement = (iconNode, customAttrs = {}) => {
   return createSVGElement([tag, attrs, iconNode]);
 };
 
-// ../../node_modules/lucide/dist/esm/icons/info.mjs
-var Info = [
-  ["circle", { cx: "12", cy: "12", r: "10" }],
-  ["path", { d: "M12 16v-4" }],
-  ["path", { d: "M12 8h.01" }]
-];
+// ../../node_modules/lucide/dist/esm/icons/chevron-left.mjs
+var ChevronLeft = [["path", { d: "m15 18-6-6 6-6" }]];
+
+// ../../node_modules/lucide/dist/esm/icons/chevron-right.mjs
+var ChevronRight = [["path", { d: "m9 18 6-6-6-6" }]];
 
 // ../../node_modules/lucide/dist/esm/icons/plus.mjs
 var Plus = [
@@ -452,29 +451,64 @@ var LeftMenu = class {
       self.classList.add("is-active");
     }, "this");
     new $menuItem({
-      ariaLabel: "Add connection",
+      ariaLabel: "Add Project",
       icon: createIcon(Plus),
-      label: "Add connection",
+      label: "Add Project",
       onclick: activateItem
     }).create(output);
-    new $menuItem({
-      ariaLabel: "About",
-      icon: createIcon(Info),
-      label: "About",
-      onclick: activateItem
-    }).create(output);
+  }
+};
+
+// source-code/helpers/screen-header.helper.ts
+var createScreenHeader = (args0) => {
+  const header = new $div({
+    class: "screen-header"
+  }).create(args0.output).ids.div;
+  const navigation = new $div({
+    class: "__navigation"
+  }).create(header).ids.div;
+  new $div({
+    class: "__icon __icon-left",
+    content: createElement(ChevronLeft, { size: 17, strokeWidth: 2.2 }).outerHTML
+  }).create(navigation);
+  new $div({
+    class: "__icon-separator",
+    content: " "
+  }).create(navigation);
+  new $div({
+    class: "__icon __icon-right",
+    content: createElement(ChevronRight, { size: 17, strokeWidth: 2.2 }).outerHTML
+  }).create(navigation);
+  new $div({
+    class: "__title",
+    content: args0.title
+  }).create(header);
+};
+
+// source-code/screens/select-project/select-project.ts
+var SelectProject = class {
+  render() {
+    const output = new $div({
+      class: "screen"
+    }).create("#app").ids.div;
+    createScreenHeader({
+      output,
+      title: "Select Project"
+    });
   }
 };
 
 // source-code/app.ts
 window.addEventListener("DOMContentLoaded", () => {
   new LeftMenu().render();
+  new SelectProject().render();
 });
 /*! Bundled license information:
 
 lucide/dist/esm/defaultAttributes.mjs:
 lucide/dist/esm/createElement.mjs:
-lucide/dist/esm/icons/info.mjs:
+lucide/dist/esm/icons/chevron-left.mjs:
+lucide/dist/esm/icons/chevron-right.mjs:
 lucide/dist/esm/icons/plus.mjs:
 lucide/dist/esm/lucide.mjs:
   (**

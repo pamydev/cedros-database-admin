@@ -22,16 +22,9 @@ export class LeftMenu {
     }, "this");
 
     new $menuItem({
-      ariaLabel: "Add connection",
+      ariaLabel: "Add Project",
       icon: createIcon(Plus),
-      label: "Add connection",
-      onclick: activateItem,
-    }).create(output);
-
-    new $menuItem({
-      ariaLabel: "About",
-      icon: createIcon(Info),
-      label: "About",
+      label: "Add Project",
       onclick: activateItem,
     }).create(output);
   }
