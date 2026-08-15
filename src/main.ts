@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, systemPreferences } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 
@@ -10,6 +10,20 @@ if (started) {
 ipcMain.handle("channel:log", async () => {
   console.log("Hello from the main process!");
   return "Logged from the main process!";
+});
+
+ipcMain.handle("system:get-accent-color", () => {
+  if (process.platform !== "darwin") {
+    return "#0a84ff";
+  }
+
+  try {
+    const rgba = systemPreferences.getAccentColor();
+    return `#${rgba.slice(0, 6)}`;
+  } catch (error) {
+    console.error("Failed to read the macOS accent color:", error);
+    return "#0a84ff";
+  }
 });
 
 const createWindow = () => {
@@ -24,13 +38,15 @@ const createWindow = () => {
       y: 18,
     },
 
-    vibrancy: "under-window",
+    vibrancy: "sidebar",
     visualEffectState: "active",
 
-    // backgroundColor: "#1e2324",
+    backgroundColor: "#ff0000",
 
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   });
 

@@ -124,6 +124,7 @@ var Winnetou_ = class {
   }
 };
 var Winnetou = new Winnetou_();
+var W = Winnetou;
 
 // node_modules/winnetoujs/dist/core/constructos.js
 var Constructos = class {
@@ -307,6 +308,128 @@ var $div = class _$div extends Constructos {
   }
 };
 
+// ../../node_modules/lucide/dist/esm/defaultAttributes.mjs
+var defaultAttributes = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: 24,
+  height: 24,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  "stroke-width": 2,
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round"
+};
+
+// ../../node_modules/lucide/dist/esm/createElement.mjs
+var createSVGElement = ([tag, attrs, children]) => {
+  const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  Object.keys(attrs).forEach((name) => {
+    element.setAttribute(name, String(attrs[name]));
+  });
+  if (children == null ? void 0 : children.length) {
+    children.forEach((child) => {
+      const childElement = createSVGElement(child);
+      element.appendChild(childElement);
+    });
+  }
+  return element;
+};
+var createElement = (iconNode, customAttrs = {}) => {
+  const tag = "svg";
+  const attrs = {
+    ...defaultAttributes,
+    ...customAttrs
+  };
+  return createSVGElement([tag, attrs, iconNode]);
+};
+
+// ../../node_modules/lucide/dist/esm/icons/info.mjs
+var Info = [
+  ["circle", { cx: "12", cy: "12", r: "10" }],
+  ["path", { d: "M12 16v-4" }],
+  ["path", { d: "M12 8h.01" }]
+];
+
+// ../../node_modules/lucide/dist/esm/icons/plus.mjs
+var Plus = [
+  ["path", { d: "M5 12h14" }],
+  ["path", { d: "M12 5v14" }]
+];
+
+// source-code/left-menu/menu-item.wcto.js
+var $menuItem = class _$menuItem extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} elements
+   * @param {string} elements.ariaLabel  
+   * @param {string} elements.onclick  
+   * @param {string} elements.icon  
+   * @param {string} elements.label  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `menuItem-win-${this.identifier}`,
+      elements,
+      options,
+      _$menuItem
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <button     id="menuItem-win-${this.identifier}"
+    class="left-menu__item"
+    type="button"
+    aria-label="${(props == null ? void 0 : props.ariaLabel) || ""}"
+    onclick="${(props == null ? void 0 : props.onclick) || ""}">
+    <span class="left-menu__icon" aria-hidden="true">${(props == null ? void 0 : props.icon) || ""}</span>
+    <span class="left-menu__label">${(props == null ? void 0 : props.label) || ""}</span>
+  </button>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        menuItem: `menuItem-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+
 // source-code/left-menu/left-menu.ts
 var LeftMenu = class {
   render() {
@@ -316,6 +439,22 @@ var LeftMenu = class {
     new $div({
       class: "__header"
     }).create(output);
+    const activateItem = W.fx((self) => {
+      document.querySelectorAll(".left-menu__item").forEach((item) => item.classList.remove("is-active"));
+      self.classList.add("is-active");
+    }, "this");
+    new $menuItem({
+      ariaLabel: "Add connection",
+      icon: createElement(Plus, { size: 17, strokeWidth: 2.2 }).outerHTML,
+      label: "Add connection",
+      onclick: activateItem
+    }).create(output);
+    new $menuItem({
+      ariaLabel: "About",
+      icon: createElement(Info, { size: 17, strokeWidth: 2.2 }).outerHTML,
+      label: "About",
+      onclick: activateItem
+    }).create(output);
   }
 };
 
@@ -323,4 +462,18 @@ var LeftMenu = class {
 window.addEventListener("DOMContentLoaded", () => {
   new LeftMenu().render();
 });
+/*! Bundled license information:
+
+lucide/dist/esm/defaultAttributes.mjs:
+lucide/dist/esm/createElement.mjs:
+lucide/dist/esm/icons/info.mjs:
+lucide/dist/esm/icons/plus.mjs:
+lucide/dist/esm/lucide.mjs:
+  (**
+   * @license lucide v1.31.0 - ISC
+   *
+   * This source code is licensed under the ISC license.
+   * See the LICENSE file in the root directory of this source tree.
+   *)
+*/
 //# sourceMappingURL=app.js.map

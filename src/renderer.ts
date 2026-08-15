@@ -29,6 +29,17 @@
 import "./index.css";
 import "./app";
 
+async function initializeSystemTheme(): Promise<void> {
+  try {
+    const accentColor = await window.systemAPI.getAccentColor();
+    document.documentElement.style.setProperty("--mac-accent", accentColor);
+  } catch (error) {
+    console.error("Failed to load the system accent color:", error);
+  }
+}
+
+void initializeSystemTheme();
+
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
 );
