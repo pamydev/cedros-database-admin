@@ -4,8 +4,18 @@ export interface systemApi {
   getAccentColor: () => Promise<string>;
 }
 
+export interface ICreateNewProjectArgs {
+  name: string;
+  description: string;
+  file: {
+    name: string;
+    type: string;
+    data: ArrayBuffer;
+  } | null;
+}
+
 export interface database {
-  createNewProject: (args: { name: string }) => Promise<boolean>;
+  createNewProject: (args: ICreateNewProjectArgs) => Promise<boolean>;
 }
 
 declare global {

@@ -1112,6 +1112,9 @@ var AboutScreen = class extends Screen {
 // source-code/screens/new-project/new-project.ts
 var NewProjectScreen = class extends Screen {
   output;
+  name;
+  description;
+  file;
   render() {
     this.output = this.buildScreen({
       output: "screen",
@@ -1124,24 +1127,24 @@ var NewProjectScreen = class extends Screen {
     const panel = new $div({
       class: "PANEL"
     }).create(this.output).ids.div;
-    new $inputForm({
+    this.name = new $inputForm({
       label: "Project Name",
       description: "A project is a container for your database configurations and settings, saved queries, and other related resources.",
       type: "text",
       placeholder: "Enter project name",
       required: true
-    }).create(panel);
-    new $textareaForm({
+    }).create(panel).ids.input;
+    this.description = new $textareaForm({
       label: "Project Description",
       placeholder: "Enter project description",
       description: "Provide a brief description of the project, its purpose, and any other relevant information.",
       required: false
-    }).create(panel);
-    new $fileForm({
+    }).create(panel).ids.textarea;
+    this.file = new $fileForm({
       label: "Project File",
       description: "Upload a project file to import existing configurations and settings.",
       required: false
-    }).create(panel);
+    }).create(panel).ids.file;
     const divRight = new $div({
       class: "DIV-RIGHT"
     }).create(panel).ids.div;
@@ -1153,10 +1156,19 @@ var NewProjectScreen = class extends Screen {
     }).create(divRight);
   }
   async send() {
-    window.database.createNewProject({
-      name: "Test Project"
-    }).then((result) => {
-      alert("Project created successfully!");
+    const name = document.getElementById(this.name).value;
+    const description = document.getElementById(this.description).value;
+    const fileInput = document.getElementById(this.file);
+    const selectedFile = fileInput.files ? fileInput.files[0] : null;
+    const file = selectedFile ? {
+      name: selectedFile.name,
+      type: selectedFile.type,
+      data: await selectedFile.arrayBuffer()
+    } : null;
+    let res = await window.database.createNewProject({
+      name,
+      description,
+      file
     });
   }
 };

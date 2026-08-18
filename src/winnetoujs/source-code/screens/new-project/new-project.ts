@@ -14,6 +14,9 @@ import { manualMenuEffect } from "../../left-menu/left-menu";
 
 export class NewProjectScreen extends Screen {
   private output: string;
+  private name: string;
+  private description: string;
+  private file: string;
   render() {
     this.output = this.buildScreen({
       output: "screen",
@@ -27,29 +30,29 @@ export class NewProjectScreen extends Screen {
       class: "PANEL",
     }).create(this.output).ids.div;
 
-    new $inputForm({
+    this.name = new $inputForm({
       label: "Project Name",
       description:
         "A project is a container for your database configurations and settings, saved queries, and other related resources.",
       type: "text",
       placeholder: "Enter project name",
       required: true,
-    }).create(panel);
+    }).create(panel).ids.input;
 
-    new $textareaForm({
+    this.description = new $textareaForm({
       label: "Project Description",
       placeholder: "Enter project description",
       description:
         "Provide a brief description of the project, its purpose, and any other relevant information.",
       required: false,
-    }).create(panel);
+    }).create(panel).ids.textarea;
 
-    new $fileForm({
+    this.file = new $fileForm({
       label: "Project File",
       description:
         "Upload a project file to import existing configurations and settings.",
       required: false,
-    }).create(panel);
+    }).create(panel).ids.file;
 
     const divRight = new $div({
       class: "DIV-RIGHT",
@@ -64,12 +67,24 @@ export class NewProjectScreen extends Screen {
   }
 
   private async send(): Promise<void> {
-    window.database
-      .createNewProject({
-        name: "Test Project",
-      })
-      .then((result) => {
-        alert("Project created successfully!");
-      });
+    const name = (document.getElementById(this.name) as HTMLInputElement).value;
+    const description = (
+      document.getElementById(this.description) as HTMLTextAreaElement
+    ).value;
+    const fileInput = document.getElementById(this.file) as HTMLInputElement;
+    const selectedFile = fileInput.files ? fileInput.files[0] : null;
+    const file = selectedFile
+      ? {
+          name: selectedFile.name,
+          type: selectedFile.type,
+          data: await selectedFile.arrayBuffer(),
+        }
+      : null;
+
+    let res = await window.database.createNewProject({
+      name,
+      description,
+      file,
+    });
   }
 }
