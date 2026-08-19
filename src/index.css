@@ -170,6 +170,41 @@
   gap: 10px;
 }
 
+.LIST-ITEM {
+  width: 100%;
+  padding: 10px;
+  background: var(--mac-window-bg);
+  border-bottom: 1px solid var(--mac-separator-soft);
+  color: var(--mac-text);
+  font-family: var(--mac-font);
+  font-size: var(--font-size-small);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.LIST-ITEM:last-child {
+  border-bottom: none;
+}
+.LIST-ITEM .LIST-ITEM-LEFT {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.LIST-ITEM .LIST-ITEM-RIGHT {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+.LIST-ITEM .LIST-ITEM-TITLE {
+  font-weight: 600;
+  font-size: var(--font-size);
+}
+.LIST-ITEM .LIST-ITEM-DESCRIPTION {
+  font-size: var(--font-size-small);
+  color: var(--mac-secondary-text);
+}
+
 button {
   font-family: var(--mac-font);
   font-size: var(--font-size);
@@ -197,6 +232,7 @@ button.primary svg {
 button.secondary {
   background: var(--mac-window-bg);
   color: var(--mac-text);
+  border: 1px solid var(--mac-separator-soft);
 }
 button.secondary svg {
   width: 12px !important;
@@ -266,6 +302,13 @@ form textarea {
   color: var(--mac-text);
   font-family: var(--mac-font);
   font-size: var(--font-size);
+}
+
+.background-image {
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  border: 1px solid var(--mac-separator-soft);
 }
 
 :root {

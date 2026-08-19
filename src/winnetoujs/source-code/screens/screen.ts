@@ -10,8 +10,8 @@ export class Screen {
     output: string;
     title: string;
     identifier: string;
-  }) {
-    if (this.exists(args0.identifier)) return;
+  }): string {
+    if (this.exists(args0.identifier)) return "exists";
 
     const output = new $div(
       {

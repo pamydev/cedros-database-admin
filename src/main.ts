@@ -5,6 +5,7 @@ import { setApplicationMenu } from "./mac-menu";
 import { ipcChannels } from "./ipc.channels";
 import { database } from "../types/ipc";
 import { databaseIPCApi } from "./database/database";
+import { registerProtocols } from "./protocols/protocols";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -31,8 +32,8 @@ databaseIPCApi();
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 600,
+    width: 1900,
+    height: 1000,
 
     titleBarStyle: "hiddenInset",
     trafficLightPosition: {
@@ -62,7 +63,7 @@ const createWindow = () => {
   }
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -85,6 +86,10 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+app.whenReady().then(() => {
+  registerProtocols();
 });
 
 // In this file you can include the rest of your app's specific main process

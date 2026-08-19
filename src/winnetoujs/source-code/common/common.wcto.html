@@ -85,3 +85,16 @@
       style="display: none" />
   </form>
 </winnetou>
+
+<winnetou d="background image">
+  <div
+    id="[[backgroundImage]]"
+    class="background-image"
+    style="background-image: url('{{imageUrl?}}'); {{style?}}">
+    {{content?}}
+  </div>
+</winnetou>
+
+<winnetou d="image">
+  <img id="[[image]]" src="{{src?}}" alt="{{alt?}}" style="{{style?}}" />
+</winnetou>

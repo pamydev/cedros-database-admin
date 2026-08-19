@@ -10,6 +10,7 @@ const systemAPI: systemApi = {
 const database: database = {
   createNewProject: (args): Promise<boolean> =>
     ipcRenderer.invoke(ipcChannels.create_new_project, args),
+  loadProjects: () => ipcRenderer.invoke(ipcChannels.load_projects),
 };
 
 contextBridge.exposeInMainWorld("systemAPI", systemAPI);

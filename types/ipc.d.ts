@@ -1,3 +1,5 @@
+import { IProjects } from "./mongify";
+
 export {};
 
 export interface systemApi {
@@ -16,6 +18,7 @@ export interface ICreateNewProjectArgs {
 
 export interface database {
   createNewProject: (args: ICreateNewProjectArgs) => Promise<boolean>;
+  loadProjects: () => Promise<IProjects[]>;
 }
 
 declare global {

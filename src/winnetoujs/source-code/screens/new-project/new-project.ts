@@ -12,17 +12,21 @@ import { W } from "winnetoujs";
 import { appRouter } from "../../router/router";
 import { manualMenuEffect } from "../../left-menu/left-menu";
 
-export class NewProjectScreen extends Screen {
+class NewProjectScreen extends Screen {
   private output: string;
   private name: string;
   private description: string;
   private file: string;
   render() {
-    this.output = this.buildScreen({
+    const output = this.buildScreen({
       output: "screen",
       title: "New Project",
       identifier: "new-project",
     });
+
+    if (output === "exists") return;
+    this.output = output;
+
     this.createForm();
   }
   private createForm(): void {
@@ -86,5 +90,13 @@ export class NewProjectScreen extends Screen {
       description,
       file,
     });
+
+    if (res) {
+      alert("Project saved");
+    }
+
+    appRouter.methods.selectProject.go("reload");
   }
 }
+
+export const newProjectScreen = new NewProjectScreen();

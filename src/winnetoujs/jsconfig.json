@@ -9,7 +9,8 @@
       "@libs/*": ["./libs/*"],
       "@strings": ["./src/strings"],
       "@icons": ["./source-code/helpers/icons.helper.ts"],
-      "@common": ["./source-code/common/common.wcto"]
+      "@common": ["./source-code/common/common.wcto"],
+      "@screens/*": ["./source-code/screens/*"]
     }
   },
   "exclude": ["node_modules", "**/node_modules/*"],

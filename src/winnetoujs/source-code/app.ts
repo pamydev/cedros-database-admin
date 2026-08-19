@@ -6,5 +6,5 @@ window.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("menuItem-win-new-project")
     ?.classList.add("is-active");
-  appRouter.methods.addProject.go();
+  appRouter.methods.selectProject.go();
 });

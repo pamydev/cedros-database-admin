@@ -441,3 +441,127 @@ export class $fileForm extends Constructos {
   return this.component;
  }
 }
+export class $backgroundImage extends Constructos {
+ // ========================================
+ /**
+  * 
+  * @param {object} [elements]
+  * @param {any} [elements.imageUrl]  
+  * @param {any} [elements.style]  
+  * @param {any} [elements.content]  
+  * @param {object} [options]
+  * @param {string} [options.identifier]
+  */
+ constructor (elements, options) {
+  super();
+  /**@protected */
+  this.identifier = this._getIdentifier(options ?
+   options.identifier || "notSet" : "notSet");
+  const digestedPropsToString = this
+   ._mutableToString(elements);
+  /**@protected */
+  this.component = this.code(
+   digestedPropsToString);
+  this._saveUsingMutable(
+   `backgroundImage-win-${this.identifier}`,
+   elements, options, $backgroundImage);
+ }
+ /**
+  * Generate the HTML code for this constructo
+  * @param {*} props - The properties object containing all prop values
+  * @returns {string} The HTML template string with interpolated values
+  * @protected
+  */
+ code (props) {
+  return `
+  <div     id="backgroundImage-win-${this.identifier}"
+    class="background-image"
+    style="background-image: url('${props?.imageUrl || ""}'); ${props?.style || ""}">
+    ${props?.content || ""}
+  </div>
+`;
+ }
+ /**
+  * Create Winnetou Constructo
+  * @param  {string} output The string id where constructo will be placed. It is a query selector type
+  * @param  {object} [options] Options to control how the construct is inserted. Optional.
+  * @param  {boolean} [options.clear] Clean the node before inserting the construct
+  * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+  */
+ create (output, options) {
+  this.attachToDOM(this.component, output,
+   options);
+  return {
+   ids: {
+    backgroundImage: `backgroundImage-win-${this.identifier}`,
+   },
+  };
+ }
+ /**
+  * Get the constructo as a string
+  * @returns {string} The component HTML string
+  */
+ constructoString () {
+  return this.component;
+ }
+}
+export class $image extends Constructos {
+ // ========================================
+ /**
+  * 
+  * @param {object} [elements]
+  * @param {any} [elements.src]  
+  * @param {any} [elements.alt]  
+  * @param {any} [elements.style]  
+  * @param {object} [options]
+  * @param {string} [options.identifier]
+  */
+ constructor (elements, options) {
+  super();
+  /**@protected */
+  this.identifier = this._getIdentifier(options ?
+   options.identifier || "notSet" : "notSet");
+  const digestedPropsToString = this
+   ._mutableToString(elements);
+  /**@protected */
+  this.component = this.code(
+   digestedPropsToString);
+  this._saveUsingMutable(
+   `image-win-${this.identifier}`, elements,
+   options, $image);
+ }
+ /**
+  * Generate the HTML code for this constructo
+  * @param {*} props - The properties object containing all prop values
+  * @returns {string} The HTML template string with interpolated values
+  * @protected
+  */
+ code (props) {
+  return `
+  <img id="image-win-${this.identifier}" src="${props?.src || ""}" alt="${props?.alt || ""}" style="${props?.style || ""}" >
+`;
+ }
+ /**
+  * Create Winnetou Constructo
+  * @param  {string} output The string id where constructo will be placed. It is a query selector type
+  * @param  {object} [options] Options to control how the construct is inserted. Optional.
+  * @param  {boolean} [options.clear] Clean the node before inserting the construct
+  * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+  */
+ create (output, options) {
+  this.attachToDOM(this.component, output,
+   options);
+  return {
+   ids: {
+    image: `image-win-${this.identifier}`,
+   },
+  };
+ }
+ /**
+  * Get the constructo as a string
+  * @returns {string} The component HTML string
+  */
+ constructoString () {
+  return this.component;
+ }
+}

@@ -1,9 +1,9 @@
 // router.ts
 import { Router } from "winnetoujs/modules/router";
-import { SelectProjectScreen } from "../screens/select-project/select-project";
-import { AboutScreen } from "../screens/about/about";
 import { manualMenuEffect } from "../left-menu/left-menu";
-import { NewProjectScreen } from "../screens/new-project/new-project";
+import { selectProjectScreen } from "@screens/select-project/select-project";
+import { newProjectScreen } from "@screens/new-project/new-project";
+import { aboutScreen } from "@screens/about/about";
 
 class MyRouter {
   constructor() {
@@ -25,18 +25,22 @@ class MyRouter {
         this.routes["/add-project"] = () => {
           this.hideScreens();
           manualMenuEffect("add-project");
-          new NewProjectScreen().render();
+          newProjectScreen.render();
         };
       },
     },
 
     selectProject: {
-      go: () => Router.navigate("/select-project"),
+      go: (reload?: "reload") =>
+        Router.navigate(`/select-project/${reload || "null"}`),
       set: () => {
-        this.routes["/select-project"] = () => {
+        this.routes["/select-project/:reload"] = (reload: "reload") => {
           this.hideScreens();
           manualMenuEffect("select-project");
-          new SelectProjectScreen().render();
+          if (reload === "reload") {
+            selectProjectScreen.loadProjects("reload");
+          }
+          selectProjectScreen.render();
         };
       },
     },
@@ -47,7 +51,7 @@ class MyRouter {
         this.routes["/about"] = () => {
           this.hideScreens();
           manualMenuEffect("about");
-          new AboutScreen().render();
+          aboutScreen.render();
         };
       },
     },

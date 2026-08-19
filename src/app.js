@@ -376,6 +376,75 @@ var $buttonPrimary = class _$buttonPrimary extends Constructos {
     return this.component;
   }
 };
+var $buttonSecondary = class _$buttonSecondary extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.onclick]  
+   * @param {any} [elements.style]  
+   * @param {any} [elements.icon]  
+   * @param {any} [elements.content]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `buttonSecondary-win-${this.identifier}`,
+      elements,
+      options,
+      _$buttonSecondary
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <button     id="buttonSecondary-win-${this.identifier}"
+    class="secondary"
+    onclick="${(props == null ? void 0 : props.onclick) || ""}"
+    style="${(props == null ? void 0 : props.style) || ""}">
+    ${(props == null ? void 0 : props.icon) || ""} ${(props == null ? void 0 : props.content) || ""}
+  </button>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        buttonSecondary: `buttonSecondary-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
 var $inputForm = class _$inputForm extends Constructos {
   // ========================================
   /**
@@ -616,6 +685,73 @@ var $fileForm = class _$fileForm extends Constructos {
         file: `file-win-${this.identifier}`,
         file: `file-win-${this.identifier}`,
         resourceName: `resourceName-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $backgroundImage = class _$backgroundImage extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.imageUrl]  
+   * @param {any} [elements.style]  
+   * @param {any} [elements.content]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `backgroundImage-win-${this.identifier}`,
+      elements,
+      options,
+      _$backgroundImage
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <div     id="backgroundImage-win-${this.identifier}"
+    class="background-image"
+    style="background-image: url('${(props == null ? void 0 : props.imageUrl) || ""}'); ${(props == null ? void 0 : props.style) || ""}">
+    ${(props == null ? void 0 : props.content) || ""}
+  </div>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        backgroundImage: `backgroundImage-win-${this.identifier}`
       }
     };
   }
@@ -1004,7 +1140,7 @@ var Screen = class {
     throw new Error("Method not implemented.");
   }
   buildScreen(args0) {
-    if (this.exists(args0.identifier)) return;
+    if (this.exists(args0.identifier)) return "exists";
     const output = new $div(
       {
         class: "screen"
@@ -1071,12 +1207,62 @@ var Screen = class {
 var SelectProjectScreen = class extends Screen {
   output;
   render() {
-    this.output = this.buildScreen({
+    const output = this.buildScreen({
       output: "screen",
       title: "Select Project",
       identifier: "select-project"
     });
-    this.emptyProjects();
+    if (output === "exists") return;
+    this.output = output;
+    this.loadProjects();
+  }
+  async loadProjects(reload) {
+    if (reload === "reload") {
+      const el = document.getElementById(this.output);
+      if (el) {
+        el.innerHTML = "";
+      }
+    }
+    const projects = await window.database.loadProjects();
+    const output = new $div({
+      class: "PANEL"
+    }).create(this.output).ids.div;
+    console.log(`printed output in ${this.output}`);
+    projects.forEach((project) => this.printProject(project, output));
+  }
+  printProject(project, output) {
+    console.log("Project:", project);
+    const projectDiv = new $div({
+      class: "LIST-ITEM"
+    }).create(output).ids.div;
+    const leftDiv = new $div({
+      class: "LIST-ITEM-LEFT"
+    }).create(projectDiv).ids.div;
+    const rightDiv = new $div({
+      class: "LIST-ITEM-RIGHT"
+    }).create(projectDiv).ids.div;
+    const uriProjectName = encodeURIComponent(project.name);
+    if (project.image)
+      new $backgroundImage({
+        imageUrl: `images://${uriProjectName}/${project.image}`,
+        style: "width: 50px; height: 50px;"
+      }).create(leftDiv);
+    const textDiv = new $div({}).create(leftDiv).ids.div;
+    new $div({
+      content: project.name,
+      class: "LIST-ITEM-TITLE"
+    }).create(textDiv);
+    new $div({
+      content: project.description,
+      class: "LIST-ITEM-DESCRIPTION"
+    }).create(textDiv);
+    new $buttonSecondary({
+      content: " Select",
+      onclick: W.fx(() => {
+        manualMenuEffect("select-project");
+        appRouter.methods.selectProject.go();
+      })
+    }).create(rightDiv);
   }
   emptyProjects() {
     const panel = new $div({
@@ -1093,21 +1279,7 @@ var SelectProjectScreen = class extends Screen {
     }).create(panel);
   }
 };
-
-// source-code/screens/about/about.ts
-var AboutScreen = class extends Screen {
-  render() {
-    const content = this.buildScreen({
-      output: "screen",
-      title: "About",
-      identifier: "about"
-    });
-    new $div({
-      class: "about-screen",
-      content: "About Screen Content"
-    }).create(content);
-  }
-};
+var selectProjectScreen = new SelectProjectScreen();
 
 // source-code/screens/new-project/new-project.ts
 var NewProjectScreen = class extends Screen {
@@ -1116,11 +1288,13 @@ var NewProjectScreen = class extends Screen {
   description;
   file;
   render() {
-    this.output = this.buildScreen({
+    const output = this.buildScreen({
       output: "screen",
       title: "New Project",
       identifier: "new-project"
     });
+    if (output === "exists") return;
+    this.output = output;
     this.createForm();
   }
   createForm() {
@@ -1170,8 +1344,32 @@ var NewProjectScreen = class extends Screen {
       description,
       file
     });
+    if (res) {
+      alert("Project saved");
+    }
+    appRouter.methods.selectProject.go("reload");
   }
 };
+var newProjectScreen = new NewProjectScreen();
+
+// source-code/screens/about/about.ts
+var AboutScreen = class extends Screen {
+  output;
+  render() {
+    const content = this.buildScreen({
+      output: "screen",
+      title: "About",
+      identifier: "about"
+    });
+    if (content === "exists") return;
+    this.output = content;
+    new $div({
+      class: "about-screen",
+      content: "About Screen Content"
+    }).create(content);
+  }
+};
+var aboutScreen = new AboutScreen();
 
 // source-code/router/router.ts
 var MyRouter = class {
@@ -1192,17 +1390,20 @@ var MyRouter = class {
         this.routes["/add-project"] = () => {
           this.hideScreens();
           manualMenuEffect("add-project");
-          new NewProjectScreen().render();
+          newProjectScreen.render();
         };
       }
     },
     selectProject: {
-      go: () => Router.navigate("/select-project"),
+      go: (reload) => Router.navigate(`/select-project/${reload || "null"}`),
       set: () => {
-        this.routes["/select-project"] = () => {
+        this.routes["/select-project/:reload"] = (reload) => {
           this.hideScreens();
           manualMenuEffect("select-project");
-          new SelectProjectScreen().render();
+          if (reload === "reload") {
+            selectProjectScreen.loadProjects("reload");
+          }
+          selectProjectScreen.render();
         };
       }
     },
@@ -1212,7 +1413,7 @@ var MyRouter = class {
         this.routes["/about"] = () => {
           this.hideScreens();
           manualMenuEffect("about");
-          new AboutScreen().render();
+          aboutScreen.render();
         };
       }
     }
@@ -1302,7 +1503,7 @@ window.addEventListener("DOMContentLoaded", () => {
   var _a;
   new LeftMenu().render();
   (_a = document.getElementById("menuItem-win-new-project")) == null ? void 0 : _a.classList.add("is-active");
-  appRouter.methods.addProject.go();
+  appRouter.methods.selectProject.go();
 });
 /*! Bundled license information:
 
