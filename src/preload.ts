@@ -15,6 +15,8 @@ const database: database = {
     ipcRenderer.invoke(ipcChannels.get_project_by_id, projectId),
   saveMongoConnection: (args0) =>
     ipcRenderer.invoke(ipcChannels.save_mongo_connection, args0),
+  saveMongifyConnection: (args) =>
+    ipcRenderer.invoke(ipcChannels.save_mongify_connection, args),
 };
 
 contextBridge.exposeInMainWorld("systemAPI", systemAPI);

@@ -4,6 +4,7 @@ import {
   database,
   ICreateNewProjectArgs,
   ISaveMongoConnection,
+  ISaveMongifyConnection,
 } from "../../types/ipc";
 import { Mongify } from "@cedrosdev/mongify";
 import fs from "fs";
@@ -91,6 +92,24 @@ export const databaseIPCApi = () => {
       const res = await db
         .getCollection<ISaveMongoConnection>("mongo_connections")
         .insert(doc);
+      return true;
+    },
+  );
+
+  ipcMain.handle(
+    ipcChannels.save_mongify_connection,
+    async (event, args: ISaveMongifyConnection) => {
+      if (!args.projectId || !args.databasePath.trim()) {
+        throw new Error("Project ID and database path are required");
+      }
+
+      await db
+        .getCollection<ISaveMongifyConnection>("mongify_connections")
+        .insert({
+          projectId: args.projectId,
+          databasePath: args.databasePath.trim(),
+        });
+
       return true;
     },
   );

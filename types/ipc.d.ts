@@ -26,11 +26,18 @@ export interface ISaveMongoConnection {
   projectId: string;
 }
 
+export interface ISaveMongifyConnection {
+  _id?: any;
+  databasePath: string;
+  projectId: string;
+}
+
 export interface database {
   createNewProject: (args: ICreateNewProjectArgs) => Promise<boolean>;
   loadProjects: () => Promise<IProjects[]>;
   getProjectById: (projectId: string) => Promise<IProjects | null>;
   saveMongoConnection: (args0: ISaveMongoConnection) => Promise<boolean>;
+  saveMongifyConnection: (args: ISaveMongifyConnection) => Promise<boolean>;
 }
 
 declare global {

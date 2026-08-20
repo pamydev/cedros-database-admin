@@ -1614,16 +1614,32 @@ var MongifyConnectionScreen = class extends Screen {
     });
     if (content === "exists") return;
     const panel = new $div({ class: "PANEL" }).create(content).ids.div;
-    new $inputForm({
+    const databasePath = new $inputForm({
       label: "Database path",
       type: "text",
       placeholder: "/path/to/database",
       required: true
-    }).create(panel);
+    }).create(panel).ids.input;
     const actions = new $div({ class: "DIV-RIGHT" }).create(panel).ids.div;
     new $buttonPrimary({
       content: "Save Connection",
-      icon: createIcon(Check)
+      icon: createIcon(Check),
+      onclick: W.fx(async () => {
+        const input = document.getElementById(databasePath);
+        if (!input.value.trim()) {
+          alert("Database path is required.");
+          return;
+        }
+        try {
+          await window.database.saveMongifyConnection({
+            projectId: _id,
+            databasePath: input.value
+          });
+          alert("Connection saved");
+        } catch {
+          alert("Could not save connection.");
+        }
+      })
     }).create(actions);
   }
 };
