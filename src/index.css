@@ -71,8 +71,8 @@
   align-items: center;
   padding: 3px;
   border-radius: 8px;
-  background: linear-gradient(180deg, var(--mac-text) 0%, var(--mac-accent) 16%, var(--mac-window-bg) 180%);
-  box-shadow: 0px 0px 1px 1px color-mix(in srgb, transparent 80%, var(--mac-window-bg));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--mac-text) 80%, transparent) 0%, var(--mac-accent) 16%, color-mix(in srgb, var(--mac-window-bg) 40%, transparent) 180%);
+  box-shadow: 0px 0px 1px 1px color-mix(in srgb, transparent 50%, var(--mac-window-bg));
 }
 .__icon__ svg {
   stroke-width: 3px;
