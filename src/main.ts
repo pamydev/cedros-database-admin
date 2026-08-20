@@ -32,7 +32,7 @@ databaseIPCApi();
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 1400,
+    width: 800,
     height: 800,
 
     titleBarStyle: "hiddenInset",

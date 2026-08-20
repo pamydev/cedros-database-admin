@@ -16,10 +16,21 @@ export interface ICreateNewProjectArgs {
   } | null;
 }
 
+export interface ISaveMongoConnection {
+  _id?: any;
+  uri: string;
+  name: string;
+  userName: string;
+  password: string;
+  database: string;
+  projectId: string;
+}
+
 export interface database {
   createNewProject: (args: ICreateNewProjectArgs) => Promise<boolean>;
   loadProjects: () => Promise<IProjects[]>;
   getProjectById: (projectId: string) => Promise<IProjects | null>;
+  saveMongoConnection: (args0: ISaveMongoConnection) => Promise<boolean>;
 }
 
 declare global {

@@ -1,6 +1,10 @@
-import { ipcMain } from "electron";
+import { ipcMain, safeStorage } from "electron";
 import { ipcChannels } from "../ipc.channels";
-import { database, ICreateNewProjectArgs } from "../../types/ipc";
+import {
+  database,
+  ICreateNewProjectArgs,
+  ISaveMongoConnection,
+} from "../../types/ipc";
 import { Mongify } from "@cedrosdev/mongify";
 import fs from "fs";
 import path from "path";
@@ -43,11 +47,13 @@ export const databaseIPCApi = () => {
     },
   );
 
+  // ipcChannels.load_projects
   ipcMain.handle(ipcChannels.load_projects, async () => {
     const projects = await db.getCollection<IProjects>("projects").find();
     return projects;
   });
 
+  // ipcChannels.get_project_by_id
   ipcMain.handle(
     ipcChannels.get_project_by_id,
     async (event, projectId: string) => {
@@ -55,6 +61,37 @@ export const databaseIPCApi = () => {
         .getCollection<IProjects>("projects")
         .findOne({ _id: projectId });
       return project;
+    },
+  );
+
+  ipcMain.handle(
+    ipcChannels.save_mongo_connection,
+    async (event, args0: ISaveMongoConnection) => {
+      await (!safeStorage.isEncryptionAvailable()
+        ? Promise.reject(
+            new Error("Encryption is not available on this system"),
+          )
+        : Promise.resolve());
+
+      const encryptedPassword = safeStorage
+        .encryptString(args0.password)
+        .toString("base64");
+
+      const doc: ISaveMongoConnection = {
+        projectId: args0.projectId,
+        database: args0.database,
+        name: args0.name,
+        password: encryptedPassword,
+        uri: args0.uri,
+        userName: args0.userName,
+      };
+
+      console.table(doc);
+
+      const res = await db
+        .getCollection<ISaveMongoConnection>("mongo_connections")
+        .insert(doc);
+      return true;
     },
   );
 };

@@ -13,6 +13,8 @@ const database: database = {
   loadProjects: () => ipcRenderer.invoke(ipcChannels.load_projects),
   getProjectById: (projectId: string) =>
     ipcRenderer.invoke(ipcChannels.get_project_by_id, projectId),
+  saveMongoConnection: (args0) =>
+    ipcRenderer.invoke(ipcChannels.save_mongo_connection, args0),
 };
 
 contextBridge.exposeInMainWorld("systemAPI", systemAPI);

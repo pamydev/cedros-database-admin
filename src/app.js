@@ -1282,7 +1282,7 @@ var listItem = (args0) => {
   if (args0.icon) {
     new $div({
       class: "ICON",
-      content: createIcon(args0.icon, false)
+      content: createIcon(args0.icon)
     }).create(leftDiv);
   } else if (args0.imageURL) {
     new $backgroundImage({
@@ -1514,6 +1514,11 @@ var addConnectionScreen = new AddConnectionScreen();
 
 // source-code/project/addConnection/mongoConnectionScreen.ts
 var MongoConnectionScreen = class extends Screen {
+  connection_name;
+  connection_uri;
+  connection_userName;
+  connection_password;
+  connection_database;
   async render(_id) {
     const project = await window.database.getProjectById(_id);
     const content = this.buildScreen({
@@ -1524,42 +1529,75 @@ var MongoConnectionScreen = class extends Screen {
     });
     if (content === "exists") return;
     const panel = new $div({ class: "PANEL" }).create(content).ids.div;
-    new $inputForm({
+    this.connection_name = new $inputForm({
       label: "Connection Name",
       type: "text",
       placeholder: "Local MongoDB",
       required: true
-    }).create(panel);
-    new $inputForm({
+    }).create(panel).ids.input;
+    this.connection_uri = new $inputForm({
       label: "MongoDB URI",
       description: "Example: mongodb://localhost:27017",
       type: "text",
       placeholder: "mongodb://localhost:27017",
       required: true
-    }).create(panel);
-    new $inputForm({
+    }).create(panel).ids.input;
+    this.connection_userName = new $inputForm({
       label: "Username",
       type: "text",
       placeholder: "Optional",
       required: false
-    }).create(panel);
-    new $inputForm({
+    }).create(panel).ids.input;
+    this.connection_password = new $inputForm({
       label: "Password",
       type: "password",
       placeholder: "Optional",
       required: false
-    }).create(panel);
-    new $inputForm({
+    }).create(panel).ids.input;
+    this.connection_database = new $inputForm({
       label: "Database",
       type: "text",
       placeholder: "Database name",
       required: true
-    }).create(panel);
+    }).create(panel).ids.input;
     const actions = new $div({ class: "DIV-RIGHT" }).create(panel).ids.div;
     new $buttonPrimary({
       content: "Save Connection",
-      icon: createIcon(Check)
+      icon: createIcon(Check),
+      onclick: W.fx(() => {
+        this.send(_id);
+      })
     }).create(actions);
+  }
+  send(projectId) {
+    const name = document.getElementById(
+      this.connection_name
+    );
+    const uri = document.getElementById(
+      this.connection_uri
+    );
+    const userName = document.getElementById(
+      this.connection_userName
+    );
+    const password = document.getElementById(
+      this.connection_password
+    );
+    const database = document.getElementById(
+      this.connection_database
+    );
+    if (!database.value || !name.value || !password.value || !uri.value || !userName.value) {
+      alert("All fields must be filled.");
+      return;
+    }
+    window.database.saveMongoConnection({
+      uri: uri.value,
+      name: name.value,
+      userName: userName.value,
+      password: password.value,
+      database: database.value,
+      projectId
+    });
+    alert("Connection saved");
   }
 };
 var mongoConnectionScreen = new MongoConnectionScreen();

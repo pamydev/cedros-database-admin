@@ -25,7 +25,7 @@ export const listItem = (args0: IListItem) => {
   if (args0.icon) {
     new $div({
       class: "ICON",
-      content: createIcon(args0.icon, false),
+      content: createIcon(args0.icon),
     }).create(leftDiv);
   } else if (args0.imageURL) {
     new $backgroundImage({
