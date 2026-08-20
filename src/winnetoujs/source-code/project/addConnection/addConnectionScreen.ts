@@ -35,13 +35,17 @@ class AddConnectionScreen extends Screen {
 
     listItem({
       label: "Redis",
-      onclick: "",
+      onclick: W.fx(() => {
+        appRouter.methods.add_redis_connection.go(_id);
+      }),
       output: this.output,
     });
 
     listItem({
       label: "Cedros Mongify",
-      onclick: "",
+      onclick: W.fx(() => {
+        appRouter.methods.add_mongify_connection.go(_id);
+      }),
       output: this.output,
     });
   }

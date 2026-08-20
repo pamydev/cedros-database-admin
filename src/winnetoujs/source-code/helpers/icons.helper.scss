@@ -6,11 +6,12 @@
   border-radius: 8px;
   background: linear-gradient(
     180deg,
-    var(--mac-text) -30%,
-    var(--mac-accent) 50%
+    var(--mac-text) 0%,
+    var(--mac-accent) 16%,
+    var(--mac-window-bg) 180%
   );
   box-shadow: 0px 0px 1px 1px
-    color-mix(in srgb, var(--mac-accent) 60%, var(--mac-window-bg));
+    color-mix(in srgb, transparent 80%, var(--mac-window-bg));
 
   svg {
     stroke-width: 3px;

@@ -1487,12 +1487,16 @@ var AddConnectionScreen = class extends Screen {
     });
     listItem({
       label: "Redis",
-      onclick: "",
+      onclick: W.fx(() => {
+        appRouter.methods.add_redis_connection.go(_id);
+      }),
       output: this.output
     });
     listItem({
       label: "Cedros Mongify",
-      onclick: "",
+      onclick: W.fx(() => {
+        appRouter.methods.add_mongify_connection.go(_id);
+      }),
       output: this.output
     });
   }
@@ -1550,6 +1554,98 @@ var MongoConnectionScreen = class extends Screen {
   }
 };
 var mongoConnectionScreen = new MongoConnectionScreen();
+
+// source-code/project/addConnection/mongifyConnectionScreen.ts
+var MongifyConnectionScreen = class extends Screen {
+  async render(_id) {
+    const project = await window.database.getProjectById(_id);
+    const content = this.buildScreen({
+      output: "screen",
+      title: "Add Cedros Mongify Connection",
+      identifier: "mongify-connection",
+      titleImg: (project == null ? void 0 : project.image) ? `images://${encodeURIComponent(project.name)}/${project.image}` : null
+    });
+    if (content === "exists") return;
+    const panel = new $div({ class: "PANEL" }).create(content).ids.div;
+    new $inputForm({
+      label: "Database path",
+      type: "text",
+      placeholder: "/path/to/database",
+      required: true
+    }).create(panel);
+    const actions = new $div({ class: "DIV-RIGHT" }).create(panel).ids.div;
+    new $buttonPrimary({
+      content: "Save Connection",
+      icon: createIcon(Check)
+    }).create(actions);
+  }
+};
+var mongifyConnectionScreen = new MongifyConnectionScreen();
+
+// source-code/project/addConnection/redisConnectionScreen.ts
+var RedisConnectionScreen = class extends Screen {
+  async render(_id) {
+    const project = await window.database.getProjectById(_id);
+    const content = this.buildScreen({
+      output: "screen",
+      title: "Add Redis Connection",
+      identifier: "redis-connection",
+      titleImg: (project == null ? void 0 : project.image) ? `images://${encodeURIComponent(project.name)}/${project.image}` : null
+    });
+    if (content === "exists") return;
+    const panel = new $div({ class: "PANEL" }).create(content).ids.div;
+    new $inputForm({
+      label: "Connection Name",
+      type: "text",
+      placeholder: "Local Redis",
+      required: true
+    }).create(panel);
+    new $inputForm({
+      label: "Redis URI",
+      description: "Example: redis://localhost:6379",
+      type: "text",
+      placeholder: "redis://localhost:6379",
+      required: true
+    }).create(panel);
+    new $inputForm({
+      label: "Host",
+      type: "text",
+      placeholder: "localhost",
+      required: true
+    }).create(panel);
+    new $inputForm({
+      label: "Port",
+      type: "number",
+      placeholder: "6379",
+      required: true
+    }).create(panel);
+    new $inputForm({
+      label: "Username",
+      type: "text",
+      placeholder: "Optional",
+      required: false
+    }).create(panel);
+    new $inputForm({
+      label: "Password",
+      type: "password",
+      placeholder: "Optional",
+      required: false
+    }).create(panel);
+    new $inputForm({
+      label: "Database",
+      description: "Redis database index, usually 0",
+      type: "number",
+      placeholder: "0",
+      required: true
+    }).create(panel);
+    const actions = new $div({ class: "DIV-RIGHT" }).create(panel).ids.div;
+    new $buttonPrimary({
+      content: "Save Connection",
+      icon: createIcon(Check)
+    }).create(actions);
+  }
+};
+var redisConnectionScreen = new RedisConnectionScreen();
 
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
@@ -1613,6 +1709,28 @@ var projectRouter = (routes = {}) => {
         routes["/screen/add-mongo-connection/:_id"] = (_id) => {
           hideScreens();
           mongoConnectionScreen.render(_id);
+        };
+      }
+    },
+    add_redis_connection: {
+      go(_id) {
+        Router.navigate(`/screen/add-redis-connection/${_id}`);
+      },
+      set() {
+        routes["/screen/add-redis-connection/:_id"] = (_id) => {
+          hideScreens();
+          redisConnectionScreen.render(_id);
+        };
+      }
+    },
+    add_mongify_connection: {
+      go(_id) {
+        Router.navigate(`/screen/add-mongify-connection/${_id}`);
+      },
+      set() {
+        routes["/screen/add-mongify-connection/:_id"] = (_id) => {
+          hideScreens();
+          mongifyConnectionScreen.render(_id);
         };
       }
     }
