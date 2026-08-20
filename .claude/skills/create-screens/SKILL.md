@@ -32,6 +32,7 @@ Do not ask for or invent implementation details unless the user requests them. T
 5. Stop after the `content === "exists"` guard. Do not add panels, list items, forms, event handlers, data loading, or feature-specific behavior.
 6. Export the instantiated screen object using the same lower-camel-case name as the class without the `Screen` suffix.
 7. Re-check imports, class naming, and the `buildScreen` arguments for TypeScript errors or typos.
+8. Use `appRouter` to navigate to the new screen in the project flow.
 
 ## Screen Template
 

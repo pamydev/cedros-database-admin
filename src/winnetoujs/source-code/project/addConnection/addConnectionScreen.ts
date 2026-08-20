@@ -1,6 +1,8 @@
 import { $div } from "@common";
 import { listItem } from "@helpers/listItem.helper";
 import { Screen } from "@screens/screen";
+import { W } from "winnetoujs";
+import { appRouter } from "../../router/router";
 
 class AddConnectionScreen extends Screen {
   private output: string;
@@ -25,7 +27,9 @@ class AddConnectionScreen extends Screen {
 
     listItem({
       label: "MongoDB",
-      onclick: "",
+      onclick: W.fx(() => {
+        appRouter.methods.add_mongo_connection.go(_id);
+      }),
       output: this.output,
     });
 

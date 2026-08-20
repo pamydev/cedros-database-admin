@@ -800,6 +800,9 @@ var createElement = (iconNode, customAttrs = {}) => {
   return createSVGElement([tag, attrs, iconNode]);
 };
 
+// ../../node_modules/lucide/dist/esm/icons/check.mjs
+var Check = [["path", { d: "M20 6 9 17l-5-5" }]];
+
 // ../../node_modules/lucide/dist/esm/icons/chevron-left.mjs
 var ChevronLeft = [["path", { d: "m15 18-6-6 6-6" }]];
 
@@ -1477,7 +1480,9 @@ var AddConnectionScreen = class extends Screen {
     }).create(content).ids.div;
     listItem({
       label: "MongoDB",
-      onclick: "",
+      onclick: W.fx(() => {
+        appRouter.methods.add_mongo_connection.go(_id);
+      }),
       output: this.output
     });
     listItem({
@@ -1493,6 +1498,58 @@ var AddConnectionScreen = class extends Screen {
   }
 };
 var addConnectionScreen = new AddConnectionScreen();
+
+// source-code/project/addConnection/mongoConnectionScreen.ts
+var MongoConnectionScreen = class extends Screen {
+  async render(_id) {
+    const project = await window.database.getProjectById(_id);
+    const content = this.buildScreen({
+      output: "screen",
+      title: "Add MongoDB Connection",
+      identifier: "mongo-connection",
+      titleImg: (project == null ? void 0 : project.image) ? `images://${encodeURIComponent(project.name)}/${project.image}` : null
+    });
+    if (content === "exists") return;
+    const panel = new $div({ class: "PANEL" }).create(content).ids.div;
+    new $inputForm({
+      label: "Connection Name",
+      type: "text",
+      placeholder: "Local MongoDB",
+      required: true
+    }).create(panel);
+    new $inputForm({
+      label: "MongoDB URI",
+      description: "Example: mongodb://localhost:27017",
+      type: "text",
+      placeholder: "mongodb://localhost:27017",
+      required: true
+    }).create(panel);
+    new $inputForm({
+      label: "Username",
+      type: "text",
+      placeholder: "Optional",
+      required: false
+    }).create(panel);
+    new $inputForm({
+      label: "Password",
+      type: "password",
+      placeholder: "Optional",
+      required: false
+    }).create(panel);
+    new $inputForm({
+      label: "Database",
+      type: "text",
+      placeholder: "Database name",
+      required: true
+    }).create(panel);
+    const actions = new $div({ class: "DIV-RIGHT" }).create(panel).ids.div;
+    new $buttonPrimary({
+      content: "Save Connection",
+      icon: createIcon(Check)
+    }).create(actions);
+  }
+};
+var mongoConnectionScreen = new MongoConnectionScreen();
 
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
@@ -1545,6 +1602,17 @@ var projectRouter = (routes = {}) => {
           hideScreens();
           manualMenuEffect("add-connection");
           addConnectionScreen.render(_id);
+        };
+      }
+    },
+    add_mongo_connection: {
+      go(_id) {
+        Router.navigate(`/screen/add-mongo-connection/${_id}`);
+      },
+      set() {
+        routes["/screen/add-mongo-connection/:_id"] = (_id) => {
+          hideScreens();
+          mongoConnectionScreen.render(_id);
         };
       }
     }
@@ -1753,6 +1821,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 lucide/dist/esm/defaultAttributes.mjs:
 lucide/dist/esm/createElement.mjs:
+lucide/dist/esm/icons/check.mjs:
 lucide/dist/esm/icons/chevron-left.mjs:
 lucide/dist/esm/icons/chevron-right.mjs:
 lucide/dist/esm/icons/clipboard-pen-line.mjs:
