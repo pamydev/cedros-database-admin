@@ -44,7 +44,9 @@ class LeftMenu {
     new $menuItem(
       {
         ariaLabel: "Select Project",
-        icon: createIcon(FolderKanban),
+        icon: createIcon(FolderKanban, {
+          color: "red",
+        }),
         label: "Select Project",
         onclick: W.fx((self: HTMLElement) => {
           appRouter.methods.selectProject.go();
@@ -56,7 +58,9 @@ class LeftMenu {
     new $menuItem(
       {
         ariaLabel: "About",
-        icon: createIcon(Info),
+        icon: createIcon(Info, {
+          color: "blue",
+        }),
         label: "About",
         onclick: W.fx((self: HTMLElement) => {
           appRouter.methods.about.go();
@@ -76,7 +80,7 @@ class LeftMenu {
     new $menuItem(
       {
         ariaLabel: "Home",
-        icon: createIcon(FolderKanban),
+        icon: createIcon(FolderKanban, { color: "grey" }),
         label: "Home",
         onclick: W.fx((self: HTMLElement) => {
           appRouter.methods.project_home.go(_id);
@@ -88,7 +92,7 @@ class LeftMenu {
     new $menuItem(
       {
         ariaLabel: "Add connection",
-        icon: createIcon(ClipboardPenLine),
+        icon: createIcon(ClipboardPenLine, { color: "grey" }),
         label: "Add connection",
         onclick: W.fx((self: HTMLElement) => {
           appRouter.methods.add_connection.go(_id);
@@ -100,7 +104,7 @@ class LeftMenu {
     new $menuItem(
       {
         ariaLabel: "Show database log entries",
-        icon: createIcon(Logs),
+        icon: createIcon(Logs, { color: "black" }),
         label: "Show database log entries",
         onclick: W.fx((self: HTMLElement) => {
           // appRouter.methods.projectHome.go();
@@ -114,7 +118,7 @@ class LeftMenu {
     new $menuItem(
       {
         ariaLabel: "Project settings",
-        icon: createIcon(Settings),
+        icon: createIcon(Settings, { color: "yellow" }),
         label: "Project settings",
         onclick: W.fx((self: HTMLElement) => {
           // appRouter.methods.projectHome.go();
@@ -126,7 +130,7 @@ class LeftMenu {
     new $menuItem(
       {
         ariaLabel: "Close project",
-        icon: createIcon(Power),
+        icon: createIcon(Power, { color: "grey" }),
         label: "Close project",
         onclick: W.fx((self: HTMLElement) => {
           // appRouter.methods.projectHome.go();

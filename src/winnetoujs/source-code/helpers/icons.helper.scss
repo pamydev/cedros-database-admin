@@ -19,6 +19,60 @@
     height: 20px;
     opacity: 0.8;
   }
+
+  &.__red {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mac-text) 80%, transparent) 0%,
+      var(--mac-red) 16%,
+      color-mix(in srgb, var(--mac-window-bg) 70%, var(--mac-red)) 180%
+    );
+  }
+
+  &.__blue {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mac-text) 80%, transparent) 0%,
+      var(--mac-blue) 16%,
+      color-mix(in srgb, var(--mac-window-bg) 70%, var(--mac-blue)) 180%
+    );
+  }
+
+  &.__green {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mac-text) 80%, transparent) 0%,
+      var(--mac-green) 16%,
+      color-mix(in srgb, var(--mac-window-bg) 70%, var(--mac-green)) 180%
+    );
+  }
+
+  &.__yellow {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mac-text) 80%, transparent) 0%,
+      var(--mac-yellow) 16%,
+      color-mix(in srgb, var(--mac-window-bg) 70%, var(--mac-yellow)) 180%
+    );
+  }
+
+  &.__black {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mac-text) 80%, transparent) 0%,
+      var(--mac-black) 16%,
+      color-mix(in srgb, var(--mac-window-bg) 70%, var(--mac-black)) 180%
+    );
+  }
+
+  &.__grey {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mac-text) 80%, transparent) 0%,
+      var(--mac-grey) 16%,
+      color-mix(in srgb, var(--mac-window-bg) 70%, var(--mac-grey)) 180%
+    );
+  }
 }
 
 .__simpleIcon__ {

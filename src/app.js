@@ -1013,9 +1013,16 @@ var $menuSeparator = class _$menuSeparator extends Constructos {
 };
 
 // source-code/helpers/icons.helper.ts
-var createIcon = (icon, simple) => {
+var createIcon = (icon, args0) => {
+  let finalClass = "__icon__";
+  if (args0 == null ? void 0 : args0.simple) {
+    finalClass = "__simpleIcon__";
+  }
+  if (args0 == null ? void 0 : args0.color) {
+    finalClass += " __" + args0.color;
+  }
   return new $div({
-    class: simple ? "__simpleIcon__" : "__icon__",
+    class: finalClass,
     content: createElement(icon).outerHTML
   }).constructoString();
 };
@@ -1302,7 +1309,9 @@ var listItem = (args0) => {
   if (args0.chevronRight !== false) {
     new $div({
       class: "CHEVRON-RIGHT",
-      content: createIcon(ChevronRight, true)
+      content: createIcon(ChevronRight, {
+        simple: true
+      })
     }).create(rightDiv);
   }
 };
@@ -1825,7 +1834,9 @@ var LeftMenu = class {
     new $menuItem(
       {
         ariaLabel: "Select Project",
-        icon: createIcon(FolderKanban),
+        icon: createIcon(FolderKanban, {
+          color: "red"
+        }),
         label: "Select Project",
         onclick: W.fx((self) => {
           appRouter.methods.selectProject.go();
@@ -1836,7 +1847,9 @@ var LeftMenu = class {
     new $menuItem(
       {
         ariaLabel: "About",
-        icon: createIcon(Info),
+        icon: createIcon(Info, {
+          color: "blue"
+        }),
         label: "About",
         onclick: W.fx((self) => {
           appRouter.methods.about.go();
@@ -1854,7 +1867,7 @@ var LeftMenu = class {
     new $menuItem(
       {
         ariaLabel: "Home",
-        icon: createIcon(FolderKanban),
+        icon: createIcon(FolderKanban, { color: "grey" }),
         label: "Home",
         onclick: W.fx((self) => {
           appRouter.methods.project_home.go(_id);
@@ -1865,7 +1878,7 @@ var LeftMenu = class {
     new $menuItem(
       {
         ariaLabel: "Add connection",
-        icon: createIcon(ClipboardPenLine),
+        icon: createIcon(ClipboardPenLine, { color: "grey" }),
         label: "Add connection",
         onclick: W.fx((self) => {
           appRouter.methods.add_connection.go(_id);
@@ -1876,7 +1889,7 @@ var LeftMenu = class {
     new $menuItem(
       {
         ariaLabel: "Show database log entries",
-        icon: createIcon(Logs),
+        icon: createIcon(Logs, { color: "black" }),
         label: "Show database log entries",
         onclick: W.fx((self) => {
         }, "this")
@@ -1887,7 +1900,7 @@ var LeftMenu = class {
     new $menuItem(
       {
         ariaLabel: "Project settings",
-        icon: createIcon(Settings),
+        icon: createIcon(Settings, { color: "yellow" }),
         label: "Project settings",
         onclick: W.fx((self) => {
         }, "this")
@@ -1897,7 +1910,7 @@ var LeftMenu = class {
     new $menuItem(
       {
         ariaLabel: "Close project",
-        icon: createIcon(Power),
+        icon: createIcon(Power, { color: "grey" }),
         label: "Close project",
         onclick: W.fx((self) => {
         }, "this")

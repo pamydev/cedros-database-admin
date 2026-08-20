@@ -57,7 +57,9 @@ export const listItem = (args0: IListItem) => {
   if (args0.chevronRight !== false) {
     new $div({
       class: "CHEVRON-RIGHT",
-      content: createIcon(ChevronRight, true),
+      content: createIcon(ChevronRight, {
+        simple: true,
+      }),
     }).create(rightDiv);
   }
 };
