@@ -89,12 +89,17 @@
 <winnetou d="background image">
   <div
     id="[[backgroundImage]]"
-    class="background-image"
+    class="background-image {{class?}}"
     style="background-image: url('{{imageUrl?}}'); {{style?}}">
     {{content?}}
   </div>
 </winnetou>
 
 <winnetou d="image">
-  <img id="[[image]]" src="{{src?}}" alt="{{alt?}}" style="{{style?}}" />
+  <img
+    id="[[image]]"
+    src="{{src?}}"
+    alt="{{alt?}}"
+    style="{{style?}}"
+    class="{{class?}}" />
 </winnetou>

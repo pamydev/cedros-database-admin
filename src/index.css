@@ -26,6 +26,7 @@
   background: transparent;
   color: var(--mac-text);
   font: inherit;
+  text-shadow: 1px 1px 1px color-mix(in srgb, var(--mac-window-bg) 50%, transparent);
   font-weight: 600;
   text-align: left;
   cursor: default;
@@ -80,6 +81,20 @@
   opacity: 0.8;
 }
 
+.__simpleIcon__ {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
+  border-radius: 8px;
+}
+.__simpleIcon__ svg {
+  stroke-width: 3px;
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+}
+
 .screen {
   width: 100%;
   background: transparent;
@@ -89,11 +104,28 @@
 .screen-header {
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: space-between;
   gap: 10px;
   padding: 0px;
   width: 100%;
   -webkit-app-region: drag;
+}
+.screen-header .__left {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 10px;
+}
+.screen-header .__right {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 10px;
+}
+.screen-header .__title-img {
+  width: auto;
+  height: 52px;
+  border-radius: 8px;
 }
 .screen-header .__navigation {
   -webkit-app-region: no-drag;
@@ -151,8 +183,63 @@
   background: transparent;
 }
 
+.LIST-ITEM {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: default;
+  transition: background-color 0.1s ease-in-out;
+  border-bottom: 1px solid var(--mac-divider);
+}
+.LIST-ITEM:last-child {
+  border-bottom: none;
+}
+.LIST-ITEM:active {
+  background-color: color-mix(var(--mac-control-hover-bg) 20%, transparent);
+}
+.LIST-ITEM .LEFT {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.LIST-ITEM .LEFT .IMAGE-ICON {
+  width: 60px;
+  height: 60px;
+}
+.LIST-ITEM .LEFT .LABEL .LABEL-TEXT {
+  font-family: var(--mac-font);
+  font-size: var(--font-size);
+  color: var(--mac-text);
+}
+.LIST-ITEM .LEFT .LABEL .SUB-LABEL-TEXT {
+  font-family: var(--mac-font);
+  font-size: var(--font-size-small);
+  color: var(--mac-secondary-text);
+}
+.LIST-ITEM .RIGHT {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.LIST-ITEM .RIGHT .CHEVRON-RIGHT {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+.LIST-ITEM .RIGHT .CHEVRON-RIGHT svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 3px;
+  opacity: 0.8;
+}
+
 .PANEL {
   width: 100%;
+  max-width: 700px;
   padding: 10px;
   background: var(--mac-window-bg);
   border-radius: 12px;
@@ -170,37 +257,14 @@
   gap: 10px;
 }
 
-.LIST-ITEM {
-  width: 100%;
-  padding: 10px;
-  background: var(--mac-window-bg);
-  border-bottom: 1px solid var(--mac-separator-soft);
-  color: var(--mac-text);
-  font-family: var(--mac-font);
-  font-size: var(--font-size-small);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.LIST-ITEM:last-child {
-  border-bottom: none;
-}
-.LIST-ITEM .LIST-ITEM-LEFT {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.LIST-ITEM .LIST-ITEM-RIGHT {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 10px;
-}
-.LIST-ITEM .LIST-ITEM-TITLE {
+.TITLE {
   font-weight: 600;
-  font-size: var(--font-size);
+  font-size: var(--font-title);
+  color: var(--mac-text);
 }
-.LIST-ITEM .LIST-ITEM-DESCRIPTION {
+
+.SUB-TITLE {
+  font-weight: 600;
   font-size: var(--font-size-small);
   color: var(--mac-secondary-text);
 }
@@ -323,6 +387,7 @@ form textarea {
   --mac-font:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;
+  --font-title: 18px;
   --font-size: 14px;
   --font-size-small: 12px;
   --font-size-smaller: 10px;

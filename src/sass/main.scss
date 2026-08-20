@@ -1,6 +1,7 @@
 @use "../../src/winnetoujs/source-code/left-menu/left-menu.scss";
 @use "../../src/winnetoujs/source-code/helpers/icons.helper.scss";
 @use "../../src/winnetoujs/source-code/screens/screen.scss";
+@use "../../src/winnetoujs/source-code/helpers/listItem.helper.scss";
 @use "./design-system.scss";
 
 :root {
@@ -15,6 +16,7 @@
   --mac-font:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;
+  --font-title: 18px;
   --font-size: 14px;
   --font-size-small: 12px;
   --font-size-smaller: 10px;

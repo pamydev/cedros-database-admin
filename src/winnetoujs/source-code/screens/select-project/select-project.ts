@@ -7,11 +7,12 @@ import {
 } from "@common";
 import { Screen } from "../screen";
 import { createIcon } from "@icons";
-import { Plus } from "lucide";
+import { ChevronRight, Plus } from "lucide";
 import { W } from "winnetoujs";
 import { appRouter } from "../../router/router";
-import { manualMenuEffect } from "../../left-menu/left-menu";
+import { leftMenu, manualMenuEffect } from "../../left-menu/left-menu";
 import { IProjects } from "../../../../../types/mongify";
+import { listItem } from "@helpers/listItem.helper";
 
 class SelectProjectScreen extends Screen {
   private output: string;
@@ -45,42 +46,21 @@ class SelectProjectScreen extends Screen {
   }
 
   private printProject(project: IProjects, output: string) {
-    console.log("Project:", project);
-    const projectDiv = new $div({
-      class: "LIST-ITEM",
-    }).create(output).ids.div;
-    const leftDiv = new $div({
-      class: "LIST-ITEM-LEFT",
-    }).create(projectDiv).ids.div;
-    const rightDiv = new $div({
-      class: "LIST-ITEM-RIGHT",
-    }).create(projectDiv).ids.div;
-
+    // console.log("Project:", project);
+    //      appRouter.methods.project_home.go(project._id);
     const uriProjectName = encodeURIComponent(project.name);
+    const imgURL = `images://${uriProjectName}/${project.image}`;
 
-    if (project.image)
-      new $backgroundImage({
-        imageUrl: `images://${uriProjectName}/${project.image}`,
-        style: "width: 50px; height: 50px;",
-      }).create(leftDiv);
-
-    const textDiv = new $div({}).create(leftDiv).ids.div;
-    new $div({
-      content: project.name,
-      class: "LIST-ITEM-TITLE",
-    }).create(textDiv);
-    new $div({
-      content: project.description,
-      class: "LIST-ITEM-DESCRIPTION",
-    }).create(textDiv);
-
-    new $buttonSecondary({
-      content: " Select",
+    listItem({
+      label: project.name,
+      subLabel: project.description,
+      chevronRight: true,
+      imageURL: imgURL,
       onclick: W.fx(() => {
-        manualMenuEffect("select-project");
-        appRouter.methods.selectProject.go();
+        appRouter.methods.project_home.go(project._id);
       }),
-    }).create(rightDiv);
+      output,
+    });
   }
 
   private emptyProjects(): void {

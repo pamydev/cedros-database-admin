@@ -1,9 +1,11 @@
 // router.ts
 import { Router } from "winnetoujs/modules/router";
-import { manualMenuEffect } from "../left-menu/left-menu";
+import { leftMenu, manualMenuEffect } from "../left-menu/left-menu";
 import { selectProjectScreen } from "@screens/select-project/select-project";
 import { newProjectScreen } from "@screens/new-project/new-project";
 import { aboutScreen } from "@screens/about/about";
+import { projectRouter } from "./project.routes";
+import { hideScreens } from "@helpers/hideScreens.helper";
 
 class MyRouter {
   constructor() {
@@ -12,10 +14,8 @@ class MyRouter {
 
   private routes = {};
 
-  private hideScreens() {
-    document.querySelectorAll<HTMLElement>(".screen").forEach((item) => {
-      document.getElementById(item.id)?.style.setProperty("display", "none");
-    });
+  public hideScreens() {
+    hideScreens();
   }
 
   public methods = {
@@ -23,6 +23,7 @@ class MyRouter {
       go: () => Router.navigate("/add-project"),
       set: () => {
         this.routes["/add-project"] = () => {
+          leftMenu.render();
           this.hideScreens();
           manualMenuEffect("add-project");
           newProjectScreen.render();
@@ -35,6 +36,8 @@ class MyRouter {
         Router.navigate(`/select-project/${reload || "null"}`),
       set: () => {
         this.routes["/select-project/:reload"] = (reload: "reload") => {
+          leftMenu.render();
+
           this.hideScreens();
           manualMenuEffect("select-project");
           if (reload === "reload") {
@@ -49,12 +52,16 @@ class MyRouter {
       go: () => Router.navigate("/about"),
       set: () => {
         this.routes["/about"] = () => {
+          leftMenu.render();
+
           this.hideScreens();
           manualMenuEffect("about");
           aboutScreen.render();
         };
       },
     },
+
+    ...projectRouter(this.routes),
   };
 
   private createRoutes() {

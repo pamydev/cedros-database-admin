@@ -1,0 +1,67 @@
+.LIST-ITEM {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: default;
+  transition: background-color 0.1s ease-in-out;
+
+  border-bottom: 1px solid var(--mac-divider);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background-color: color-mix(var(--mac-control-hover-bg) 20%, transparent);
+  }
+
+  .LEFT {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .ICON {
+    }
+
+    .IMAGE-ICON {
+      width: 60px;
+      height: 60px;
+    }
+
+    .LABEL {
+      .LABEL-TEXT {
+        font-family: var(--mac-font);
+        font-size: var(--font-size);
+        color: var(--mac-text);
+      }
+      .SUB-LABEL-TEXT {
+        font-family: var(--mac-font);
+        font-size: var(--font-size-small);
+        color: var(--mac-secondary-text);
+      }
+    }
+  }
+
+  .RIGHT {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .CHEVRON-RIGHT {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+
+      svg {
+        width: 12px;
+        height: 12px;
+        stroke-width: 3px;
+        opacity: 0.8;
+      }
+    }
+  }
+}

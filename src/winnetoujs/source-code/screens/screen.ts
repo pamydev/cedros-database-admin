@@ -1,8 +1,8 @@
-import { $div } from "@common";
+import { $div, $image } from "@common";
 import { createElement, ChevronLeft, ChevronRight } from "lucide";
 import { W } from "winnetoujs";
 export class Screen {
-  protected render() {
+  protected render(args0?: any) {
     throw new Error("Method not implemented.");
   }
 
@@ -10,6 +10,7 @@ export class Screen {
     output: string;
     title: string;
     identifier: string;
+    titleImg?: string;
   }): string {
     if (this.exists(args0.identifier)) return "exists";
 
@@ -23,6 +24,7 @@ export class Screen {
     this.createScreenHeader({
       output: output,
       title: args0.title,
+      titleImg: args0.titleImg,
     });
 
     const content = this.createScreenContent({
@@ -40,14 +42,26 @@ export class Screen {
     return exists;
   }
 
-  protected createScreenHeader(args0: { output: string; title: string }) {
+  protected createScreenHeader(args0: {
+    output: string;
+    title: string;
+    titleImg?: string;
+  }) {
     const header = new $div({
       class: "screen-header",
     }).create(args0.output).ids.div;
 
+    const leftDiv = new $div({
+      class: "__left",
+    }).create(header).ids.div;
+
+    const rightDiv = new $div({
+      class: "__right",
+    }).create(header).ids.div;
+
     const navigation = new $div({
       class: "__navigation",
-    }).create(header).ids.div;
+    }).create(leftDiv).ids.div;
 
     new $div({
       class: "__icon __icon-left",
@@ -75,7 +89,14 @@ export class Screen {
     new $div({
       class: "__title",
       content: args0.title,
-    }).create(header);
+    }).create(leftDiv);
+
+    if (args0.titleImg) {
+      new $image({
+        src: args0.titleImg,
+        class: "__title-img",
+      }).create(rightDiv);
+    }
   }
 
   protected createScreenContent(args0: { output: string }) {

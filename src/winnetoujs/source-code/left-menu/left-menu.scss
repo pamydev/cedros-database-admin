@@ -28,6 +28,9 @@
     background: transparent;
     color: var(--mac-text);
     font: inherit;
+    text-shadow: 1px 1px 1px
+      color-mix(in srgb, var(--mac-window-bg) 50%, transparent);
+
     font-weight: 600;
     text-align: left;
     cursor: default;

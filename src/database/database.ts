@@ -47,4 +47,14 @@ export const databaseIPCApi = () => {
     const projects = await db.getCollection<IProjects>("projects").find();
     return projects;
   });
+
+  ipcMain.handle(
+    ipcChannels.get_project_by_id,
+    async (event, projectId: string) => {
+      const project = await db
+        .getCollection<IProjects>("projects")
+        .findOne({ _id: projectId });
+      return project;
+    },
+  );
 };

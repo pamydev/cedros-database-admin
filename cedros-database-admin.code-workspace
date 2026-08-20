@@ -7,5 +7,15 @@
   "settings": {
     "winnetoujs.fullPath": "/Users/pamydev/CedrosDev/cedros-database-admin/src/winnetoujs",
     "workbench.colorTheme": "Visual Studio Dark - C++",
+    "editor.tokenColorCustomizations": {
+      "textMateRules": [
+        {
+          "scope": ["meta.definition.method.ts"],
+          "settings": {
+            "fontStyle": "bold underline",
+          },
+        },
+      ],
+    },
   },
 }

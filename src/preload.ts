@@ -11,6 +11,8 @@ const database: database = {
   createNewProject: (args): Promise<boolean> =>
     ipcRenderer.invoke(ipcChannels.create_new_project, args),
   loadProjects: () => ipcRenderer.invoke(ipcChannels.load_projects),
+  getProjectById: (projectId: string) =>
+    ipcRenderer.invoke(ipcChannels.get_project_by_id, projectId),
 };
 
 contextBridge.exposeInMainWorld("systemAPI", systemAPI);

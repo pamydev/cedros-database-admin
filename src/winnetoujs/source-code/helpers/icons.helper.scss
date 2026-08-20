@@ -19,3 +19,18 @@
     opacity: 0.8;
   }
 }
+
+.__simpleIcon__ {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
+  border-radius: 8px;
+
+  svg {
+    stroke-width: 3px;
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+  }
+}

@@ -446,6 +446,7 @@ export class $backgroundImage extends Constructos {
  /**
   * 
   * @param {object} [elements]
+  * @param {any} [elements.class]  
   * @param {any} [elements.imageUrl]  
   * @param {any} [elements.style]  
   * @param {any} [elements.content]  
@@ -475,7 +476,7 @@ export class $backgroundImage extends Constructos {
  code (props) {
   return `
   <div     id="backgroundImage-win-${this.identifier}"
-    class="background-image"
+    class="background-image ${props?.class || ""}"
     style="background-image: url('${props?.imageUrl || ""}'); ${props?.style || ""}">
     ${props?.content || ""}
   </div>
@@ -513,6 +514,7 @@ export class $image extends Constructos {
   * @param {any} [elements.src]  
   * @param {any} [elements.alt]  
   * @param {any} [elements.style]  
+  * @param {any} [elements.class]  
   * @param {object} [options]
   * @param {string} [options.identifier]
   */
@@ -538,7 +540,11 @@ export class $image extends Constructos {
   */
  code (props) {
   return `
-  <img id="image-win-${this.identifier}" src="${props?.src || ""}" alt="${props?.alt || ""}" style="${props?.style || ""}" >
+  <img     id="image-win-${this.identifier}"
+    src="${props?.src || ""}"
+    alt="${props?.alt || ""}"
+    style="${props?.style || ""}"
+    class="${props?.class || ""}" >
 `;
  }
  /**

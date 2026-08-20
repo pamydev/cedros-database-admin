@@ -19,6 +19,7 @@ export interface ICreateNewProjectArgs {
 export interface database {
   createNewProject: (args: ICreateNewProjectArgs) => Promise<boolean>;
   loadProjects: () => Promise<IProjects[]>;
+  getProjectById: (projectId: string) => Promise<IProjects | null>;
 }
 
 declare global {

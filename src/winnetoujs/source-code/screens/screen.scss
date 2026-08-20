@@ -7,12 +7,32 @@
 .screen-header {
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: space-between;
   gap: 10px;
   padding: 0px;
   width: 100%;
   // grab
   -webkit-app-region: drag;
+
+  .__left {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+  }
+
+  .__right {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+  }
+
+  .__title-img {
+    width: auto;
+    height: 52px;
+    border-radius: 8px;
+  }
 
   .__navigation {
     // no-grab

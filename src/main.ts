@@ -32,8 +32,8 @@ databaseIPCApi();
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 1900,
-    height: 1000,
+    width: 1400,
+    height: 800,
 
     titleBarStyle: "hiddenInset",
     trafficLightPosition: {
@@ -63,7 +63,7 @@ const createWindow = () => {
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

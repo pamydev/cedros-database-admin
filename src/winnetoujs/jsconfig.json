@@ -10,7 +10,10 @@
       "@strings": ["./src/strings"],
       "@icons": ["./source-code/helpers/icons.helper.ts"],
       "@common": ["./source-code/common/common.wcto"],
-      "@screens/*": ["./source-code/screens/*"]
+      "@screens/*": ["./source-code/screens/*"],
+      "@projectScreens/*": ["./source-code/project/*"],
+      "@leftMenu": ["./source-code/left-menu/left-menu"],
+      "@helpers/*": ["./source-code/helpers/*"]
     }
   },
   "exclude": ["node_modules", "**/node_modules/*"],
