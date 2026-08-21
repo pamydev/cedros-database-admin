@@ -16,6 +16,32 @@ const db = new Mongify({
 });
 const projectRootPath = projectRoot();
 
+let mongifyClient: Mongify | null = null;
+
+const createMongifyClient = async () => {
+  if (!mongifyClient) {
+    const mongifyConnection = await db
+      .getCollection<ISaveMongifyConnection>("mongify_connections")
+      .findOne();
+
+    if (!mongifyConnection) {
+      throw new Error("No Mongify connection found");
+    }
+
+    console.log({
+      databasePath: mongifyConnection.databasePath,
+      databaseName: mongifyConnection.databaseName,
+    });
+
+    mongifyClient = new Mongify({
+      database_name: mongifyConnection.databaseName,
+      path: mongifyConnection.databasePath,
+    });
+
+    return true;
+  }
+};
+
 export const databaseIPCApi = () => {
   // ipcChannels.create_new_project
   ipcMain.handle(
@@ -65,6 +91,7 @@ export const databaseIPCApi = () => {
     },
   );
 
+  // ipcChannels.list_databases
   ipcMain.handle(
     ipcChannels.save_mongo_connection,
     async (event, args0: ISaveMongoConnection) => {
@@ -92,10 +119,18 @@ export const databaseIPCApi = () => {
       const res = await db
         .getCollection<ISaveMongoConnection>("mongo_connections")
         .insert(doc);
+
+      await db.getCollection("databases").insert({
+        type: "mongo",
+        projectId: args0.projectId,
+        database_name: args0.database,
+      });
+
       return true;
     },
   );
 
+  // ipcChannels.save_mongify_connection
   ipcMain.handle(
     ipcChannels.save_mongify_connection,
     async (event, args: ISaveMongifyConnection) => {
@@ -108,9 +143,30 @@ export const databaseIPCApi = () => {
         .insert({
           projectId: args.projectId,
           databasePath: args.databasePath.trim(),
+          databaseName: args.databaseName.trim(),
         });
+
+      await db.getCollection("databases").insert({
+        type: "mongify",
+        projectId: args.projectId,
+        database_name: args.databaseName.trim(),
+      });
 
       return true;
     },
   );
+
+  // ipcChannels.mongify.get_collections
+  ipcMain.handle(ipcChannels.mongify.get_collections, async () => {
+    if (!mongifyClient) {
+      await createMongifyClient();
+    }
+    let collections: string[] = await mongifyClient!.listCollections();
+    return collections;
+  });
+
+  // ipcChannels.list_databases
+  ipcMain.handle(ipcChannels.list_databases, async () => {
+    const res = await db.getCollection();
+  });
 };

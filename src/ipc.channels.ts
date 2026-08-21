@@ -5,4 +5,8 @@ export const ipcChannels = {
   get_project_by_id: "api:get-project-by-id",
   save_mongo_connection: "api:save-mongo-connection",
   save_mongify_connection: "api:save-mongify-connection",
+  list_databases: "api:list-databases",
+  mongify: {
+    get_collections: "mongify:get-collections",
+  },
 };

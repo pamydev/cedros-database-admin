@@ -16,7 +16,7 @@ import { listItem } from "@helpers/listItem.helper";
 
 class SelectProjectScreen extends Screen {
   private output: string;
-  render() {
+  render(reload?: "reload") {
     const output = this.buildScreen({
       output: "screen",
       title: "Select Project",
@@ -26,7 +26,7 @@ class SelectProjectScreen extends Screen {
 
     this.output = output;
 
-    this.loadProjects();
+    this.loadProjects(reload);
     // this.emptyProjects();
   }
 
@@ -38,6 +38,14 @@ class SelectProjectScreen extends Screen {
       }
     }
     const projects = await window.database.loadProjects();
+
+    console.log({ projects });
+
+    if (projects.length === 0) {
+      this.emptyProjects();
+      return;
+    }
+
     const output = new $div({
       class: "PANEL",
     }).create(this.output).ids.div;
@@ -49,7 +57,9 @@ class SelectProjectScreen extends Screen {
     // console.log("Project:", project);
     //      appRouter.methods.project_home.go(project._id);
     const uriProjectName = encodeURIComponent(project.name);
-    const imgURL = `images://${uriProjectName}/${project.image}`;
+    const imgURL = project.image
+      ? `images://${uriProjectName}/${project.image}`
+      : null;
 
     listItem({
       label: project.name,

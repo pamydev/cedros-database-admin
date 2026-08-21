@@ -37,13 +37,9 @@ class MyRouter {
       set: () => {
         this.routes["/select-project/:reload"] = (reload: "reload") => {
           leftMenu.render();
-
           this.hideScreens();
           manualMenuEffect("select-project");
-          if (reload === "reload") {
-            selectProjectScreen.loadProjects("reload");
-          }
-          selectProjectScreen.render();
+          selectProjectScreen.render(reload);
         };
       },
     },

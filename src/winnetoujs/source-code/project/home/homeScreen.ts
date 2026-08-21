@@ -26,7 +26,34 @@ class ProjectHomeScreen extends Screen {
     new $div({
       content: project.description,
       class: "SUB-TITLE",
+      style: "margin-bottom: 20px;",
     }).create(content);
+
+    this.renderMongify();
+    // this.listDatabases();
+  }
+
+  async listDatabases() {
+    const databases = await window.database.listDatabases();
+  }
+
+  async renderMongify() {
+    const output = new $div({
+      class: "PANEL",
+    }).create(this.output).ids.div;
+
+    new $div({
+      content: "Mongify Collections",
+      style: "margin-bottom: 10px; font-weight: bold; font-size: 16px;",
+    }).create(output);
+
+    let collections = await window.database.mongify.getCollections();
+
+    collections.forEach((collection) => {
+      new $div({
+        content: collection,
+      }).create(output);
+    });
   }
 }
 

@@ -29,7 +29,12 @@ export interface ISaveMongoConnection {
 export interface ISaveMongifyConnection {
   _id?: any;
   databasePath: string;
+  databaseName: string;
   projectId: string;
+}
+
+interface mongify {
+  getCollections: () => Promise<string[]>;
 }
 
 export interface database {
@@ -38,6 +43,8 @@ export interface database {
   getProjectById: (projectId: string) => Promise<IProjects | null>;
   saveMongoConnection: (args0: ISaveMongoConnection) => Promise<boolean>;
   saveMongifyConnection: (args: ISaveMongifyConnection) => Promise<boolean>;
+  listDatabases: () => Promise<string[]>;
+  mongify: mongify;
 }
 
 declare global {

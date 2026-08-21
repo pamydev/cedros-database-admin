@@ -1319,7 +1319,7 @@ var listItem = (args0) => {
 // source-code/screens/select-project/select-project.ts
 var SelectProjectScreen = class extends Screen {
   output;
-  render() {
+  render(reload) {
     const output = this.buildScreen({
       output: "screen",
       title: "Select Project",
@@ -1327,7 +1327,7 @@ var SelectProjectScreen = class extends Screen {
     });
     if (output === "exists") return;
     this.output = output;
-    this.loadProjects();
+    this.loadProjects(reload);
   }
   async loadProjects(reload) {
     if (reload === "reload") {
@@ -1337,6 +1337,11 @@ var SelectProjectScreen = class extends Screen {
       }
     }
     const projects = await window.database.loadProjects();
+    console.log({ projects });
+    if (projects.length === 0) {
+      this.emptyProjects();
+      return;
+    }
     const output = new $div({
       class: "PANEL"
     }).create(this.output).ids.div;
@@ -1345,7 +1350,7 @@ var SelectProjectScreen = class extends Screen {
   }
   printProject(project, output) {
     const uriProjectName = encodeURIComponent(project.name);
-    const imgURL = `images://${uriProjectName}/${project.image}`;
+    const imgURL = project.image ? `images://${uriProjectName}/${project.image}` : null;
     listItem({
       label: project.name,
       subLabel: project.description,
@@ -1616,8 +1621,16 @@ var MongifyConnectionScreen = class extends Screen {
     const panel = new $div({ class: "PANEL" }).create(content).ids.div;
     const databasePath = new $inputForm({
       label: "Database path",
+      description: "Do not add /Mongify at the end of the path,if full path are like /home/user/Mongify/database-name, just add /home/user",
       type: "text",
       placeholder: "/path/to/database",
+      required: true
+    }).create(panel).ids.input;
+    const databaseName = new $inputForm({
+      label: "Database name",
+      description: "The name of the database, example: cedros_database_admin. It's after the /Mongify/ folder in the path.",
+      type: "text",
+      placeholder: "cedros_database_admin",
       required: true
     }).create(panel).ids.input;
     const actions = new $div({ class: "DIV-RIGHT" }).create(panel).ids.div;
@@ -1625,15 +1638,21 @@ var MongifyConnectionScreen = class extends Screen {
       content: "Save Connection",
       icon: createIcon(Check),
       onclick: W.fx(async () => {
-        const input = document.getElementById(databasePath);
-        if (!input.value.trim()) {
+        const databasePathInput = document.getElementById(
+          databasePath
+        );
+        const databaseNameInput = document.getElementById(
+          databaseName
+        );
+        if (!databasePathInput.value.trim()) {
           alert("Database path is required.");
           return;
         }
         try {
           await window.database.saveMongifyConnection({
             projectId: _id,
-            databasePath: input.value
+            databasePath: databasePathInput.value,
+            databaseName: databaseNameInput.value
           });
           alert("Connection saved");
         } catch {
@@ -1729,8 +1748,28 @@ var ProjectHomeScreen = class extends Screen {
     }).create(content);
     new $div({
       content: project.description,
-      class: "SUB-TITLE"
+      class: "SUB-TITLE",
+      style: "margin-bottom: 20px;"
     }).create(content);
+    this.renderMongify();
+  }
+  async listDatabases() {
+    const databases = await window.database.listDatabases();
+  }
+  async renderMongify() {
+    const output = new $div({
+      class: "PANEL"
+    }).create(this.output).ids.div;
+    new $div({
+      content: "Mongify Collections",
+      style: "margin-bottom: 10px; font-weight: bold; font-size: 16px;"
+    }).create(output);
+    let collections = await window.database.mongify.getCollections();
+    collections.forEach((collection) => {
+      new $div({
+        content: collection
+      }).create(output);
+    });
   }
 };
 var projectHomeScreen = new ProjectHomeScreen();
@@ -1828,10 +1867,7 @@ var MyRouter = class {
           leftMenu2.render();
           this.hideScreens();
           manualMenuEffect("select-project");
-          if (reload === "reload") {
-            selectProjectScreen.loadProjects("reload");
-          }
-          selectProjectScreen.render();
+          selectProjectScreen.render(reload);
         };
       }
     },

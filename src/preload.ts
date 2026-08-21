@@ -17,6 +17,11 @@ const database: database = {
     ipcRenderer.invoke(ipcChannels.save_mongo_connection, args0),
   saveMongifyConnection: (args) =>
     ipcRenderer.invoke(ipcChannels.save_mongify_connection, args),
+  mongify: {
+    getCollections: () =>
+      ipcRenderer.invoke(ipcChannels.mongify.get_collections),
+  },
+  listDatabases: () => ipcRenderer.invoke(ipcChannels.list_databases),
 };
 
 contextBridge.exposeInMainWorld("systemAPI", systemAPI);
