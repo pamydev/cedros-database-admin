@@ -763,6 +763,68 @@ var $image = class _$image extends Constructos {
     return this.component;
   }
 };
+var $span = class _$span extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} elements
+   * @param {any} [elements.class]  
+   * @param {any} elements.content  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `span-win-${this.identifier}`,
+      elements,
+      options,
+      _$span
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <span id="span-win-${this.identifier}" class="${(props == null ? void 0 : props.class) || ""}">${(props == null ? void 0 : props.content) || ""}</span>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        span: `span-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
 
 // ../../node_modules/lucide/dist/esm/defaultAttributes.mjs
 var defaultAttributes = {
@@ -1740,7 +1802,9 @@ var redisConnectionScreen = new RedisConnectionScreen();
 var ProjectHomeScreen = class extends Screen {
   output;
   panelOutput;
+  projectId;
   async render(_id) {
+    this.projectId = _id;
     const project = await window.database.getProjectById(_id);
     const content = this.buildScreen({
       output: "screen",
@@ -1762,15 +1826,13 @@ var ProjectHomeScreen = class extends Screen {
     this.panelOutput = new $div({
       class: "FLEX-TRANSPARENT"
     }).create(content).ids.div;
-    this.listDatabases();
-    this.listWorkspaces();
+    this.listDatabasesAndWorkspaces();
   }
-  async listDatabases() {
+  async listDatabasesAndWorkspaces() {
     const output = new $div({
       class: "PANEL CONTENT-WIDTH"
     }).create(this.panelOutput).ids.div;
-    const databases = await window.database.listDatabases();
-    console.log("databases", databases);
+    const databases = await window.database.listDatabases(this.projectId);
     if (databases.length === 0) {
       new $div({
         content: "No databases found"
@@ -1780,32 +1842,42 @@ var ProjectHomeScreen = class extends Screen {
     listItem({
       label: "Databases list",
       output,
-      subLabel: "Click on a database to view its collections or select multiple to create a workspace",
+      subLabel: "Click on a database to view its collections and start working with it. You can also add new databases or remove existing ones.",
       onclick: "",
       chevronRight: false
     });
     databases.forEach((db) => this.printDatabase(db, output));
+    listItem({
+      label: "Workspaces list",
+      output,
+      subLabel: "Workspaces are saved queries and configurations for your databases. ",
+      onclick: "",
+      chevronRight: false
+    });
   }
   printDatabase(db, output) {
+    const label = new $span({
+      content: db.type,
+      class: `__span-${db.type}__`
+    }).constructoString();
     listItem({
-      label: db.database_name,
-      onclick: "",
+      label: label + db.database_name,
+      onclick: W.fx(() => {
+        this.openDatabase(db);
+      }),
       output,
       icon: Database
     });
   }
-  listWorkspaces() {
-    const output = new $div({
-      class: "PANEL CONTENT-WIDTH"
-    }).create(this.panelOutput).ids.div;
-    new $div({
-      content: "No workspaces found"
-    }).create(output);
+  async openDatabase(db) {
+    if (db.type === "mongify") {
+      this.renderMongify(db);
+    }
   }
-  async renderMongify() {
+  async renderMongify(db) {
     const output = new $div({
       class: "PANEL"
-    }).create(this.output).ids.div;
+    }).create(this.panelOutput).ids.div;
     new $div({
       content: "Mongify Collections",
       style: "margin-bottom: 10px; font-weight: bold; font-size: 16px;"

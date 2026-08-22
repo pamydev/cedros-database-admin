@@ -21,7 +21,8 @@ const database: database = {
     getCollections: () =>
       ipcRenderer.invoke(ipcChannels.mongify.get_collections),
   },
-  listDatabases: () => ipcRenderer.invoke(ipcChannels.list_databases),
+  listDatabases: (projectId) =>
+    ipcRenderer.invoke(ipcChannels.list_databases, projectId),
 };
 
 contextBridge.exposeInMainWorld("systemAPI", systemAPI);

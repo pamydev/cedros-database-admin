@@ -92,7 +92,7 @@ export const databaseIPCApi = () => {
     },
   );
 
-  // ipcChannels.list_databases
+  // ipcChannels.save_mongo_connection
   ipcMain.handle(
     ipcChannels.save_mongo_connection,
     async (event, args0: ISaveMongoConnection) => {
@@ -167,9 +167,11 @@ export const databaseIPCApi = () => {
   });
 
   // ipcChannels.list_databases
-  ipcMain.handle(ipcChannels.list_databases, async () => {
+  ipcMain.handle(ipcChannels.list_databases, async (ev, projectId: string) => {
     console.log("inside list_databases");
-    const res = await db.getCollection<IDatabase>("databases").find();
+    const res = await db.getCollection<IDatabase>("databases").find({
+      projectId,
+    });
     return res;
   });
 };

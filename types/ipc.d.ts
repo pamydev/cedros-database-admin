@@ -50,7 +50,7 @@ export interface database {
   getProjectById: (projectId: string) => Promise<IProjects | null>;
   saveMongoConnection: (args0: ISaveMongoConnection) => Promise<boolean>;
   saveMongifyConnection: (args: ISaveMongifyConnection) => Promise<boolean>;
-  listDatabases: () => Promise<IDatabase[]>;
+  listDatabases: (projectId: string) => Promise<IDatabase[]>;
   mongify: mongify;
 }
 
