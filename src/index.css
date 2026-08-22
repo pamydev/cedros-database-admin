@@ -205,14 +205,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
+  padding: 10px 0;
+  gap: 30px;
   border-radius: 8px;
   cursor: default;
   transition: background-color 0.1s ease-in-out;
   border-bottom: 1px solid var(--mac-divider);
 }
+.LIST-ITEM:first-child {
+  padding-top: 0;
+}
 .LIST-ITEM:last-child {
   border-bottom: none;
+  padding-bottom: 0;
 }
 .LIST-ITEM:active {
   background-color: color-mix(var(--mac-control-hover-bg) 20%, transparent);
@@ -222,19 +227,29 @@
   align-items: center;
   gap: 10px;
 }
+.LIST-ITEM .LEFT .ICON div {
+  border-radius: 5px;
+}
+.LIST-ITEM .LEFT .ICON svg {
+  width: 16px;
+  height: 16px;
+}
 .LIST-ITEM .LEFT .IMAGE-ICON {
   width: 60px;
   height: 60px;
 }
 .LIST-ITEM .LEFT .LABEL .LABEL-TEXT {
   font-family: var(--mac-font);
-  font-size: var(--font-size);
+  font-size: var(--font-size-small);
   color: var(--mac-text);
+  font-weight: 600;
 }
 .LIST-ITEM .LEFT .LABEL .SUB-LABEL-TEXT {
+  margin-top: 2px;
   font-family: var(--mac-font);
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-smaller);
   color: var(--mac-secondary-text);
+  font-weight: 600;
 }
 .LIST-ITEM .RIGHT {
   display: flex;
@@ -249,10 +264,18 @@
   height: 20px;
 }
 .LIST-ITEM .RIGHT .CHEVRON-RIGHT svg {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   stroke-width: 3px;
-  opacity: 0.8;
+  opacity: 0.3;
+}
+
+.FLEX-TRANSPARENT {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  background: transparent;
+  flex-wrap: wrap;
 }
 
 .PANEL {
@@ -266,6 +289,10 @@
   color: var(--mac-text);
   font-family: var(--mac-font);
   font-size: var(--font-size-small);
+}
+.PANEL.CONTENT-WIDTH {
+  width: fit-content;
+  max-width: 300px;
 }
 
 .DIV-RIGHT {
@@ -392,6 +419,7 @@ form textarea {
 .background-image {
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   border-radius: 10px;
   border: 1px solid var(--mac-separator-soft);
 }
@@ -417,7 +445,7 @@ form textarea {
   --font-title: 18px;
   --font-size: 14px;
   --font-size-small: 12px;
-  --font-size-smaller: 10px;
+  --font-size-smaller: 11px;
   --mac-divider: rgba(100, 100, 100, 0.1);
 }
 

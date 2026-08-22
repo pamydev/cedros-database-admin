@@ -823,6 +823,13 @@ var ClipboardPenLine = [
   ]
 ];
 
+// ../../node_modules/lucide/dist/esm/icons/database.mjs
+var Database = [
+  ["ellipse", { cx: "12", cy: "5", rx: "9", ry: "3" }],
+  ["path", { d: "M3 5V19A9 3 0 0 0 21 19V5" }],
+  ["path", { d: "M3 12A9 3 0 0 0 21 12" }]
+];
+
 // ../../node_modules/lucide/dist/esm/icons/folder-kanban.mjs
 var FolderKanban = [
   [
@@ -1732,6 +1739,7 @@ var redisConnectionScreen = new RedisConnectionScreen();
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
   output;
+  panelOutput;
   async render(_id) {
     const project = await window.database.getProjectById(_id);
     const content = this.buildScreen({
@@ -1751,10 +1759,48 @@ var ProjectHomeScreen = class extends Screen {
       class: "SUB-TITLE",
       style: "margin-bottom: 20px;"
     }).create(content);
-    this.renderMongify();
+    this.panelOutput = new $div({
+      class: "FLEX-TRANSPARENT"
+    }).create(content).ids.div;
+    this.listDatabases();
+    this.listWorkspaces();
   }
   async listDatabases() {
+    const output = new $div({
+      class: "PANEL CONTENT-WIDTH"
+    }).create(this.panelOutput).ids.div;
     const databases = await window.database.listDatabases();
+    console.log("databases", databases);
+    if (databases.length === 0) {
+      new $div({
+        content: "No databases found"
+      }).create(output);
+      return;
+    }
+    listItem({
+      label: "Databases list",
+      output,
+      subLabel: "Click on a database to view its collections or select multiple to create a workspace",
+      onclick: "",
+      chevronRight: false
+    });
+    databases.forEach((db) => this.printDatabase(db, output));
+  }
+  printDatabase(db, output) {
+    listItem({
+      label: db.database_name,
+      onclick: "",
+      output,
+      icon: Database
+    });
+  }
+  listWorkspaces() {
+    const output = new $div({
+      class: "PANEL CONTENT-WIDTH"
+    }).create(this.panelOutput).ids.div;
+    new $div({
+      content: "No workspaces found"
+    }).create(output);
   }
   async renderMongify() {
     const output = new $div({
@@ -2046,6 +2092,7 @@ lucide/dist/esm/icons/check.mjs:
 lucide/dist/esm/icons/chevron-left.mjs:
 lucide/dist/esm/icons/chevron-right.mjs:
 lucide/dist/esm/icons/clipboard-pen-line.mjs:
+lucide/dist/esm/icons/database.mjs:
 lucide/dist/esm/icons/folder-kanban.mjs:
 lucide/dist/esm/icons/info.mjs:
 lucide/dist/esm/icons/logs.mjs:

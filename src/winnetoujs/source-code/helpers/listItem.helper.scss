@@ -2,15 +2,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
+  padding: 10px 0;
+  gap: 30px;
   border-radius: 8px;
   cursor: default;
   transition: background-color 0.1s ease-in-out;
 
   border-bottom: 1px solid var(--mac-divider);
 
+  &:first-child {
+    padding-top: 0;
+  }
+
   &:last-child {
     border-bottom: none;
+    padding-bottom: 0;
   }
 
   &:active {
@@ -23,6 +29,13 @@
     gap: 10px;
 
     .ICON {
+      div {
+        border-radius: 5px;
+      }
+      svg {
+        width: 16px;
+        height: 16px;
+      }
     }
 
     .IMAGE-ICON {
@@ -33,13 +46,16 @@
     .LABEL {
       .LABEL-TEXT {
         font-family: var(--mac-font);
-        font-size: var(--font-size);
+        font-size: var(--font-size-small);
         color: var(--mac-text);
+        font-weight: 600;
       }
       .SUB-LABEL-TEXT {
+        margin-top: 2px;
         font-family: var(--mac-font);
-        font-size: var(--font-size-small);
+        font-size: var(--font-size-smaller);
         color: var(--mac-secondary-text);
+        font-weight: 600;
       }
     }
   }
@@ -57,10 +73,10 @@
       height: 20px;
 
       svg {
-        width: 12px;
-        height: 12px;
+        width: 13px;
+        height: 13px;
         stroke-width: 3px;
-        opacity: 0.8;
+        opacity: 0.3;
       }
     }
   }

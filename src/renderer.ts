@@ -32,7 +32,10 @@ import "./app";
 async function initializeSystemTheme(): Promise<void> {
   try {
     const accentColor = await window.systemAPI.getAccentColor();
-    document.documentElement.style.setProperty("--mac-accent", accentColor);
+    document.documentElement.style.setProperty(
+      "--mac-accent",
+      `color-mix(in srgb, ${accentColor} 80%, var(--mac-window-bg))`,
+    );
   } catch (error) {
     console.error("Failed to load the system accent color:", error);
   }

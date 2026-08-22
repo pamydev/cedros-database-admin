@@ -1,8 +1,12 @@
 import { $div } from "@common";
 import { Screen } from "@screens/screen";
+import { IDatabase } from "../../../../../types/ipc";
+import { listItem } from "@helpers/listItem.helper";
+import { Database } from "lucide";
 
 class ProjectHomeScreen extends Screen {
   private output: string;
+  private panelOutput: string;
   public async render(_id: string) {
     const project = await window.database.getProjectById(_id);
 
@@ -29,12 +33,56 @@ class ProjectHomeScreen extends Screen {
       style: "margin-bottom: 20px;",
     }).create(content);
 
-    this.renderMongify();
-    // this.listDatabases();
+    this.panelOutput = new $div({
+      class: "FLEX-TRANSPARENT",
+    }).create(content).ids.div;
+
+    // this.renderMongify();
+    this.listDatabases();
+    this.listWorkspaces();
   }
 
   async listDatabases() {
+    const output = new $div({
+      class: "PANEL CONTENT-WIDTH",
+    }).create(this.panelOutput).ids.div;
     const databases = await window.database.listDatabases();
+    console.log("databases", databases);
+    if (databases.length === 0) {
+      new $div({
+        content: "No databases found",
+      }).create(output);
+      return;
+    }
+
+    listItem({
+      label: "Databases list",
+      output: output,
+      subLabel:
+        "Click on a database to view its collections or select multiple to create a workspace",
+      onclick: "",
+      chevronRight: false,
+    });
+    databases.forEach((db) => this.printDatabase(db, output));
+  }
+
+  private printDatabase(db: IDatabase, output: string) {
+    listItem({
+      label: db.database_name,
+      onclick: "",
+      output: output,
+      icon: Database,
+    });
+  }
+
+  private listWorkspaces() {
+    const output = new $div({
+      class: "PANEL CONTENT-WIDTH",
+    }).create(this.panelOutput).ids.div;
+
+    new $div({
+      content: "No workspaces found",
+    }).create(output);
   }
 
   async renderMongify() {

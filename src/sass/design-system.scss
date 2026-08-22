@@ -1,3 +1,10 @@
+.FLEX-TRANSPARENT {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  background: transparent;
+  flex-wrap: wrap;
+}
 .PANEL {
   width: 100%;
   max-width: 700px;
@@ -11,6 +18,11 @@
   color: var(--mac-text);
   font-family: var(--mac-font);
   font-size: var(--font-size-small);
+
+  &.CONTENT-WIDTH {
+    width: fit-content;
+    max-width: 300px;
+  }
 }
 
 // to align the content to the right side of the panel
@@ -144,6 +156,7 @@ form {
 .background-image {
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   border-radius: 10px;
   border: 1px solid var(--mac-separator-soft);
 }

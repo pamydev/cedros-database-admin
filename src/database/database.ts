@@ -5,6 +5,7 @@ import {
   ICreateNewProjectArgs,
   ISaveMongoConnection,
   ISaveMongifyConnection,
+  IDatabase,
 } from "../../types/ipc";
 import { Mongify } from "@cedrosdev/mongify";
 import fs from "fs";
@@ -167,6 +168,8 @@ export const databaseIPCApi = () => {
 
   // ipcChannels.list_databases
   ipcMain.handle(ipcChannels.list_databases, async () => {
-    const res = await db.getCollection();
+    console.log("inside list_databases");
+    const res = await db.getCollection<IDatabase>("databases").find();
+    return res;
   });
 };

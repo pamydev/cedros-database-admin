@@ -33,6 +33,13 @@ export interface ISaveMongifyConnection {
   projectId: string;
 }
 
+export interface IDatabase {
+  type: "mongo" | "mongify" | "redis";
+  projectId: string;
+  database_name: string;
+  _id?: any;
+}
+
 interface mongify {
   getCollections: () => Promise<string[]>;
 }
@@ -43,7 +50,7 @@ export interface database {
   getProjectById: (projectId: string) => Promise<IProjects | null>;
   saveMongoConnection: (args0: ISaveMongoConnection) => Promise<boolean>;
   saveMongifyConnection: (args: ISaveMongifyConnection) => Promise<boolean>;
-  listDatabases: () => Promise<string[]>;
+  listDatabases: () => Promise<IDatabase[]>;
   mongify: mongify;
 }
 
