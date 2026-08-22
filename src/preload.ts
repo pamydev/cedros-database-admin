@@ -18,8 +18,8 @@ const database: database = {
   saveMongifyConnection: (args) =>
     ipcRenderer.invoke(ipcChannels.save_mongify_connection, args),
   mongify: {
-    getCollections: () =>
-      ipcRenderer.invoke(ipcChannels.mongify.get_collections),
+    getCollections: (args0) =>
+      ipcRenderer.invoke(ipcChannels.mongify.get_collections, args0),
   },
   listDatabases: (projectId) =>
     ipcRenderer.invoke(ipcChannels.list_databases, projectId),

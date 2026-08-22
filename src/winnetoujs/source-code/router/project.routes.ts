@@ -10,61 +10,67 @@ import { Router } from "winnetoujs/modules/router";
 export const projectRouter = (routes = {}) => {
   return {
     project_home: {
-      go(_id: string) {
-        Router.navigate(`/screen/home/${_id}`);
+      go(projectId: string) {
+        Router.navigate(`/screen/home/${projectId}`);
       },
       set() {
-        routes["/screen/home/:_id"] = (_id: string) => {
-          leftMenu.renderProjectMenu(_id);
+        routes["/screen/home/:projectId"] = (projectId: string) => {
+          leftMenu.renderProjectMenu(projectId);
           hideScreens();
           manualMenuEffect("home");
-          projectHomeScreen.render(_id);
+          projectHomeScreen.render(projectId);
         };
       },
     },
     add_connection: {
-      go(_id: string) {
-        Router.navigate(`/screen/add-connection/${_id}`);
+      go(projectId: string) {
+        Router.navigate(`/screen/add-connection/${projectId}`);
       },
       set() {
-        routes["/screen/add-connection/:_id"] = (_id: string) => {
-          leftMenu.renderProjectMenu(_id);
+        routes["/screen/add-connection/:projectId"] = (projectId: string) => {
+          leftMenu.renderProjectMenu(projectId);
           hideScreens();
           manualMenuEffect("add-connection");
-          addConnectionScreen.render(_id);
+          addConnectionScreen.render(projectId);
         };
       },
     },
     add_mongo_connection: {
-      go(_id: string) {
-        Router.navigate(`/screen/add-mongo-connection/${_id}`);
+      go(projectId: string) {
+        Router.navigate(`/screen/add-mongo-connection/${projectId}`);
       },
       set() {
-        routes["/screen/add-mongo-connection/:_id"] = (_id: string) => {
+        routes["/screen/add-mongo-connection/:projectId"] = (
+          projectId: string,
+        ) => {
           hideScreens();
-          mongoConnectionScreen.render(_id);
+          mongoConnectionScreen.render(projectId);
         };
       },
     },
     add_redis_connection: {
-      go(_id: string) {
-        Router.navigate(`/screen/add-redis-connection/${_id}`);
+      go(projectId: string) {
+        Router.navigate(`/screen/add-redis-connection/${projectId}`);
       },
       set() {
-        routes["/screen/add-redis-connection/:_id"] = (_id: string) => {
+        routes["/screen/add-redis-connection/:projectId"] = (
+          projectId: string,
+        ) => {
           hideScreens();
-          redisConnectionScreen.render(_id);
+          redisConnectionScreen.render(projectId);
         };
       },
     },
     add_mongify_connection: {
-      go(_id: string) {
-        Router.navigate(`/screen/add-mongify-connection/${_id}`);
+      go(projectId: string) {
+        Router.navigate(`/screen/add-mongify-connection/${projectId}`);
       },
       set() {
-        routes["/screen/add-mongify-connection/:_id"] = (_id: string) => {
+        routes["/screen/add-mongify-connection/:projectId"] = (
+          projectId: string,
+        ) => {
           hideScreens();
-          mongifyConnectionScreen.render(_id);
+          mongifyConnectionScreen.render(projectId);
         };
       },
     },

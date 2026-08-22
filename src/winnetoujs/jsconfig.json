@@ -13,9 +13,10 @@
       "@screens/*": ["./source-code/screens/*"],
       "@projectScreens/*": ["./source-code/project/*"],
       "@leftMenu": ["./source-code/left-menu/left-menu"],
-      "@helpers/*": ["./source-code/helpers/*"]
+      "@helpers/*": ["./source-code/helpers/*"],
+      "@projectTypes/*": ["../../types/*"]
     }
   },
   "exclude": ["node_modules", "**/node_modules/*"],
-  "include": ["../../types/*.d.ts", "./**/*.ts", "./**/*.js"]
+  "include": ["./**/*.ts", "./**/*.js"]
 }

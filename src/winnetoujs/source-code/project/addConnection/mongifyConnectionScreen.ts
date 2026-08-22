@@ -5,8 +5,8 @@ import { Screen } from "@screens/screen";
 import { W } from "winnetoujs";
 
 class MongifyConnectionScreen extends Screen {
-  public async render(_id: string) {
-    const project = await window.database.getProjectById(_id);
+  public async render(projectId: string) {
+    const project = await window.database.getProjectById(projectId);
 
     const content = this.buildScreen({
       output: "screen",
@@ -58,7 +58,7 @@ class MongifyConnectionScreen extends Screen {
 
         try {
           await window.database.saveMongifyConnection({
-            projectId: _id,
+            projectId: projectId,
             databasePath: databasePathInput.value,
             databaseName: databaseNameInput.value,
           });

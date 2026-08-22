@@ -3,30 +3,44 @@ import { ipcChannels } from "../ipc.channels";
 import {
   database,
   ICreateNewProjectArgs,
-  ISaveMongoConnection,
   ISaveMongifyConnection,
-  IDatabase,
-} from "../../types/ipc";
+  IGetMongifyCollectionsArgs,
+  IMongifyConnectionsColl,
+  IDatabasesColl,
+} from "@projectTypes/ipc";
 import { Mongify } from "@cedrosdev/mongify";
 import fs from "fs";
 import path from "path";
-import { IProjects } from "../../types/mongify";
+import { IProject } from "@projectTypes/ipc";
 import { projectRoot } from "../settings/home.dir";
 const db = new Mongify({
   database_name: "cedros_database_admin",
 });
+
 const projectRootPath = projectRoot();
 
-let mongifyClient: Mongify | null = null;
+let mongifyClient = new Map<string, Mongify>();
 
-const createMongifyClient = async () => {
-  if (!mongifyClient) {
+const generateUniqueId = () => {
+  return Math.random().toString(36).substring(2, 15);
+};
+
+const createMongifyClient = async (args0: IGetMongifyCollectionsArgs) => {
+  const connectionId = `${args0.projectId}-${args0.databaseId}`;
+  if (!mongifyClient.has(connectionId)) {
     const mongifyConnection = await db
       .getCollection<ISaveMongifyConnection>("mongify_connections")
-      .findOne();
+      .findOne({
+        projectId: args0.projectId,
+      });
+
+    console.table({
+      _id: args0.databaseId,
+      projectId: args0.projectId,
+    });
 
     if (!mongifyConnection) {
-      throw new Error("No Mongify connection found");
+      throw new Error("[code 3hdk82n] No Mongify connection found");
     }
 
     console.log({
@@ -34,10 +48,13 @@ const createMongifyClient = async () => {
       databaseName: mongifyConnection.databaseName,
     });
 
-    mongifyClient = new Mongify({
-      database_name: mongifyConnection.databaseName,
-      path: mongifyConnection.databasePath,
-    });
+    mongifyClient.set(
+      connectionId,
+      new Mongify({
+        database_name: mongifyConnection.databaseName,
+        path: mongifyConnection.databasePath,
+      }),
+    );
 
     return true;
   }
@@ -65,7 +82,10 @@ export const databaseIPCApi = () => {
         fs.writeFileSync(filePath, Buffer.from(file.data));
       }
 
-      const res = await db.getCollection<IProjects>("projects").insert({
+      const projectId = generateUniqueId();
+
+      const res = await db.getCollection<IProject>("projects").insert({
+        projectId,
         name,
         description,
         image: imageName,
@@ -77,7 +97,7 @@ export const databaseIPCApi = () => {
 
   // ipcChannels.load_projects
   ipcMain.handle(ipcChannels.load_projects, async () => {
-    const projects = await db.getCollection<IProjects>("projects").find();
+    const projects = await db.getCollection<IProject>("projects").find();
     return projects;
   });
 
@@ -86,8 +106,8 @@ export const databaseIPCApi = () => {
     ipcChannels.get_project_by_id,
     async (event, projectId: string) => {
       const project = await db
-        .getCollection<IProjects>("projects")
-        .findOne({ _id: projectId });
+        .getCollection<IProject>("projects")
+        .findOne({ projectId });
       return project;
     },
   );
@@ -95,7 +115,7 @@ export const databaseIPCApi = () => {
   // ipcChannels.save_mongo_connection
   ipcMain.handle(
     ipcChannels.save_mongo_connection,
-    async (event, args0: ISaveMongoConnection) => {
+    async (event, args0: any) => {
       await (!safeStorage.isEncryptionAvailable()
         ? Promise.reject(
             new Error("Encryption is not available on this system"),
@@ -106,7 +126,7 @@ export const databaseIPCApi = () => {
         .encryptString(args0.password)
         .toString("base64");
 
-      const doc: ISaveMongoConnection = {
+      const doc: any = {
         projectId: args0.projectId,
         database: args0.database,
         name: args0.name,
@@ -117,9 +137,7 @@ export const databaseIPCApi = () => {
 
       console.table(doc);
 
-      const res = await db
-        .getCollection<ISaveMongoConnection>("mongo_connections")
-        .insert(doc);
+      const res = await db.getCollection<any>("mongo_connections").insert(doc);
 
       await db.getCollection("databases").insert({
         type: "mongo",
@@ -139,39 +157,51 @@ export const databaseIPCApi = () => {
         throw new Error("Project ID and database path are required");
       }
 
+      const databaseId = generateUniqueId();
+      const registerId = generateUniqueId();
+
       await db
-        .getCollection<ISaveMongifyConnection>("mongify_connections")
+        .getCollection<IMongifyConnectionsColl>("mongify_connections")
         .insert({
+          internalId: databaseId,
           projectId: args.projectId,
           databasePath: args.databasePath.trim(),
           databaseName: args.databaseName.trim(),
         });
 
-      await db.getCollection("databases").insert({
+      await db.getCollection<IDatabasesColl>("databases").insert({
         type: "mongify",
         projectId: args.projectId,
         database_name: args.databaseName.trim(),
+        databaseId,
+        internalId: registerId,
       });
 
       return true;
     },
   );
 
-  // ipcChannels.mongify.get_collections
-  ipcMain.handle(ipcChannels.mongify.get_collections, async () => {
-    if (!mongifyClient) {
-      await createMongifyClient();
-    }
-    let collections: string[] = await mongifyClient!.listCollections();
-    return collections;
-  });
-
   // ipcChannels.list_databases
   ipcMain.handle(ipcChannels.list_databases, async (ev, projectId: string) => {
-    console.log("inside list_databases");
-    const res = await db.getCollection<IDatabase>("databases").find({
+    const res = await db.getCollection<IDatabasesColl>("databases").find({
       projectId,
     });
     return res;
   });
+
+  // ipcChannels.mongify.get_collections
+  ipcMain.handle(
+    ipcChannels.mongify.get_collections,
+    async (ev, args0: IGetMongifyCollectionsArgs) => {
+      const connection_id = `${args0.projectId}-${args0.databaseId}`;
+      if (!mongifyClient.has(connection_id)) {
+        await createMongifyClient(args0);
+      }
+      let collections: string[] | undefined = await mongifyClient
+        .get(connection_id)
+        ?.listCollections();
+
+      return collections;
+    },
+  );
 };

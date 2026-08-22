@@ -2,10 +2,6 @@ import { $div, $image } from "@common";
 import { createElement, ChevronLeft, ChevronRight } from "lucide";
 import { W } from "winnetoujs";
 export class Screen {
-  protected render(args0?: any) {
-    throw new Error("Method not implemented.");
-  }
-
   protected buildScreen(args0: {
     output: string;
     title: string;

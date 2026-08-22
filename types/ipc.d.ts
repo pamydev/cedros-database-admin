@@ -6,6 +6,13 @@ export interface systemApi {
   getAccentColor: () => Promise<string>;
 }
 
+export interface IProject {
+  projectId: string;
+  name: string;
+  description: string;
+  image: string | null;
+}
+
 export interface ICreateNewProjectArgs {
   name: string;
   description: string;
@@ -16,32 +23,36 @@ export interface ICreateNewProjectArgs {
   } | null;
 }
 
-export interface ISaveMongoConnection {
-  _id?: any;
-  uri: string;
-  name: string;
-  userName: string;
-  password: string;
-  database: string;
+export interface IDatabasesColl {
+  type: "mongo" | "mongify" | "redis";
   projectId: string;
+  database_name: string;
+  databaseId: string;
+  internalId: string;
 }
 
-export interface ISaveMongifyConnection {
-  _id?: any;
+export interface IMongifyConnectionsColl {
+  internalId: string;
   databasePath: string;
   databaseName: string;
   projectId: string;
 }
 
-export interface IDatabase {
-  type: "mongo" | "mongify" | "redis";
+export interface ISaveMongifyConnection {
+  databasePath: string;
+  databaseName: string;
   projectId: string;
-  database_name: string;
-  _id?: any;
 }
 
-interface mongify {
-  getCollections: () => Promise<string[]>;
+export interface IGetMongifyCollectionsArgs {
+  databaseId: string;
+  projectId: string;
+}
+
+export interface mongifyMethods {
+  getCollections: (
+    args0: IGetMongifyCollectionsArgs,
+  ) => Promise<string[] | undefined>;
 }
 
 export interface database {
@@ -50,8 +61,8 @@ export interface database {
   getProjectById: (projectId: string) => Promise<IProjects | null>;
   saveMongoConnection: (args0: ISaveMongoConnection) => Promise<boolean>;
   saveMongifyConnection: (args: ISaveMongifyConnection) => Promise<boolean>;
-  listDatabases: (projectId: string) => Promise<IDatabase[]>;
-  mongify: mongify;
+  listDatabases: (projectId: string) => Promise<IDatabasesColl[]>;
+  mongify: mongifyMethods;
 }
 
 declare global {

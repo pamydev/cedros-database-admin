@@ -6,8 +6,8 @@ import { appRouter } from "../../router/router";
 
 class AddConnectionScreen extends Screen {
   private output: string;
-  public async render(_id: string) {
-    const project = await window.database.getProjectById(_id);
+  public async render(projectId: string) {
+    const project = await window.database.getProjectById(projectId);
 
     const content = this.buildScreen({
       output: "screen",
@@ -28,7 +28,7 @@ class AddConnectionScreen extends Screen {
     listItem({
       label: "MongoDB",
       onclick: W.fx(() => {
-        appRouter.methods.add_mongo_connection.go(_id);
+        appRouter.methods.add_mongo_connection.go(projectId);
       }),
       output: this.output,
     });
@@ -36,7 +36,7 @@ class AddConnectionScreen extends Screen {
     listItem({
       label: "Redis",
       onclick: W.fx(() => {
-        appRouter.methods.add_redis_connection.go(_id);
+        appRouter.methods.add_redis_connection.go(projectId);
       }),
       output: this.output,
     });
@@ -44,7 +44,7 @@ class AddConnectionScreen extends Screen {
     listItem({
       label: "Cedros Mongify",
       onclick: W.fx(() => {
-        appRouter.methods.add_mongify_connection.go(_id);
+        appRouter.methods.add_mongify_connection.go(projectId);
       }),
       output: this.output,
     });

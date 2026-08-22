@@ -1259,9 +1259,6 @@ var Router = new WinnetouRouter_();
 
 // source-code/screens/screen.ts
 var Screen = class {
-  render(args0) {
-    throw new Error("Method not implemented.");
-  }
   buildScreen(args0) {
     if (this.exists(args0.identifier)) return "exists";
     const output = new $div(
@@ -1426,7 +1423,7 @@ var SelectProjectScreen = class extends Screen {
       chevronRight: true,
       imageURL: imgURL,
       onclick: W.fx(() => {
-        appRouter.methods.project_home.go(project._id);
+        appRouter.methods.project_home.go(project.projectId);
       }),
       output
     });
@@ -1549,8 +1546,8 @@ var hideScreens = () => {
 // source-code/project/addConnection/addConnectionScreen.ts
 var AddConnectionScreen = class extends Screen {
   output;
-  async render(_id) {
-    const project = await window.database.getProjectById(_id);
+  async render(projectId) {
+    const project = await window.database.getProjectById(projectId);
     const content = this.buildScreen({
       output: "screen",
       title: "Add Connection",
@@ -1564,21 +1561,21 @@ var AddConnectionScreen = class extends Screen {
     listItem({
       label: "MongoDB",
       onclick: W.fx(() => {
-        appRouter.methods.add_mongo_connection.go(_id);
+        appRouter.methods.add_mongo_connection.go(projectId);
       }),
       output: this.output
     });
     listItem({
       label: "Redis",
       onclick: W.fx(() => {
-        appRouter.methods.add_redis_connection.go(_id);
+        appRouter.methods.add_redis_connection.go(projectId);
       }),
       output: this.output
     });
     listItem({
       label: "Cedros Mongify",
       onclick: W.fx(() => {
-        appRouter.methods.add_mongify_connection.go(_id);
+        appRouter.methods.add_mongify_connection.go(projectId);
       }),
       output: this.output
     });
@@ -1678,8 +1675,8 @@ var mongoConnectionScreen = new MongoConnectionScreen();
 
 // source-code/project/addConnection/mongifyConnectionScreen.ts
 var MongifyConnectionScreen = class extends Screen {
-  async render(_id) {
-    const project = await window.database.getProjectById(_id);
+  async render(projectId) {
+    const project = await window.database.getProjectById(projectId);
     const content = this.buildScreen({
       output: "screen",
       title: "Add Cedros Mongify Connection",
@@ -1719,7 +1716,7 @@ var MongifyConnectionScreen = class extends Screen {
         }
         try {
           await window.database.saveMongifyConnection({
-            projectId: _id,
+            projectId,
             databasePath: databasePathInput.value,
             databaseName: databaseNameInput.value
           });
@@ -1803,23 +1800,23 @@ var ProjectHomeScreen = class extends Screen {
   output;
   panelOutput;
   projectId;
-  async render(_id) {
-    this.projectId = _id;
-    const project = await window.database.getProjectById(_id);
+  async render(projectId) {
+    this.projectId = projectId;
+    const projectDetails = await window.database.getProjectById(projectId);
     const content = this.buildScreen({
       output: "screen",
       title: "Project Home",
       identifier: "project-home",
-      titleImg: (project == null ? void 0 : project.image) ? `images://${encodeURIComponent(project.name)}/${project.image}` : null
+      titleImg: (projectDetails == null ? void 0 : projectDetails.image) ? `images://${encodeURIComponent(projectDetails.name)}/${projectDetails.image}` : null
     });
     if (content === "exists") return;
     this.output = content;
     new $div({
-      content: project.name,
+      content: projectDetails.name,
       class: "TITLE"
     }).create(content);
     new $div({
-      content: project.description,
+      content: projectDetails.description,
       class: "SUB-TITLE",
       style: "margin-bottom: 20px;"
     }).create(content);
@@ -1882,7 +1879,10 @@ var ProjectHomeScreen = class extends Screen {
       content: "Mongify Collections",
       style: "margin-bottom: 10px; font-weight: bold; font-size: 16px;"
     }).create(output);
-    let collections = await window.database.mongify.getCollections();
+    let collections = await window.database.mongify.getCollections({
+      databaseId: db.databaseId,
+      projectId: this.projectId
+    });
     collections.forEach((collection) => {
       new $div({
         content: collection
@@ -1896,61 +1896,61 @@ var projectHomeScreen = new ProjectHomeScreen();
 var projectRouter = (routes = {}) => {
   return {
     project_home: {
-      go(_id) {
-        Router.navigate(`/screen/home/${_id}`);
+      go(projectId) {
+        Router.navigate(`/screen/home/${projectId}`);
       },
       set() {
-        routes["/screen/home/:_id"] = (_id) => {
-          leftMenu2.renderProjectMenu(_id);
+        routes["/screen/home/:projectId"] = (projectId) => {
+          leftMenu2.renderProjectMenu(projectId);
           hideScreens();
           manualMenuEffect("home");
-          projectHomeScreen.render(_id);
+          projectHomeScreen.render(projectId);
         };
       }
     },
     add_connection: {
-      go(_id) {
-        Router.navigate(`/screen/add-connection/${_id}`);
+      go(projectId) {
+        Router.navigate(`/screen/add-connection/${projectId}`);
       },
       set() {
-        routes["/screen/add-connection/:_id"] = (_id) => {
-          leftMenu2.renderProjectMenu(_id);
+        routes["/screen/add-connection/:projectId"] = (projectId) => {
+          leftMenu2.renderProjectMenu(projectId);
           hideScreens();
           manualMenuEffect("add-connection");
-          addConnectionScreen.render(_id);
+          addConnectionScreen.render(projectId);
         };
       }
     },
     add_mongo_connection: {
-      go(_id) {
-        Router.navigate(`/screen/add-mongo-connection/${_id}`);
+      go(projectId) {
+        Router.navigate(`/screen/add-mongo-connection/${projectId}`);
       },
       set() {
-        routes["/screen/add-mongo-connection/:_id"] = (_id) => {
+        routes["/screen/add-mongo-connection/:projectId"] = (projectId) => {
           hideScreens();
-          mongoConnectionScreen.render(_id);
+          mongoConnectionScreen.render(projectId);
         };
       }
     },
     add_redis_connection: {
-      go(_id) {
-        Router.navigate(`/screen/add-redis-connection/${_id}`);
+      go(projectId) {
+        Router.navigate(`/screen/add-redis-connection/${projectId}`);
       },
       set() {
-        routes["/screen/add-redis-connection/:_id"] = (_id) => {
+        routes["/screen/add-redis-connection/:projectId"] = (projectId) => {
           hideScreens();
-          redisConnectionScreen.render(_id);
+          redisConnectionScreen.render(projectId);
         };
       }
     },
     add_mongify_connection: {
-      go(_id) {
-        Router.navigate(`/screen/add-mongify-connection/${_id}`);
+      go(projectId) {
+        Router.navigate(`/screen/add-mongify-connection/${projectId}`);
       },
       set() {
-        routes["/screen/add-mongify-connection/:_id"] = (_id) => {
+        routes["/screen/add-mongify-connection/:projectId"] = (projectId) => {
           hideScreens();
-          mongifyConnectionScreen.render(_id);
+          mongifyConnectionScreen.render(projectId);
         };
       }
     }

@@ -11,8 +11,8 @@ import { ChevronRight, Plus } from "lucide";
 import { W } from "winnetoujs";
 import { appRouter } from "../../router/router";
 import { leftMenu, manualMenuEffect } from "../../left-menu/left-menu";
-import { IProjects } from "../../../../../types/mongify";
 import { listItem } from "@helpers/listItem.helper";
+import { IProject } from "@projectTypes/ipc";
 
 class SelectProjectScreen extends Screen {
   private output: string;
@@ -53,7 +53,7 @@ class SelectProjectScreen extends Screen {
     projects.forEach((project) => this.printProject(project, output));
   }
 
-  private printProject(project: IProjects, output: string) {
+  private printProject(project: IProject, output: string) {
     // console.log("Project:", project);
     //      appRouter.methods.project_home.go(project._id);
     const uriProjectName = encodeURIComponent(project.name);
@@ -67,7 +67,7 @@ class SelectProjectScreen extends Screen {
       chevronRight: true,
       imageURL: imgURL,
       onclick: W.fx(() => {
-        appRouter.methods.project_home.go(project._id);
+        appRouter.methods.project_home.go(project.projectId);
       }),
       output,
     });

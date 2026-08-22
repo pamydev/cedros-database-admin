@@ -1,6 +1,6 @@
 import { $div, $span } from "@common";
 import { Screen } from "@screens/screen";
-import { IDatabase } from "../../../../../types/ipc";
+import { IDatabasesColl } from "../../../../../types/ipc";
 import { listItem } from "@helpers/listItem.helper";
 import { Database } from "lucide";
 import { W } from "winnetoujs";
@@ -10,16 +10,16 @@ class ProjectHomeScreen extends Screen {
   private panelOutput: string;
   private projectId: string;
 
-  public async render(_id: string) {
-    this.projectId = _id;
-    const project = await window.database.getProjectById(_id);
+  public async render(projectId: string) {
+    this.projectId = projectId;
+    const projectDetails = await window.database.getProjectById(projectId);
 
     const content = this.buildScreen({
       output: "screen",
       title: "Project Home",
       identifier: "project-home",
-      titleImg: project?.image
-        ? `images://${encodeURIComponent(project.name)}/${project.image}`
+      titleImg: projectDetails?.image
+        ? `images://${encodeURIComponent(projectDetails.name)}/${projectDetails.image}`
         : null,
     });
 
@@ -27,12 +27,12 @@ class ProjectHomeScreen extends Screen {
     this.output = content;
 
     new $div({
-      content: project.name,
+      content: projectDetails.name,
       class: "TITLE",
     }).create(content);
 
     new $div({
-      content: project.description,
+      content: projectDetails.description,
       class: "SUB-TITLE",
       style: "margin-bottom: 20px;",
     }).create(content);
@@ -82,7 +82,7 @@ class ProjectHomeScreen extends Screen {
     });
   }
 
-  private printDatabase(db: IDatabase, output: string) {
+  private printDatabase(db: IDatabasesColl, output: string) {
     const label = new $span({
       content: db.type,
       class: `__span-${db.type}__`,
@@ -97,13 +97,13 @@ class ProjectHomeScreen extends Screen {
     });
   }
 
-  async openDatabase(db: IDatabase) {
+  async openDatabase(db: IDatabasesColl) {
     if (db.type === "mongify") {
       this.renderMongify(db);
     }
   }
 
-  async renderMongify(db: IDatabase) {
+  async renderMongify(db: IDatabasesColl) {
     const output = new $div({
       class: "PANEL",
     }).create(this.panelOutput).ids.div;
@@ -113,7 +113,10 @@ class ProjectHomeScreen extends Screen {
       style: "margin-bottom: 10px; font-weight: bold; font-size: 16px;",
     }).create(output);
 
-    let collections = await window.database.mongify.getCollections();
+    let collections = await window.database.mongify.getCollections({
+      databaseId: db.databaseId,
+      projectId: this.projectId,
+    });
 
     collections.forEach((collection) => {
       new $div({
