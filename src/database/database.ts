@@ -7,6 +7,7 @@ import {
   IGetMongifyCollectionsArgs,
   IMongifyConnectionsColl,
   IDatabasesColl,
+  IMongifySendQueryArgs,
 } from "@projectTypes/ipc";
 import { Mongify } from "@cedrosdev/mongify";
 import fs from "fs";
@@ -29,9 +30,10 @@ const createMongifyClient = async (args0: IGetMongifyCollectionsArgs) => {
   const connectionId = `${args0.projectId}-${args0.databaseId}`;
   if (!mongifyClient.has(connectionId)) {
     const mongifyConnection = await db
-      .getCollection<ISaveMongifyConnection>("mongify_connections")
+      .getCollection<IMongifyConnectionsColl>("mongify_connections")
       .findOne({
         projectId: args0.projectId,
+        internalId: args0.databaseId,
       });
 
     console.table({
@@ -201,7 +203,30 @@ export const databaseIPCApi = () => {
         .get(connection_id)
         ?.listCollections();
 
+      console.log({ connection_id, collections });
+
       return collections;
+    },
+  );
+
+  ipcMain.handle(
+    ipcChannels.mongify.send_query,
+    async (ev, args0: IMongifySendQueryArgs) => {
+      console.table(args0);
+      const connection_id = `${args0.projectId}-${args0.databaseId}`;
+      if (!mongifyClient.has(connection_id)) {
+        await createMongifyClient(args0);
+      }
+      const db = mongifyClient.get(connection_id);
+      let res;
+
+      try {
+        res = await eval(args0.command);
+      } catch (e) {
+        console.log("error code 3d2kl9", e);
+      }
+      console.log("Eval returning from mongify query", res);
+      return res;
     },
   );
 };

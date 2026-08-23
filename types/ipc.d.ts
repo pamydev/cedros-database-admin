@@ -49,10 +49,17 @@ export interface IGetMongifyCollectionsArgs {
   projectId: string;
 }
 
+export interface IMongifySendQueryArgs {
+  projectId: string;
+  databaseId: string;
+  command: string;
+}
+
 export interface mongifyMethods {
   getCollections: (
     args0: IGetMongifyCollectionsArgs,
   ) => Promise<string[] | undefined>;
+  sendQuery: (args0: IMongifySendQueryArgs) => Promise<{}>;
 }
 
 export interface database {

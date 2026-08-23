@@ -1,4 +1,4 @@
-import { $div, $span } from "@common";
+import { $buttonPrimary, $contentEditable, $div, $span } from "@common";
 import { Screen } from "@screens/screen";
 import { IDatabasesColl } from "../../../../../types/ipc";
 import { listItem } from "@helpers/listItem.helper";
@@ -68,6 +68,7 @@ class ProjectHomeScreen extends Screen {
       chevronRight: false,
     });
 
+    console.table(databases);
     databases.forEach((db) => this.printDatabase(db, output));
 
     // workspaces
@@ -104,25 +105,42 @@ class ProjectHomeScreen extends Screen {
   }
 
   async renderMongify(db: IDatabasesColl) {
+    console.log("renderMongify", db.database_name);
     const output = new $div({
       class: "PANEL",
     }).create(this.panelOutput).ids.div;
 
     new $div({
-      content: "Mongify Collections",
-      style: "margin-bottom: 10px; font-weight: bold; font-size: 16px;",
+      content: db.database_name,
+      class: "TITLE",
     }).create(output);
 
-    let collections = await window.database.mongify.getCollections({
-      databaseId: db.databaseId,
-      projectId: this.projectId,
-    });
+    new $buttonPrimary({
+      content: "Send",
+      onclick: W.fx(async () => {
+        const res = await window.database.mongify.sendQuery({
+          projectId: db.projectId,
+          databaseId: db.databaseId,
+          command: document.getElementById(command).textContent,
+        });
+        console.log(res);
+      }),
+    }).create(output);
 
-    collections.forEach((collection) => {
-      new $div({
-        content: collection,
-      }).create(output);
-    });
+    const command = new $contentEditable({
+      class: "code-editor",
+    }).create(output).ids.contentEditable;
+
+    // let collections = await window.database.mongify.getCollections({
+    //   databaseId: db.databaseId,
+    //   projectId: this.projectId,
+    // });
+
+    // collections.forEach((collection) => {
+    //   new $div({
+    //     content: collection,
+    //   }).create(output);
+    // });
   }
 }
 

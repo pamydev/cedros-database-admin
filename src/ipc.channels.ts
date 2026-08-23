@@ -8,5 +8,6 @@ export const ipcChannels = {
   list_databases: "api:list-databases",
   mongify: {
     get_collections: "mongify:get-collections",
+    send_query: "mongify:send-query",
   },
 };

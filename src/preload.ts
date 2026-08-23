@@ -20,6 +20,8 @@ const database: database = {
   mongify: {
     getCollections: (args0) =>
       ipcRenderer.invoke(ipcChannels.mongify.get_collections, args0),
+    sendQuery: (args0) =>
+      ipcRenderer.invoke(ipcChannels.mongify.send_query, args0),
   },
   listDatabases: (projectId) =>
     ipcRenderer.invoke(ipcChannels.list_databases, projectId),

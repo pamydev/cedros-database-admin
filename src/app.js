@@ -825,6 +825,76 @@ var $span = class _$span extends Constructos {
     return this.component;
   }
 };
+var $contentEditable = class _$contentEditable extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.class]  
+   * @param {any} [elements.oninput]  
+   * @param {any} [elements.style]  
+   * @param {any} [elements.content]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `contentEditable-win-${this.identifier}`,
+      elements,
+      options,
+      _$contentEditable
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <div     id="contentEditable-win-${this.identifier}"
+    class="${(props == null ? void 0 : props.class) || ""}"
+    contenteditable="true"
+    oninput="${(props == null ? void 0 : props.oninput) || ""}"
+    style="${(props == null ? void 0 : props.style) || ""}">
+    ${(props == null ? void 0 : props.content) || ""}
+  </div>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        contentEditable: `contentEditable-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
 
 // ../../node_modules/lucide/dist/esm/defaultAttributes.mjs
 var defaultAttributes = {
@@ -1843,6 +1913,7 @@ var ProjectHomeScreen = class extends Screen {
       onclick: "",
       chevronRight: false
     });
+    console.table(databases);
     databases.forEach((db) => this.printDatabase(db, output));
     listItem({
       label: "Workspaces list",
@@ -1872,22 +1943,28 @@ var ProjectHomeScreen = class extends Screen {
     }
   }
   async renderMongify(db) {
+    console.log("renderMongify", db.database_name);
     const output = new $div({
       class: "PANEL"
     }).create(this.panelOutput).ids.div;
     new $div({
-      content: "Mongify Collections",
-      style: "margin-bottom: 10px; font-weight: bold; font-size: 16px;"
+      content: db.database_name,
+      class: "TITLE"
     }).create(output);
-    let collections = await window.database.mongify.getCollections({
-      databaseId: db.databaseId,
-      projectId: this.projectId
-    });
-    collections.forEach((collection) => {
-      new $div({
-        content: collection
-      }).create(output);
-    });
+    new $buttonPrimary({
+      content: "Send",
+      onclick: W.fx(async () => {
+        const res = await window.database.mongify.sendQuery({
+          projectId: db.projectId,
+          databaseId: db.databaseId,
+          command: document.getElementById(command).textContent
+        });
+        console.log(res);
+      })
+    }).create(output);
+    const command = new $contentEditable({
+      class: "code-editor"
+    }).create(output).ids.contentEditable;
   }
 };
 var projectHomeScreen = new ProjectHomeScreen();
