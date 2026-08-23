@@ -1,18 +1,17 @@
 import { ipcMain, safeStorage } from "electron";
 import { ipcChannels } from "../ipc.channels";
 import {
-  database,
   ICreateNewProjectArgs,
   ISaveMongifyConnection,
   IGetMongifyCollectionsArgs,
   IMongifyConnectionsColl,
   IDatabasesColl,
   IMongifySendQueryArgs,
-} from "@projectTypes/ipc";
+} from "@projectTypes/contracts";
 import { Mongify } from "@cedrosdev/mongify";
 import fs from "fs";
 import path from "path";
-import { IProject } from "@projectTypes/ipc";
+import { IProject } from "@projectTypes/contracts";
 import { projectRoot } from "../settings/home.dir";
 const db = new Mongify({
   database_name: "cedros_database_admin",

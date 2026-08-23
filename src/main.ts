@@ -3,7 +3,7 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { setApplicationMenu } from "./mac-menu";
 import { ipcChannels } from "./ipc.channels";
-import { database } from "../types/ipc";
+import { database } from "../types/contracts";
 import { databaseIPCApi } from "./database/database";
 import { registerProtocols } from "./protocols/protocols";
 

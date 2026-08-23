@@ -1,6 +1,6 @@
 import { $buttonPrimary, $contentEditable, $div, $span } from "@common";
 import { Screen } from "@screens/screen";
-import { IDatabasesColl } from "../../../../../types/ipc";
+import { IDatabasesColl } from "../../../../../types/contracts";
 import { listItem } from "@helpers/listItem.helper";
 import { Database } from "lucide";
 import { W } from "winnetoujs";

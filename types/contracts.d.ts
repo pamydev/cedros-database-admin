@@ -1,5 +1,3 @@
-import { IProjects } from "./mongify";
-
 export {};
 
 export interface systemApi {
@@ -53,28 +51,4 @@ export interface IMongifySendQueryArgs {
   projectId: string;
   databaseId: string;
   command: string;
-}
-
-export interface mongifyMethods {
-  getCollections: (
-    args0: IGetMongifyCollectionsArgs,
-  ) => Promise<string[] | undefined>;
-  sendQuery: (args0: IMongifySendQueryArgs) => Promise<{}>;
-}
-
-export interface database {
-  createNewProject: (args: ICreateNewProjectArgs) => Promise<boolean>;
-  loadProjects: () => Promise<IProjects[]>;
-  getProjectById: (projectId: string) => Promise<IProjects | null>;
-  saveMongoConnection: (args0: ISaveMongoConnection) => Promise<boolean>;
-  saveMongifyConnection: (args: ISaveMongifyConnection) => Promise<boolean>;
-  listDatabases: (projectId: string) => Promise<IDatabasesColl[]>;
-  mongify: mongifyMethods;
-}
-
-declare global {
-  interface Window {
-    systemAPI: systemApi;
-    database: database;
-  }
 }

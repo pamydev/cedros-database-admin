@@ -12,7 +12,7 @@ import { W } from "winnetoujs";
 import { appRouter } from "../../router/router";
 import { leftMenu, manualMenuEffect } from "../../left-menu/left-menu";
 import { listItem } from "@helpers/listItem.helper";
-import { IProject } from "@projectTypes/ipc";
+import { IProject } from "@projectTypes/contracts";
 
 class SelectProjectScreen extends Screen {
   private output: string;
