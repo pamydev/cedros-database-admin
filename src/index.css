@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
 .left-menu {
   flex: 0;
   height: 100%;
@@ -117,6 +118,9 @@
   width: 100%;
   background: transparent;
   position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .screen-header {
@@ -195,6 +199,7 @@
 .screen-content {
   padding: 10px;
   padding-left: 10px;
+  padding-bottom: 0px;
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -282,14 +287,103 @@
   padding-bottom: 4px;
 }
 
+.code-editor-container {
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid var(--mac-accent);
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
 .code-editor {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  overflow: auto;
+  outline: none;
+  font-family: var(--code-font);
+}
+.code-editor:focus {
+  ouline: none;
+}
+
+.code-editor-output {
+  font-family: var(--code-font);
   padding: 10px;
   border-radius: 10px;
   background: transparent;
   border: 1px solid var(--mac-yellow);
   width: 100%;
-  height: 100px;
+  height: auto;
   margin-top: 10px;
+  overflow: auto;
+}
+.code-editor-output .table-row {
+  display: flex;
+  flex-direction: row;
+}
+.code-editor-output .table-row:first-child .table-cell {
+  font-weight: 600;
+  background: color-mix(var(--mac-yellow) 20%, transparent);
+}
+.code-editor-output .table-row:not(:first-child):hover .table-cell {
+  background: color-mix(var(--mac-yellow) 10%, transparent);
+}
+.code-editor-output .table-cell {
+  padding: 8px 10px;
+  border-right: 1px solid color-mix(var(--mac-yellow) 40%, transparent);
+  border-bottom: 1px solid color-mix(var(--mac-yellow) 40%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100px;
+  font-size: var(--font-size-smaller);
+  overflow-x: auto;
+}
+.code-editor-output .table-cell:last-child {
+  border-right: 0;
+}
+
+.suggestion-box {
+  position: fixed;
+  width: 400px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background-color: color-mix(var(--mac-sidebar-bg) 80%, transparent);
+  border: 1px inset var(--mac-accent);
+  padding: 2px 6px;
+}
+.suggestion-box .__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.suggestion-box .__item .__left {
+  display: flex;
+  gap: 2px;
+  justify-content: flex-start;
+  align-items: center;
+}
+.suggestion-box .__item .__left .__icon svg {
+  width: 17px;
+  height: 17px;
+  stroke: 2px;
+}
+.suggestion-box .__item .__left .__text {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  font-family: var(--code-font);
+}
+.suggestion-box .__item .__right .__description {
+  color: color-mix(var(--mac-text) 50%, transparent);
+  font-size: var(--font-size-smaller);
+  font-family: var(--code-font);
 }
 
 .FLEX-TRANSPARENT {
@@ -461,6 +555,7 @@ form textarea {
   --mac-secondary-text: rgba(0, 0, 0, 0.54);
   --mac-separator: rgba(0, 0, 0, 0.3);
   --mac-separator-soft: rgba(0, 0, 0, 0.1);
+  --code-font: "JetBrains Mono", monospace;
   --mac-font:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;

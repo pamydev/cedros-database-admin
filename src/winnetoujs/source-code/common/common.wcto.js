@@ -630,12 +630,11 @@ export class $span extends Constructos {
   return this.component;
  }
 }
-export class $contentEditable extends Constructos {
+export class $codeEditor extends Constructos {
  // ========================================
  /**
   * 
   * @param {object} [elements]
-  * @param {any} [elements.class]  
   * @param {any} [elements.oninput]  
   * @param {any} [elements.style]  
   * @param {any} [elements.content]  
@@ -653,8 +652,8 @@ export class $contentEditable extends Constructos {
   this.component = this.code(
    digestedPropsToString);
   this._saveUsingMutable(
-   `contentEditable-win-${this.identifier}`,
-   elements, options, $contentEditable);
+   `codeEditor-win-${this.identifier}`,
+   elements, options, $codeEditor);
  }
  /**
   * Generate the HTML code for this constructo
@@ -664,12 +663,14 @@ export class $contentEditable extends Constructos {
   */
  code (props) {
   return `
-  <div     id="contentEditable-win-${this.identifier}"
-    class="${props?.class || ""}"
-    contenteditable="true"
-    oninput="${props?.oninput || ""}"
-    style="${props?.style || ""}">
-    ${props?.content || ""}
+  <div id="codeEditor-win-${this.identifier}" class="code-editor-container">
+    <div       id="contentEditable-win-${this.identifier}"
+      class="code-editor"
+      contenteditable="true"
+      oninput="${props?.oninput || ""}"
+      style="${props?.style || ""}">
+      ${props?.content || ""}
+    </div>
   </div>
 `;
  }
@@ -685,6 +686,7 @@ export class $contentEditable extends Constructos {
    options);
   return {
    ids: {
+    codeEditor: `codeEditor-win-${this.identifier}`,
     contentEditable: `contentEditable-win-${this.identifier}`,
    },
   };

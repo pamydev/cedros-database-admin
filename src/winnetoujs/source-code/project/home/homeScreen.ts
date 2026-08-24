@@ -1,9 +1,11 @@
-import { $buttonPrimary, $contentEditable, $div, $span } from "@common";
+import { $buttonPrimary, $codeEditor, $div, $span } from "@common";
 import { Screen } from "@screens/screen";
 import { IDatabasesColl } from "../../../../../types/contracts";
 import { listItem } from "@helpers/listItem.helper";
 import { Database } from "lucide";
 import { W } from "winnetoujs";
+import { digestOutput } from "./digestOutput";
+import { suggestions } from "./suggestions";
 
 class ProjectHomeScreen extends Screen {
   private output: string;
@@ -108,6 +110,7 @@ class ProjectHomeScreen extends Screen {
     console.log("renderMongify", db.database_name);
     const output = new $div({
       class: "PANEL",
+      style: "position:relative",
     }).create(this.panelOutput).ids.div;
 
     new $div({
@@ -124,23 +127,23 @@ class ProjectHomeScreen extends Screen {
           command: document.getElementById(command).textContent,
         });
         console.log(res);
+        digestOutput({
+          output: output,
+          result: res,
+        });
       }),
     }).create(output);
 
-    const command = new $contentEditable({
-      class: "code-editor",
+    const command = new $codeEditor({
+      content: "db.listCollections()",
     }).create(output).ids.contentEditable;
 
-    // let collections = await window.database.mongify.getCollections({
-    //   databaseId: db.databaseId,
-    //   projectId: this.projectId,
-    // });
-
-    // collections.forEach((collection) => {
-    //   new $div({
-    //     content: collection,
-    //   }).create(output);
-    // });
+    document.getElementById(command).addEventListener("keyup", (e) => {
+      suggestions({
+        codeEditor: command,
+        output,
+      });
+    });
   }
 }
 

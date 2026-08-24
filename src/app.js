@@ -825,12 +825,11 @@ var $span = class _$span extends Constructos {
     return this.component;
   }
 };
-var $contentEditable = class _$contentEditable extends Constructos {
+var $codeEditor = class _$codeEditor extends Constructos {
   // ========================================
   /**
    * 
    * @param {object} [elements]
-   * @param {any} [elements.class]  
    * @param {any} [elements.oninput]  
    * @param {any} [elements.style]  
    * @param {any} [elements.content]  
@@ -845,10 +844,10 @@ var $contentEditable = class _$contentEditable extends Constructos {
       digestedPropsToString
     );
     this._saveUsingMutable(
-      `contentEditable-win-${this.identifier}`,
+      `codeEditor-win-${this.identifier}`,
       elements,
       options,
-      _$contentEditable
+      _$codeEditor
     );
   }
   /**
@@ -859,12 +858,14 @@ var $contentEditable = class _$contentEditable extends Constructos {
    */
   code(props) {
     return `
-  <div     id="contentEditable-win-${this.identifier}"
-    class="${(props == null ? void 0 : props.class) || ""}"
-    contenteditable="true"
-    oninput="${(props == null ? void 0 : props.oninput) || ""}"
-    style="${(props == null ? void 0 : props.style) || ""}">
-    ${(props == null ? void 0 : props.content) || ""}
+  <div id="codeEditor-win-${this.identifier}" class="code-editor-container">
+    <div       id="contentEditable-win-${this.identifier}"
+      class="code-editor"
+      contenteditable="true"
+      oninput="${(props == null ? void 0 : props.oninput) || ""}"
+      style="${(props == null ? void 0 : props.style) || ""}">
+      ${(props == null ? void 0 : props.content) || ""}
+    </div>
   </div>
 `;
   }
@@ -883,6 +884,7 @@ var $contentEditable = class _$contentEditable extends Constructos {
     );
     return {
       ids: {
+        codeEditor: `codeEditor-win-${this.identifier}`,
         contentEditable: `contentEditable-win-${this.identifier}`
       }
     };
@@ -931,6 +933,18 @@ var createElement = (iconNode, customAttrs = {}) => {
   };
   return createSVGElement([tag, attrs, iconNode]);
 };
+
+// ../../node_modules/lucide/dist/esm/icons/box.mjs
+var Box = [
+  [
+    "path",
+    {
+      d: "M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"
+    }
+  ],
+  ["path", { d: "m3.3 7 8.7 5 8.7-5" }],
+  ["path", { d: "M12 22V12" }]
+];
 
 // ../../node_modules/lucide/dist/esm/icons/check.mjs
 var Check = [["path", { d: "M20 6 9 17l-5-5" }]];
@@ -1865,6 +1879,110 @@ var RedisConnectionScreen = class extends Screen {
 };
 var redisConnectionScreen = new RedisConnectionScreen();
 
+// source-code/project/home/digestOutput.ts
+var digestOutput = (args0) => {
+  const { output, result } = args0;
+  if (typeof result[0] === "object") {
+    renderTable(result, output);
+  } else {
+    new $div({
+      class: "code-editor-output",
+      content: JSON.stringify(result, null, 2)
+    }).create(output);
+  }
+};
+var renderTable = (data, output) => {
+  const table = new $div({
+    class: "code-editor-output"
+  }).create(output).ids.div;
+  const header = Object.keys(data[0]);
+  const headerRow = new $div({
+    class: "table-row"
+  }).create(table).ids.div;
+  header.forEach((key) => {
+    new $div({
+      class: "table-cell",
+      content: key
+    }).create(headerRow);
+  });
+  data.forEach((row) => {
+    const rowDiv = new $div({
+      class: "table-row"
+    }).create(table).ids.div;
+    header.forEach((key) => {
+      new $div({
+        class: "table-cell",
+        content: row[key]
+      }).create(rowDiv);
+    });
+  });
+};
+
+// source-code/project/home/mongify.suggestions.ts
+var mongify = {
+  methods: ["listCollections", "find", "findOne", "insert", "insertMany"]
+};
+
+// source-code/project/home/suggestions.ts
+var getCursorPosition = () => {
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0).cloneRange();
+  range.collapse(true);
+  const caretRect = range.getBoundingClientRect();
+  return { left: caretRect.left, bottom: caretRect.bottom + 4 };
+};
+var addSuggestionItem = (args0) => {
+  const item = new $div({
+    class: "__item"
+  }).create(args0.output).ids.div;
+  const left = new $div({
+    class: "__left"
+  }).create(item).ids.div;
+  const right = new $div({
+    class: "__right"
+  }).create(item).ids.div;
+  new $div({
+    content: createIcon(Box, { simple: true }),
+    class: "__icon"
+  }).create(left);
+  new $div({
+    content: args0.method,
+    class: "__text"
+  }).create(left);
+  new $div({
+    content: "(method)",
+    class: "__description"
+  }).create(right);
+};
+var suggestions = (args0) => {
+  var _a, _b;
+  const { codeEditor, output } = args0;
+  const codeEditorElement = document.getElementById(codeEditor);
+  const text = codeEditorElement.innerText;
+  console.log({ text });
+  const command = text.split("db.")[1];
+  const methodsAvailable = mongify.methods.filter((method) => {
+    if (method.includes(command)) return method;
+  });
+  console.log("methodsAvailable", methodsAvailable);
+  const position = getCursorPosition();
+  (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
+  console.log(position);
+  const suggestionBox = new $div(
+    {
+      style: `top:${position.bottom}px;left:${position.left}px;`,
+      class: "suggestion-box"
+    },
+    { identifier: "suggestion-box" }
+  ).create(output).ids.div;
+  methodsAvailable.forEach(
+    (method) => addSuggestionItem({ method, output: suggestionBox })
+  );
+  if (methodsAvailable.length === 0) {
+    (_b = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _b.remove();
+  }
+};
+
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
   output;
@@ -1945,7 +2063,8 @@ var ProjectHomeScreen = class extends Screen {
   async renderMongify(db) {
     console.log("renderMongify", db.database_name);
     const output = new $div({
-      class: "PANEL"
+      class: "PANEL",
+      style: "position:relative"
     }).create(this.panelOutput).ids.div;
     new $div({
       content: db.database_name,
@@ -1960,11 +2079,21 @@ var ProjectHomeScreen = class extends Screen {
           command: document.getElementById(command).textContent
         });
         console.log(res);
+        digestOutput({
+          output,
+          result: res
+        });
       })
     }).create(output);
-    const command = new $contentEditable({
-      class: "code-editor"
+    const command = new $codeEditor({
+      content: "db.listCollections()"
     }).create(output).ids.contentEditable;
+    document.getElementById(command).addEventListener("keyup", (e) => {
+      suggestions({
+        codeEditor: command,
+        output
+      });
+    });
   }
 };
 var projectHomeScreen = new ProjectHomeScreen();
@@ -2237,6 +2366,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 lucide/dist/esm/defaultAttributes.mjs:
 lucide/dist/esm/createElement.mjs:
+lucide/dist/esm/icons/box.mjs:
 lucide/dist/esm/icons/check.mjs:
 lucide/dist/esm/icons/chevron-left.mjs:
 lucide/dist/esm/icons/chevron-right.mjs:

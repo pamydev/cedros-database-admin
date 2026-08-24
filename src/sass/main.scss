@@ -5,6 +5,8 @@
 @use "../../src/winnetoujs/source-code/project/home/homeScreen.scss";
 @use "./design-system.scss";
 
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+
 :root {
   --mac-red: #ff375f;
   --mac-blue: #0a84ff;
@@ -21,6 +23,8 @@
   --mac-secondary-text: rgba(0, 0, 0, 0.54);
   --mac-separator: rgba(0, 0, 0, 0.3);
   --mac-separator-soft: rgba(0, 0, 0, 0.1);
+
+  --code-font: "JetBrains Mono", monospace;
   --mac-font:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial,
     sans-serif;

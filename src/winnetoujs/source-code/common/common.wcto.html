@@ -109,12 +109,14 @@
 </winnetou>
 
 <winnetou d="content editable">
-  <div
-    id="[[contentEditable]]"
-    class="{{class?}}"
-    contenteditable="true"
-    oninput="{{oninput?}}"
-    style="{{style?}}">
-    {{content?}}
+  <div id="[[codeEditor]]" class="code-editor-container">
+    <div
+      id="[[contentEditable]]"
+      class="code-editor"
+      contenteditable="true"
+      oninput="{{oninput?}}"
+      style="{{style?}}">
+      {{content?}}
+    </div>
   </div>
 </winnetou>

@@ -13,7 +13,7 @@ import fs from "fs";
 import path from "path";
 import { IProject } from "@projectTypes/contracts";
 import { projectRoot } from "../settings/home.dir";
-const db = new Mongify({
+const database = new Mongify({
   database_name: "cedros_database_admin",
 });
 
@@ -28,7 +28,7 @@ const generateUniqueId = () => {
 const createMongifyClient = async (args0: IGetMongifyCollectionsArgs) => {
   const connectionId = `${args0.projectId}-${args0.databaseId}`;
   if (!mongifyClient.has(connectionId)) {
-    const mongifyConnection = await db
+    const mongifyConnection = await database
       .getCollection<IMongifyConnectionsColl>("mongify_connections")
       .findOne({
         projectId: args0.projectId,
@@ -36,18 +36,17 @@ const createMongifyClient = async (args0: IGetMongifyCollectionsArgs) => {
       });
 
     console.table({
-      _id: args0.databaseId,
+      when: "createMongifyClient",
+      databaseId: args0.databaseId,
       projectId: args0.projectId,
+      connectionId: connectionId,
+      databasePath: mongifyConnection?.databasePath,
+      databaseName: mongifyConnection?.databaseName,
     });
 
     if (!mongifyConnection) {
       throw new Error("[code 3hdk82n] No Mongify connection found");
     }
-
-    console.log({
-      databasePath: mongifyConnection.databasePath,
-      databaseName: mongifyConnection.databaseName,
-    });
 
     mongifyClient.set(
       connectionId,
@@ -85,7 +84,7 @@ export const databaseIPCApi = () => {
 
       const projectId = generateUniqueId();
 
-      const res = await db.getCollection<IProject>("projects").insert({
+      const res = await database.getCollection<IProject>("projects").insert({
         projectId,
         name,
         description,
@@ -98,7 +97,7 @@ export const databaseIPCApi = () => {
 
   // ipcChannels.load_projects
   ipcMain.handle(ipcChannels.load_projects, async () => {
-    const projects = await db.getCollection<IProject>("projects").find();
+    const projects = await database.getCollection<IProject>("projects").find();
     return projects;
   });
 
@@ -106,7 +105,7 @@ export const databaseIPCApi = () => {
   ipcMain.handle(
     ipcChannels.get_project_by_id,
     async (event, projectId: string) => {
-      const project = await db
+      const project = await database
         .getCollection<IProject>("projects")
         .findOne({ projectId });
       return project;
@@ -138,9 +137,11 @@ export const databaseIPCApi = () => {
 
       console.table(doc);
 
-      const res = await db.getCollection<any>("mongo_connections").insert(doc);
+      const res = await database
+        .getCollection<any>("mongo_connections")
+        .insert(doc);
 
-      await db.getCollection("databases").insert({
+      await database.getCollection("databases").insert({
         type: "mongo",
         projectId: args0.projectId,
         database_name: args0.database,
@@ -161,7 +162,7 @@ export const databaseIPCApi = () => {
       const databaseId = generateUniqueId();
       const registerId = generateUniqueId();
 
-      await db
+      await database
         .getCollection<IMongifyConnectionsColl>("mongify_connections")
         .insert({
           internalId: databaseId,
@@ -170,7 +171,7 @@ export const databaseIPCApi = () => {
           databaseName: args.databaseName.trim(),
         });
 
-      await db.getCollection<IDatabasesColl>("databases").insert({
+      await database.getCollection<IDatabasesColl>("databases").insert({
         type: "mongify",
         projectId: args.projectId,
         database_name: args.databaseName.trim(),
@@ -184,7 +185,7 @@ export const databaseIPCApi = () => {
 
   // ipcChannels.list_databases
   ipcMain.handle(ipcChannels.list_databases, async (ev, projectId: string) => {
-    const res = await db.getCollection<IDatabasesColl>("databases").find({
+    const res = await database.getCollection<IDatabasesColl>("databases").find({
       projectId,
     });
     return res;
@@ -217,6 +218,7 @@ export const databaseIPCApi = () => {
         await createMongifyClient(args0);
       }
       const db = mongifyClient.get(connection_id);
+      console.log({ db });
       let res;
 
       try {
