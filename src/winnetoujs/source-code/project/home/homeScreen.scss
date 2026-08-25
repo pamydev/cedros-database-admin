@@ -109,7 +109,6 @@
         svg {
           width: 17px;
           height: 17px;
-          stroke: 2px;
         }
       }
       .__text {
@@ -119,10 +118,21 @@
       }
     }
     .__right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 2px;
       .__description {
         color: color-mix(var(--mac-text) 50%, transparent);
         font-size: var(--font-size-smaller);
         font-family: var(--code-font);
+      }
+      .__enterIcon {
+        svg {
+          width: 12px;
+          height: 12px;
+          stroke: color-mix(var(--mac-text) 30%, transparent);
+        }
       }
     }
   }

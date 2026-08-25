@@ -1,7 +1,7 @@
 import { mongify } from "./mongify.suggestions";
 import { createIcon } from "@icons";
 import { $div } from "@common";
-import { Box } from "lucide";
+import { Box, CornerDownLeft } from "lucide";
 
 const getCursorPosition = () => {
   const selection = window.getSelection();
@@ -45,6 +45,11 @@ const addSuggestionItem = (args0: { method: string; output: string }) => {
   new $div({
     content: "(method)",
     class: "__description",
+  }).create(right);
+
+  new $div({
+    class: "__enterIcon",
+    content: createIcon(CornerDownLeft, { simple: true }),
   }).create(right);
 };
 

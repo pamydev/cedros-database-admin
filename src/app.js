@@ -971,6 +971,12 @@ var ClipboardPenLine = [
   ]
 ];
 
+// ../../node_modules/lucide/dist/esm/icons/corner-down-left.mjs
+var CornerDownLeft = [
+  ["path", { d: "M20 4v7a4 4 0 0 1-4 4H4" }],
+  ["path", { d: "m9 10-5 5 5 5" }]
+];
+
 // ../../node_modules/lucide/dist/esm/icons/database.mjs
 var Database = [
   ["ellipse", { cx: "12", cy: "5", rx: "9", ry: "3" }],
@@ -1960,6 +1966,10 @@ var addSuggestionItem = (args0) => {
     content: "(method)",
     class: "__description"
   }).create(right);
+  new $div({
+    class: "__enterIcon",
+    content: createIcon(CornerDownLeft, { simple: true })
+  }).create(right);
 };
 var removeSelectedFromAllItems = () => {
   document.querySelectorAll(".__suggestion-item").forEach((el) => {
@@ -2433,6 +2443,7 @@ lucide/dist/esm/icons/check.mjs:
 lucide/dist/esm/icons/chevron-left.mjs:
 lucide/dist/esm/icons/chevron-right.mjs:
 lucide/dist/esm/icons/clipboard-pen-line.mjs:
+lucide/dist/esm/icons/corner-down-left.mjs:
 lucide/dist/esm/icons/database.mjs:
 lucide/dist/esm/icons/folder-kanban.mjs:
 lucide/dist/esm/icons/info.mjs:
