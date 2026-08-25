@@ -246,6 +246,7 @@ var $div = class _$div extends Constructos {
    * @param {any} [elements.class]  
    * @param {any} [elements.onclick]  
    * @param {any} [elements.style]  
+   * @param {any} [elements.data]  
    * @param {any} [elements.content]  
    * @param {object} [options]
    * @param {string} [options.identifier]
@@ -275,7 +276,8 @@ var $div = class _$div extends Constructos {
   <div     id="div-win-${this.identifier}"
     class="${(props == null ? void 0 : props.class) || ""}"
     onclick="${(props == null ? void 0 : props.onclick) || ""}"
-    style="${(props == null ? void 0 : props.style) || ""}">
+    style="${(props == null ? void 0 : props.style) || ""}"
+    ${(props == null ? void 0 : props.data) || ""}>
     ${(props == null ? void 0 : props.content) || ""}
   </div>
 `;
@@ -1931,10 +1933,15 @@ var getCursorPosition = () => {
   const caretRect = range.getBoundingClientRect();
   return { left: caretRect.left, bottom: caretRect.bottom + 4 };
 };
+var position = 0;
+var selectedPosition = 0;
+var totalItems = 0;
 var addSuggestionItem = (args0) => {
   const item = new $div({
-    class: "__item"
+    class: `__suggestion-item ${selectedPosition === position ? "__selected__" : ""}`,
+    data: `data-position="${position}" data-content="${args0.method}"`
   }).create(args0.output).ids.div;
+  position++;
   const left = new $div({
     class: "__left"
   }).create(item).ids.div;
@@ -1954,8 +1961,52 @@ var addSuggestionItem = (args0) => {
     class: "__description"
   }).create(right);
 };
+var removeSelectedFromAllItems = () => {
+  document.querySelectorAll(".__suggestion-item").forEach((el) => {
+    document.getElementById(el.id).classList.remove("__selected__");
+  });
+};
+var suggestionSelect = (args0) => {
+  var _a;
+  const key = args0.e.key;
+  if (key === "ArrowDown") {
+    args0.e.preventDefault();
+    if (selectedPosition + 1 === totalItems) return;
+    selectedPosition++;
+    removeSelectedFromAllItems();
+    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
+  }
+  if (key === "ArrowUp") {
+    args0.e.preventDefault();
+    if (selectedPosition === 0) return;
+    selectedPosition--;
+    removeSelectedFromAllItems();
+    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
+  }
+  if (key === "Enter") {
+    args0.e.preventDefault();
+    const selectedEl = document.querySelector(
+      `[data-position="${selectedPosition}"]`
+    );
+    const content = selectedEl.dataset.content;
+    const editor = document.getElementById(args0.codeEditor);
+    editor.innerText = "db." + content;
+    editor.focus();
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    const selection = window.getSelection();
+    selection == null ? void 0 : selection.removeAllRanges();
+    selection == null ? void 0 : selection.addRange(range);
+    position = 0;
+    selectedPosition = 0;
+    (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
+  }
+};
 var suggestions = (args0) => {
   var _a, _b;
+  const key = args0.e.key;
+  if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") return;
   const { codeEditor, output } = args0;
   const codeEditorElement = document.getElementById(codeEditor);
   const text = codeEditorElement.innerText;
@@ -1964,17 +2015,20 @@ var suggestions = (args0) => {
   const methodsAvailable = mongify.methods.filter((method) => {
     if (method.includes(command)) return method;
   });
+  totalItems = methodsAvailable.length;
   console.log("methodsAvailable", methodsAvailable);
-  const position = getCursorPosition();
+  const cursorPosition = getCursorPosition();
   (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
-  console.log(position);
+  console.log(cursorPosition);
   const suggestionBox = new $div(
     {
-      style: `top:${position.bottom}px;left:${position.left}px;`,
+      style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,
       class: "suggestion-box"
     },
     { identifier: "suggestion-box" }
   ).create(output).ids.div;
+  position = 0;
+  selectedPosition = 0;
   methodsAvailable.forEach(
     (method) => addSuggestionItem({ method, output: suggestionBox })
   );
@@ -2088,8 +2142,16 @@ var ProjectHomeScreen = class extends Screen {
     const command = new $codeEditor({
       content: "db.listCollections()"
     }).create(output).ids.contentEditable;
+    document.getElementById(command).addEventListener("keydown", (e) => {
+      suggestionSelect({
+        e,
+        codeEditor: command,
+        output
+      });
+    });
     document.getElementById(command).addEventListener("keyup", (e) => {
       suggestions({
+        e,
         codeEditor: command,
         output
       });

@@ -5,7 +5,7 @@ import { listItem } from "@helpers/listItem.helper";
 import { Database } from "lucide";
 import { W } from "winnetoujs";
 import { digestOutput } from "./digestOutput";
-import { suggestions } from "./suggestions";
+import { suggestions, suggestionSelect } from "./suggestions";
 
 class ProjectHomeScreen extends Screen {
   private output: string;
@@ -138,8 +138,17 @@ class ProjectHomeScreen extends Screen {
       content: "db.listCollections()",
     }).create(output).ids.contentEditable;
 
+    document.getElementById(command).addEventListener("keydown", (e) => {
+      suggestionSelect({
+        e,
+        codeEditor: command,
+        output,
+      });
+    });
+
     document.getElementById(command).addEventListener("keyup", (e) => {
       suggestions({
+        e,
         codeEditor: command,
         output,
       });

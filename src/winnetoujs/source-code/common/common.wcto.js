@@ -9,6 +9,7 @@ export class $div extends Constructos {
   * @param {any} [elements.class]  
   * @param {any} [elements.onclick]  
   * @param {any} [elements.style]  
+  * @param {any} [elements.data]  
   * @param {any} [elements.content]  
   * @param {object} [options]
   * @param {string} [options.identifier]
@@ -38,7 +39,8 @@ export class $div extends Constructos {
   <div     id="div-win-${this.identifier}"
     class="${props?.class || ""}"
     onclick="${props?.onclick || ""}"
-    style="${props?.style || ""}">
+    style="${props?.style || ""}"
+    ${props?.data || ""}>
     ${props?.content || ""}
   </div>
 `;

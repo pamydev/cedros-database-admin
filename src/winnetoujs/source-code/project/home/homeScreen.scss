@@ -89,12 +89,17 @@
   gap: 5px;
   background-color: color-mix(var(--mac-sidebar-bg) 80%, transparent);
   border: 1px inset var(--mac-accent);
-  padding: 2px 6px;
 
-  .__item {
+  .__suggestion-item {
+    padding: 2px 6px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    &.__selected__ {
+      background-color: color-mix(var(--mac-accent) 10%, transparent);
+    }
     .__left {
       display: flex;
       gap: 2px;
