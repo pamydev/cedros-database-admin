@@ -1,3 +1,9 @@
 export const mongify = {
-  methods: ["listCollections", "find", "findOne", "insert", "insertMany"],
+  methods: [
+    "listCollections",
+    "createCollection",
+    "getCollection",
+    "deleteCollection",
+  ],
+  getCollectionFunctions: ["find", "findOne", "insert", "update", "delete"],
 };

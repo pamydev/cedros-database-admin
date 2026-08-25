@@ -1,0 +1,39 @@
+{
+  "folders": [
+    {
+      "path": "../../..",
+    },
+  ],
+
+  "settings": {
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+      "**/*.js": true,
+      "**/*.css": true,
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/bower_components": true,
+      "**/*.code-search": true,
+      "**/*.css": true,
+      "**/*.js": true,
+    },
+
+    "winnetoujs.fullPath": "/Users/pamydev/CedrosDev/cedros-database-admin/src/winnetoujs",
+    "workbench.colorTheme": "Visual Studio Dark - C++",
+    "editor.tokenColorCustomizations": {
+      "textMateRules": [
+        {
+          "scope": ["meta.definition.method.ts"],
+          "settings": {
+            "fontStyle": "bold underline",
+          },
+        },
+      ],
+    },
+  },
+}

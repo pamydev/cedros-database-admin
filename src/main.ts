@@ -3,7 +3,6 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { setApplicationMenu } from "./mac-menu";
 import { ipcChannels } from "./ipc.channels";
-import { database } from "../types/contracts";
 import { databaseIPCApi } from "./database/database";
 import { registerProtocols } from "./protocols/protocols";
 
@@ -32,8 +31,8 @@ databaseIPCApi();
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 1500,
-    height: 800,
+    width: 1700,
+    height: 1000,
 
     titleBarStyle: "hiddenInset",
     trafficLightPosition: {

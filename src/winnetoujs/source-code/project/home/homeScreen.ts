@@ -6,6 +6,7 @@ import { Database } from "lucide";
 import { W } from "winnetoujs";
 import { digestOutput } from "./digestOutput";
 import { suggestions, suggestionSelect } from "./suggestions";
+import { mongify_sendQuery } from "./mongify.sendQuery";
 
 class ProjectHomeScreen extends Screen {
   private output: string;
@@ -120,36 +121,47 @@ class ProjectHomeScreen extends Screen {
 
     new $buttonPrimary({
       content: "Send",
-      onclick: W.fx(async () => {
-        const res = await window.database.mongify.sendQuery({
-          projectId: db.projectId,
+      onclick: W.fx(async () =>
+        mongify_sendQuery({
+          command: codeEditorDiv,
           databaseId: db.databaseId,
-          command: document.getElementById(command).textContent,
-        });
-        console.log(res);
-        digestOutput({
-          output: output,
-          result: res,
-        });
-      }),
+          output,
+          projectId: db.projectId,
+        }),
+      ),
     }).create(output);
 
-    const command = new $codeEditor({
+    const codeEditorDiv = new $codeEditor({
       content: "db.listCollections()",
     }).create(output).ids.contentEditable;
 
-    document.getElementById(command).addEventListener("keydown", (e) => {
+    let leftAltPressed = false;
+    document.getElementById(codeEditorDiv).addEventListener("keydown", (e) => {
+      if (e.repeat) return;
+      const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
+
+      if (sendShortcut) {
+        e.preventDefault();
+
+        mongify_sendQuery({
+          command: codeEditorDiv,
+          databaseId: db.databaseId,
+          output,
+          projectId: db.projectId,
+        });
+      }
+
       suggestionSelect({
         e,
-        codeEditor: command,
+        codeEditor: codeEditorDiv,
         output,
       });
     });
 
-    document.getElementById(command).addEventListener("keyup", (e) => {
+    document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
       suggestions({
         e,
-        codeEditor: command,
+        codeEditor: codeEditorDiv,
         output,
       });
     });

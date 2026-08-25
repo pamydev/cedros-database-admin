@@ -15,11 +15,16 @@ const getCursorPosition = () => {
 let position = 0;
 let selectedPosition = 0;
 let totalItems = 0;
+let suggestionsIsVisible = false;
 
-const addSuggestionItem = (args0: { method: string; output: string }) => {
+const addSuggestionItem = (args0: {
+  method: string;
+  output: string;
+  type: "method" | "collection" | "function";
+}) => {
   const item = new $div({
     class: `__suggestion-item ${selectedPosition === position ? "__selected__" : ""}`,
-    data: `data-position="${position}" data-content="${args0.method}"`,
+    data: `data-position="${position}" data-content="${args0.method}" data-type="${args0.type}"`,
   }).create(args0.output).ids.div;
 
   position++;
@@ -43,7 +48,7 @@ const addSuggestionItem = (args0: { method: string; output: string }) => {
   }).create(left);
 
   new $div({
-    content: "(method)",
+    content: `(${args0.type})`,
     class: "__description",
   }).create(right);
 
@@ -86,15 +91,27 @@ export const suggestionSelect = (args0: {
   }
 
   if (key === "Enter") {
+    if (!suggestionsIsVisible) return;
     args0.e.preventDefault();
     const selectedEl = document.querySelector(
       `[data-position="${selectedPosition}"]`,
     ) as HTMLElement;
     const content = selectedEl.dataset.content;
+    const type: "method" | "collection" | "function" = selectedEl.dataset
+      .type as "method" | "collection" | "function";
 
     const editor = document.getElementById(args0.codeEditor) as HTMLElement;
 
-    editor.innerText = "db." + content;
+    if (type === "method") {
+      editor.innerText = "db." + content;
+    } else if (type === "collection") {
+    } else if (type === "function") {
+      // must use this regex (/db\.[^.]+\.(.+)/)?.[1] to insert content before
+      const text = editor.innerText;
+      const match = text.match(/db\.[^.]+\.(.+)/);
+      const beforeFunction = match?.[1] || "";
+      editor.innerText = text.replace(beforeFunction, content);
+    }
     editor.focus();
 
     const range = document.createRange();
@@ -107,7 +124,7 @@ export const suggestionSelect = (args0: {
 
     position = 0;
     selectedPosition = 0;
-    document.getElementById("div-win-suggestion-box")?.remove();
+    removeSuggestionBox();
   }
 };
 
@@ -123,19 +140,43 @@ export const suggestions = (args0: {
   const { codeEditor, output } = args0;
   const codeEditorElement = document.getElementById(codeEditor);
   const text = codeEditorElement.innerText;
-  console.log({ text });
+
+  const regExPreFunction = /db\.[^.]+\./;
+  const regExFunction = /db\.[^.]+\.(.+)/;
+  const functionText = text.match(regExFunction)?.[1] || "";
   const command = text.split("db.")[1];
+  let suggestionsAvailable: string[] = [];
+  let type: "method" | "collection" | "function";
 
-  const methodsAvailable = mongify.methods.filter((method) => {
-    if (method.includes(command)) return method;
+  if (text.match(regExPreFunction)) {
+    type = "function";
+    suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
+      if (method.startsWith(functionText) || functionText === "") return true;
+      return false;
+    });
+  } else {
+    type = "method";
+    suggestionsAvailable = mongify.methods.filter((method) => {
+      if (method.startsWith(command) || command === "") return true;
+      return false;
+    });
+  }
+
+  console.table({
+    emptyCommand: command === "",
+    command,
+    suggestionsAvailable,
+    mongify_methods: mongify.methods,
   });
+  console.log(JSON.stringify(command), command.length);
 
-  totalItems = methodsAvailable.length;
+  totalItems = suggestionsAvailable.length;
 
-  console.log("methodsAvailable", methodsAvailable);
+  console.log("methodsAvailable", suggestionsAvailable);
   const cursorPosition = getCursorPosition();
-  document.getElementById("div-win-suggestion-box")?.remove();
+  removeSuggestionBox();
   console.log(cursorPosition);
+  suggestionsIsVisible = true;
   const suggestionBox = new $div(
     {
       style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,
@@ -146,11 +187,16 @@ export const suggestions = (args0: {
 
   position = 0;
   selectedPosition = 0;
-  methodsAvailable.forEach((method) =>
-    addSuggestionItem({ method, output: suggestionBox }),
+  suggestionsAvailable.forEach((method) =>
+    addSuggestionItem({ method, output: suggestionBox, type }),
   );
 
-  if (methodsAvailable.length === 0) {
-    document.getElementById("div-win-suggestion-box")?.remove();
+  if (suggestionsAvailable.length === 0) {
+    removeSuggestionBox();
   }
+};
+
+const removeSuggestionBox = () => {
+  document.getElementById("div-win-suggestion-box")?.remove();
+  suggestionsIsVisible = false;
 };

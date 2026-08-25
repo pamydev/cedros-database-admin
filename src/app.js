@@ -1887,6 +1887,170 @@ var RedisConnectionScreen = class extends Screen {
 };
 var redisConnectionScreen = new RedisConnectionScreen();
 
+// source-code/project/home/mongify.suggestions.ts
+var mongify = {
+  methods: [
+    "listCollections",
+    "createCollection",
+    "getCollection",
+    "deleteCollection"
+  ],
+  getCollectionFunctions: ["find", "findOne", "insert", "update", "delete"]
+};
+
+// source-code/project/home/suggestions.ts
+var getCursorPosition = () => {
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0).cloneRange();
+  range.collapse(true);
+  const caretRect = range.getBoundingClientRect();
+  return { left: caretRect.left, bottom: caretRect.bottom + 4 };
+};
+var position = 0;
+var selectedPosition = 0;
+var totalItems = 0;
+var suggestionsIsVisible = false;
+var addSuggestionItem = (args0) => {
+  const item = new $div({
+    class: `__suggestion-item ${selectedPosition === position ? "__selected__" : ""}`,
+    data: `data-position="${position}" data-content="${args0.method}" data-type="${args0.type}"`
+  }).create(args0.output).ids.div;
+  position++;
+  const left = new $div({
+    class: "__left"
+  }).create(item).ids.div;
+  const right = new $div({
+    class: "__right"
+  }).create(item).ids.div;
+  new $div({
+    content: createIcon(Box, { simple: true }),
+    class: "__icon"
+  }).create(left);
+  new $div({
+    content: args0.method,
+    class: "__text"
+  }).create(left);
+  new $div({
+    content: `(${args0.type})`,
+    class: "__description"
+  }).create(right);
+  new $div({
+    class: "__enterIcon",
+    content: createIcon(CornerDownLeft, { simple: true })
+  }).create(right);
+};
+var removeSelectedFromAllItems = () => {
+  document.querySelectorAll(".__suggestion-item").forEach((el) => {
+    document.getElementById(el.id).classList.remove("__selected__");
+  });
+};
+var suggestionSelect = (args0) => {
+  const key = args0.e.key;
+  if (key === "ArrowDown") {
+    args0.e.preventDefault();
+    if (selectedPosition + 1 === totalItems) return;
+    selectedPosition++;
+    removeSelectedFromAllItems();
+    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
+  }
+  if (key === "ArrowUp") {
+    args0.e.preventDefault();
+    if (selectedPosition === 0) return;
+    selectedPosition--;
+    removeSelectedFromAllItems();
+    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
+  }
+  if (key === "Enter") {
+    if (!suggestionsIsVisible) return;
+    args0.e.preventDefault();
+    const selectedEl = document.querySelector(
+      `[data-position="${selectedPosition}"]`
+    );
+    const content = selectedEl.dataset.content;
+    const type = selectedEl.dataset.type;
+    const editor = document.getElementById(args0.codeEditor);
+    if (type === "method") {
+      editor.innerText = "db." + content;
+    } else if (type === "collection") {
+    } else if (type === "function") {
+      const text = editor.innerText;
+      const match = text.match(/db\.[^.]+\.(.+)/);
+      const beforeFunction = (match == null ? void 0 : match[1]) || "";
+      editor.innerText = text.replace(beforeFunction, content);
+    }
+    editor.focus();
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    const selection = window.getSelection();
+    selection == null ? void 0 : selection.removeAllRanges();
+    selection == null ? void 0 : selection.addRange(range);
+    position = 0;
+    selectedPosition = 0;
+    removeSuggestionBox();
+  }
+};
+var suggestions = (args0) => {
+  var _a;
+  const key = args0.e.key;
+  if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") return;
+  const { codeEditor, output } = args0;
+  const codeEditorElement = document.getElementById(codeEditor);
+  const text = codeEditorElement.innerText;
+  const regExPreFunction = /db\.[^.]+\./;
+  const regExFunction = /db\.[^.]+\.(.+)/;
+  const functionText = ((_a = text.match(regExFunction)) == null ? void 0 : _a[1]) || "";
+  const command = text.split("db.")[1];
+  let suggestionsAvailable = [];
+  let type;
+  if (text.match(regExPreFunction)) {
+    type = "function";
+    suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
+      if (method.startsWith(functionText) || functionText === "") return true;
+      return false;
+    });
+  } else {
+    type = "method";
+    suggestionsAvailable = mongify.methods.filter((method) => {
+      if (method.startsWith(command) || command === "") return true;
+      return false;
+    });
+  }
+  console.table({
+    emptyCommand: command === "",
+    command,
+    suggestionsAvailable,
+    mongify_methods: mongify.methods
+  });
+  console.log(JSON.stringify(command), command.length);
+  totalItems = suggestionsAvailable.length;
+  console.log("methodsAvailable", suggestionsAvailable);
+  const cursorPosition = getCursorPosition();
+  removeSuggestionBox();
+  console.log(cursorPosition);
+  suggestionsIsVisible = true;
+  const suggestionBox = new $div(
+    {
+      style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,
+      class: "suggestion-box"
+    },
+    { identifier: "suggestion-box" }
+  ).create(output).ids.div;
+  position = 0;
+  selectedPosition = 0;
+  suggestionsAvailable.forEach(
+    (method) => addSuggestionItem({ method, output: suggestionBox, type })
+  );
+  if (suggestionsAvailable.length === 0) {
+    removeSuggestionBox();
+  }
+};
+var removeSuggestionBox = () => {
+  var _a;
+  (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
+  suggestionsIsVisible = false;
+};
+
 // source-code/project/home/digestOutput.ts
 var digestOutput = (args0) => {
   const { output, result } = args0;
@@ -1926,125 +2090,19 @@ var renderTable = (data, output) => {
   });
 };
 
-// source-code/project/home/mongify.suggestions.ts
-var mongify = {
-  methods: ["listCollections", "find", "findOne", "insert", "insertMany"]
-};
-
-// source-code/project/home/suggestions.ts
-var getCursorPosition = () => {
-  const selection = window.getSelection();
-  const range = selection.getRangeAt(0).cloneRange();
-  range.collapse(true);
-  const caretRect = range.getBoundingClientRect();
-  return { left: caretRect.left, bottom: caretRect.bottom + 4 };
-};
-var position = 0;
-var selectedPosition = 0;
-var totalItems = 0;
-var addSuggestionItem = (args0) => {
-  const item = new $div({
-    class: `__suggestion-item ${selectedPosition === position ? "__selected__" : ""}`,
-    data: `data-position="${position}" data-content="${args0.method}"`
-  }).create(args0.output).ids.div;
-  position++;
-  const left = new $div({
-    class: "__left"
-  }).create(item).ids.div;
-  const right = new $div({
-    class: "__right"
-  }).create(item).ids.div;
-  new $div({
-    content: createIcon(Box, { simple: true }),
-    class: "__icon"
-  }).create(left);
-  new $div({
-    content: args0.method,
-    class: "__text"
-  }).create(left);
-  new $div({
-    content: "(method)",
-    class: "__description"
-  }).create(right);
-  new $div({
-    class: "__enterIcon",
-    content: createIcon(CornerDownLeft, { simple: true })
-  }).create(right);
-};
-var removeSelectedFromAllItems = () => {
-  document.querySelectorAll(".__suggestion-item").forEach((el) => {
-    document.getElementById(el.id).classList.remove("__selected__");
+// source-code/project/home/mongify.sendQuery.ts
+var mongify_sendQuery = async (args0) => {
+  const { projectId, databaseId, command, output } = args0;
+  const res = await window.database.mongify.sendQuery({
+    projectId,
+    databaseId,
+    command: document.getElementById(command).textContent
   });
-};
-var suggestionSelect = (args0) => {
-  var _a;
-  const key = args0.e.key;
-  if (key === "ArrowDown") {
-    args0.e.preventDefault();
-    if (selectedPosition + 1 === totalItems) return;
-    selectedPosition++;
-    removeSelectedFromAllItems();
-    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
-  }
-  if (key === "ArrowUp") {
-    args0.e.preventDefault();
-    if (selectedPosition === 0) return;
-    selectedPosition--;
-    removeSelectedFromAllItems();
-    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
-  }
-  if (key === "Enter") {
-    args0.e.preventDefault();
-    const selectedEl = document.querySelector(
-      `[data-position="${selectedPosition}"]`
-    );
-    const content = selectedEl.dataset.content;
-    const editor = document.getElementById(args0.codeEditor);
-    editor.innerText = "db." + content;
-    editor.focus();
-    const range = document.createRange();
-    range.selectNodeContents(editor);
-    range.collapse(false);
-    const selection = window.getSelection();
-    selection == null ? void 0 : selection.removeAllRanges();
-    selection == null ? void 0 : selection.addRange(range);
-    position = 0;
-    selectedPosition = 0;
-    (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
-  }
-};
-var suggestions = (args0) => {
-  var _a, _b;
-  const key = args0.e.key;
-  if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") return;
-  const { codeEditor, output } = args0;
-  const codeEditorElement = document.getElementById(codeEditor);
-  const text = codeEditorElement.innerText;
-  console.log({ text });
-  const command = text.split("db.")[1];
-  const methodsAvailable = mongify.methods.filter((method) => {
-    if (method.includes(command)) return method;
+  console.log(res);
+  digestOutput({
+    output,
+    result: res
   });
-  totalItems = methodsAvailable.length;
-  console.log("methodsAvailable", methodsAvailable);
-  const cursorPosition = getCursorPosition();
-  (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
-  console.log(cursorPosition);
-  const suggestionBox = new $div(
-    {
-      style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,
-      class: "suggestion-box"
-    },
-    { identifier: "suggestion-box" }
-  ).create(output).ids.div;
-  position = 0;
-  selectedPosition = 0;
-  methodsAvailable.forEach(
-    (method) => addSuggestionItem({ method, output: suggestionBox })
-  );
-  if (methodsAvailable.length === 0) {
-    (_b = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _b.remove();
-  }
 };
 
 // source-code/project/home/homeScreen.ts
@@ -2136,33 +2194,41 @@ var ProjectHomeScreen = class extends Screen {
     }).create(output);
     new $buttonPrimary({
       content: "Send",
-      onclick: W.fx(async () => {
-        const res = await window.database.mongify.sendQuery({
-          projectId: db.projectId,
+      onclick: W.fx(
+        async () => mongify_sendQuery({
+          command: codeEditorDiv,
           databaseId: db.databaseId,
-          command: document.getElementById(command).textContent
-        });
-        console.log(res);
-        digestOutput({
           output,
-          result: res
-        });
-      })
+          projectId: db.projectId
+        })
+      )
     }).create(output);
-    const command = new $codeEditor({
+    const codeEditorDiv = new $codeEditor({
       content: "db.listCollections()"
     }).create(output).ids.contentEditable;
-    document.getElementById(command).addEventListener("keydown", (e) => {
+    let leftAltPressed = false;
+    document.getElementById(codeEditorDiv).addEventListener("keydown", (e) => {
+      if (e.repeat) return;
+      const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
+      if (sendShortcut) {
+        e.preventDefault();
+        mongify_sendQuery({
+          command: codeEditorDiv,
+          databaseId: db.databaseId,
+          output,
+          projectId: db.projectId
+        });
+      }
       suggestionSelect({
         e,
-        codeEditor: command,
+        codeEditor: codeEditorDiv,
         output
       });
     });
-    document.getElementById(command).addEventListener("keyup", (e) => {
+    document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
       suggestions({
         e,
-        codeEditor: command,
+        codeEditor: codeEditorDiv,
         output
       });
     });
