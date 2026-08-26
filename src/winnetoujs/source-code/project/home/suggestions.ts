@@ -189,7 +189,6 @@ export const suggestions = async (args0: {
   let type: "method" | "collection" | "function";
 
   if (text.match(regExPreFunction)) {
-    console.log("INSIDE FUNCTION");
     type = "function";
     suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
       if (method.startsWith(functionText) || functionText === "") return true;
@@ -197,7 +196,6 @@ export const suggestions = async (args0: {
     });
   } else if (text.match(getCollectionPreRegex)) {
     type = "collection";
-    console.log("INSIDE GET COLLECTION");
     collections = await getCollectionsList({
       databaseId: args0.databaseId,
       projectId: args0.projectId,
@@ -206,7 +204,6 @@ export const suggestions = async (args0: {
       (coll) => coll.startsWith(getCollectionText) || getCollectionText === "",
     );
   } else {
-    console.log("INSIDE METHOD");
     type = "method";
     suggestionsAvailable = mongify.methods.filter((method) => {
       if (method.startsWith(command) || command === "") return true;

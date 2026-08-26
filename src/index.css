@@ -551,6 +551,10 @@ form textarea {
   border: 1px solid var(--mac-separator-soft);
 }
 
+.__string__ {
+  color: green;
+}
+
 :root {
   --mac-red: #ff375f;
   --mac-blue: #0a84ff;

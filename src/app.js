@@ -2033,7 +2033,6 @@ var suggestions = async (args0) => {
   let suggestionsAvailable = [];
   let type;
   if (text.match(regExPreFunction)) {
-    console.log("INSIDE FUNCTION");
     type = "function";
     suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
       if (method.startsWith(functionText) || functionText === "") return true;
@@ -2041,7 +2040,6 @@ var suggestions = async (args0) => {
     });
   } else if (text.match(getCollectionPreRegex)) {
     type = "collection";
-    console.log("INSIDE GET COLLECTION");
     collections = await getCollectionsList({
       databaseId: args0.databaseId,
       projectId: args0.projectId
@@ -2050,7 +2048,6 @@ var suggestions = async (args0) => {
       (coll) => coll.startsWith(getCollectionText) || getCollectionText === ""
     );
   } else {
-    console.log("INSIDE METHOD");
     type = "method";
     suggestionsAvailable = mongify.methods.filter((method) => {
       if (method.startsWith(command) || command === "") return true;
@@ -2135,6 +2132,43 @@ var mongify_sendQuery = async (args0) => {
     output,
     result: res
   });
+};
+
+// source-code/project/home/colorize.ts
+var isAwaiting = false;
+var colorize = async (args0) => {
+  if (isAwaiting) return;
+  isAwaiting = true;
+  await new Promise((resolve) => setTimeout(() => resolve(true), 500));
+  isAwaiting = false;
+  if (isSuggestionBoxVisible()) return;
+  const { e, codeEditorDiv } = args0;
+  const textEl = document.getElementById(codeEditorDiv);
+  const innerText = textEl.innerText;
+  let res = quotes(innerText);
+  if (res === innerText) return;
+  textEl.innerHTML = res;
+  textEl.focus();
+  const range = document.createRange();
+  range.selectNodeContents(textEl);
+  range.collapse(false);
+  const selection = window.getSelection();
+  selection == null ? void 0 : selection.removeAllRanges();
+  selection == null ? void 0 : selection.addRange(range);
+};
+var quotes = (text) => {
+  const regex = /("[^"]+")/g;
+  const matches = text.matchAll(regex);
+  for (const match of matches) {
+    text = text.replace(
+      match[0],
+      `<span class='__string__'>${match[0]}</span>`
+    );
+  }
+  return text;
+};
+var isSuggestionBoxVisible = () => {
+  return document.getElementById("div-win-suggestion-box") !== null;
 };
 
 // source-code/project/home/homeScreen.ts
@@ -2256,6 +2290,10 @@ var ProjectHomeScreen = class extends Screen {
       });
     });
     document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
+      colorize({
+        e,
+        codeEditorDiv
+      });
       suggestions({
         e,
         codeEditor: codeEditorDiv,
