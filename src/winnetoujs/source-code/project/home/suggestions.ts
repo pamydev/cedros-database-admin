@@ -16,6 +16,24 @@ let position = 0;
 let selectedPosition = 0;
 let totalItems = 0;
 let suggestionsIsVisible = false;
+let collectionsList = new Map<string, string[]>();
+
+const getCollectionsList = async (args0: {
+  projectId: string;
+  databaseId: string;
+}): Promise<string[]> => {
+  const identifier = `${args0.projectId}-${args0.databaseId}`;
+  if (collectionsList.has(identifier)) return collectionsList.get(identifier);
+
+  let res = (await window.database.mongify.sendQuery({
+    command: "db.listCollections()",
+    databaseId: args0.databaseId,
+    projectId: args0.projectId,
+  })) as string[];
+
+  collectionsList.set(identifier, res);
+  return res;
+};
 
 const addSuggestionItem = (args0: {
   method: string;
@@ -105,12 +123,25 @@ export const suggestionSelect = (args0: {
     if (type === "method") {
       editor.innerText = "db." + content;
     } else if (type === "collection") {
+      const text = editor.innerText;
+      const regex = /db\.getCollection\(\"([^.]+)/;
+      const match = text.match(regex);
+      const toBeReplaced = match?.[1];
+
+      if (toBeReplaced === "" || !toBeReplaced) {
+        editor.innerText = `db.getCollection("${content}")`;
+      } else {
+        editor.innerText = text.replace(toBeReplaced, content) + '")';
+      }
     } else if (type === "function") {
-      // must use this regex (/db\.[^.]+\.(.+)/)?.[1] to insert content before
       const text = editor.innerText;
       const match = text.match(/db\.[^.]+\.(.+)/);
-      const beforeFunction = match?.[1] || "";
-      editor.innerText = text.replace(beforeFunction, content);
+      const toBeReplaced = match?.[1] || "";
+      if (toBeReplaced === "" || !toBeReplaced) {
+        editor.innerText = text + content + "(";
+      } else {
+        editor.innerText = text.replace(toBeReplaced, content) + "(";
+      }
     }
     editor.focus();
 
@@ -128,10 +159,12 @@ export const suggestionSelect = (args0: {
   }
 };
 
-export const suggestions = (args0: {
+export const suggestions = async (args0: {
   e: KeyboardEvent;
   codeEditor: string;
   output: string;
+  databaseId: string;
+  projectId: string;
 }) => {
   const key = args0.e.key;
 
@@ -144,17 +177,36 @@ export const suggestions = (args0: {
   const regExPreFunction = /db\.[^.]+\./;
   const regExFunction = /db\.[^.]+\.(.+)/;
   const functionText = text.match(regExFunction)?.[1] || "";
+
+  const getCollectionPreRegex = /db\.getCollection\(\"/;
+  const getCollectionRegex = /db\.getCollection\(\"([^.]+)/;
+  const getCollectionText = text.match(getCollectionRegex)?.[1] || "";
+  let collections: string[];
+
   const command = text.split("db.")[1];
+
   let suggestionsAvailable: string[] = [];
   let type: "method" | "collection" | "function";
 
   if (text.match(regExPreFunction)) {
+    console.log("INSIDE FUNCTION");
     type = "function";
     suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
       if (method.startsWith(functionText) || functionText === "") return true;
       return false;
     });
+  } else if (text.match(getCollectionPreRegex)) {
+    type = "collection";
+    console.log("INSIDE GET COLLECTION");
+    collections = await getCollectionsList({
+      databaseId: args0.databaseId,
+      projectId: args0.projectId,
+    });
+    suggestionsAvailable = collections.filter(
+      (coll) => coll.startsWith(getCollectionText) || getCollectionText === "",
+    );
   } else {
+    console.log("INSIDE METHOD");
     type = "method";
     suggestionsAvailable = mongify.methods.filter((method) => {
       if (method.startsWith(command) || command === "") return true;
@@ -162,20 +214,10 @@ export const suggestions = (args0: {
     });
   }
 
-  console.table({
-    emptyCommand: command === "",
-    command,
-    suggestionsAvailable,
-    mongify_methods: mongify.methods,
-  });
-  console.log(JSON.stringify(command), command.length);
-
   totalItems = suggestionsAvailable.length;
 
-  console.log("methodsAvailable", suggestionsAvailable);
   const cursorPosition = getCursorPosition();
   removeSuggestionBox();
-  console.log(cursorPosition);
   suggestionsIsVisible = true;
   const suggestionBox = new $div(
     {

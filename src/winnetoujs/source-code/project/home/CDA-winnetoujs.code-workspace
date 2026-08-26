@@ -33,6 +33,13 @@
             "fontStyle": "bold underline",
           },
         },
+        {
+          "scope": ["meta.embedded.line.ts"],
+          "settings": {
+            "fontStyle": "italic",
+            "foreground": "#99ffaa",
+          },
+        },
       ],
     },
   },

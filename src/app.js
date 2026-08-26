@@ -1910,6 +1910,18 @@ var position = 0;
 var selectedPosition = 0;
 var totalItems = 0;
 var suggestionsIsVisible = false;
+var collectionsList = /* @__PURE__ */ new Map();
+var getCollectionsList = async (args0) => {
+  const identifier = `${args0.projectId}-${args0.databaseId}`;
+  if (collectionsList.has(identifier)) return collectionsList.get(identifier);
+  let res = await window.database.mongify.sendQuery({
+    command: "db.listCollections()",
+    databaseId: args0.databaseId,
+    projectId: args0.projectId
+  });
+  collectionsList.set(identifier, res);
+  return res;
+};
 var addSuggestionItem = (args0) => {
   const item = new $div({
     class: `__suggestion-item ${selectedPosition === position ? "__selected__" : ""}`,
@@ -1972,11 +1984,24 @@ var suggestionSelect = (args0) => {
     if (type === "method") {
       editor.innerText = "db." + content;
     } else if (type === "collection") {
+      const text = editor.innerText;
+      const regex = /db\.getCollection\(\"([^.]+)/;
+      const match = text.match(regex);
+      const toBeReplaced = match == null ? void 0 : match[1];
+      if (toBeReplaced === "" || !toBeReplaced) {
+        editor.innerText = `db.getCollection("${content}")`;
+      } else {
+        editor.innerText = text.replace(toBeReplaced, content) + '")';
+      }
     } else if (type === "function") {
       const text = editor.innerText;
       const match = text.match(/db\.[^.]+\.(.+)/);
-      const beforeFunction = (match == null ? void 0 : match[1]) || "";
-      editor.innerText = text.replace(beforeFunction, content);
+      const toBeReplaced = (match == null ? void 0 : match[1]) || "";
+      if (toBeReplaced === "" || !toBeReplaced) {
+        editor.innerText = text + content + "(";
+      } else {
+        editor.innerText = text.replace(toBeReplaced, content) + "(";
+      }
     }
     editor.focus();
     const range = document.createRange();
@@ -1990,8 +2015,8 @@ var suggestionSelect = (args0) => {
     removeSuggestionBox();
   }
 };
-var suggestions = (args0) => {
-  var _a;
+var suggestions = async (args0) => {
+  var _a, _b;
   const key = args0.e.key;
   if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") return;
   const { codeEditor, output } = args0;
@@ -2000,34 +2025,41 @@ var suggestions = (args0) => {
   const regExPreFunction = /db\.[^.]+\./;
   const regExFunction = /db\.[^.]+\.(.+)/;
   const functionText = ((_a = text.match(regExFunction)) == null ? void 0 : _a[1]) || "";
+  const getCollectionPreRegex = /db\.getCollection\(\"/;
+  const getCollectionRegex = /db\.getCollection\(\"([^.]+)/;
+  const getCollectionText = ((_b = text.match(getCollectionRegex)) == null ? void 0 : _b[1]) || "";
+  let collections;
   const command = text.split("db.")[1];
   let suggestionsAvailable = [];
   let type;
   if (text.match(regExPreFunction)) {
+    console.log("INSIDE FUNCTION");
     type = "function";
     suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
       if (method.startsWith(functionText) || functionText === "") return true;
       return false;
     });
+  } else if (text.match(getCollectionPreRegex)) {
+    type = "collection";
+    console.log("INSIDE GET COLLECTION");
+    collections = await getCollectionsList({
+      databaseId: args0.databaseId,
+      projectId: args0.projectId
+    });
+    suggestionsAvailable = collections.filter(
+      (coll) => coll.startsWith(getCollectionText) || getCollectionText === ""
+    );
   } else {
+    console.log("INSIDE METHOD");
     type = "method";
     suggestionsAvailable = mongify.methods.filter((method) => {
       if (method.startsWith(command) || command === "") return true;
       return false;
     });
   }
-  console.table({
-    emptyCommand: command === "",
-    command,
-    suggestionsAvailable,
-    mongify_methods: mongify.methods
-  });
-  console.log(JSON.stringify(command), command.length);
   totalItems = suggestionsAvailable.length;
-  console.log("methodsAvailable", suggestionsAvailable);
   const cursorPosition = getCursorPosition();
   removeSuggestionBox();
-  console.log(cursorPosition);
   suggestionsIsVisible = true;
   const suggestionBox = new $div(
     {
@@ -2203,9 +2235,7 @@ var ProjectHomeScreen = class extends Screen {
         })
       )
     }).create(output);
-    const codeEditorDiv = new $codeEditor({
-      content: "db.listCollections()"
-    }).create(output).ids.contentEditable;
+    const codeEditorDiv = new $codeEditor().create(output).ids.contentEditable;
     let leftAltPressed = false;
     document.getElementById(codeEditorDiv).addEventListener("keydown", (e) => {
       if (e.repeat) return;
@@ -2229,7 +2259,9 @@ var ProjectHomeScreen = class extends Screen {
       suggestions({
         e,
         codeEditor: codeEditorDiv,
-        output
+        output,
+        databaseId: db.databaseId,
+        projectId: db.projectId
       });
     });
   }

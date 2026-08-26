@@ -131,9 +131,7 @@ class ProjectHomeScreen extends Screen {
       ),
     }).create(output);
 
-    const codeEditorDiv = new $codeEditor({
-      content: "db.listCollections()",
-    }).create(output).ids.contentEditable;
+    const codeEditorDiv = new $codeEditor().create(output).ids.contentEditable;
 
     let leftAltPressed = false;
     document.getElementById(codeEditorDiv).addEventListener("keydown", (e) => {
@@ -163,6 +161,8 @@ class ProjectHomeScreen extends Screen {
         e,
         codeEditor: codeEditorDiv,
         output,
+        databaseId: db.databaseId,
+        projectId: db.projectId,
       });
     });
   }
