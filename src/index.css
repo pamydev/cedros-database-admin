@@ -285,118 +285,6 @@
   padding-bottom: 4px;
 }
 
-.code-editor-container {
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid var(--mac-accent);
-  width: 100%;
-  height: 100px;
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-}
-
-.code-editor {
-  width: 100%;
-  height: 100%;
-  background-color: transparent;
-  overflow: auto;
-  outline: none;
-  font-family: var(--code-font);
-}
-.code-editor:focus {
-  ouline: none;
-}
-
-.code-editor-output {
-  font-family: var(--code-font);
-  padding: 10px;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid var(--mac-yellow);
-  width: 100%;
-  height: auto;
-  margin-top: 10px;
-  overflow: auto;
-}
-.code-editor-output .table-row {
-  display: flex;
-  flex-direction: row;
-}
-.code-editor-output .table-row:first-child .table-cell {
-  font-weight: 600;
-  background: color-mix(var(--mac-yellow) 20%, transparent);
-}
-.code-editor-output .table-row:not(:first-child):hover .table-cell {
-  background: color-mix(var(--mac-yellow) 10%, transparent);
-}
-.code-editor-output .table-cell {
-  padding: 8px 10px;
-  border-right: 1px solid color-mix(var(--mac-yellow) 40%, transparent);
-  border-bottom: 1px solid color-mix(var(--mac-yellow) 40%, transparent);
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100px;
-  font-size: var(--font-size-smaller);
-  overflow-x: auto;
-}
-.code-editor-output .table-cell:last-child {
-  border-right: 0;
-}
-
-.suggestion-box {
-  position: fixed;
-  width: 400px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  background-color: color-mix(var(--mac-sidebar-bg) 80%, transparent);
-  border: 1px inset var(--mac-accent);
-}
-.suggestion-box .__suggestion-item {
-  padding: 2px 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.suggestion-box .__suggestion-item.__selected__ {
-  background-color: color-mix(var(--mac-accent) 10%, transparent);
-}
-.suggestion-box .__suggestion-item .__left {
-  display: flex;
-  gap: 2px;
-  justify-content: flex-start;
-  align-items: center;
-}
-.suggestion-box .__suggestion-item .__left .__icon svg {
-  width: 17px;
-  height: 17px;
-}
-.suggestion-box .__suggestion-item .__left .__text {
-  font-size: var(--font-size-small);
-  font-weight: 600;
-  font-family: var(--code-font);
-}
-.suggestion-box .__suggestion-item .__right {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 2px;
-}
-.suggestion-box .__suggestion-item .__right .__description {
-  color: color-mix(var(--mac-text) 50%, transparent);
-  font-size: var(--font-size-smaller);
-  font-family: var(--code-font);
-}
-.suggestion-box .__suggestion-item .__right .__enterIcon svg {
-  width: 12px;
-  height: 12px;
-  stroke: color-mix(var(--mac-text) 30%, transparent);
-}
-
 .FLEX-TRANSPARENT {
   display: flex;
   flex-direction: row;
@@ -551,8 +439,125 @@ form textarea {
   border: 1px solid var(--mac-separator-soft);
 }
 
+.code-editor-container {
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid var(--mac-accent);
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.code-editor {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  overflow: auto;
+  outline: none;
+  font-family: var(--code-font);
+  font-size: var(--font-size-small);
+}
+.code-editor:focus {
+  outline: none;
+}
+.code-editor span {
+  font-family: var(--code-font);
+  font-size: var(--font-size-small);
+}
+
+.code-editor-output {
+  font-family: var(--code-font);
+  padding: 10px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid var(--mac-yellow);
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
+  overflow: auto;
+}
+.code-editor-output .table-row {
+  display: flex;
+  flex-direction: row;
+}
+.code-editor-output .table-row:first-child .table-cell {
+  font-weight: 600;
+  background: color-mix(var(--mac-yellow) 20%, transparent);
+}
+.code-editor-output .table-row:not(:first-child):hover .table-cell {
+  background: color-mix(var(--mac-yellow) 10%, transparent);
+}
+.code-editor-output .table-cell {
+  padding: 8px 10px;
+  border-right: 1px solid color-mix(var(--mac-yellow) 40%, transparent);
+  border-bottom: 1px solid color-mix(var(--mac-yellow) 40%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100px;
+  font-size: var(--font-size-smaller);
+  overflow-x: auto;
+}
+.code-editor-output .table-cell:last-child {
+  border-right: 0;
+}
+
+.suggestion-box {
+  position: fixed;
+  width: 400px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background-color: color-mix(var(--mac-sidebar-bg) 80%, transparent);
+  border: 1px inset var(--mac-accent);
+}
+.suggestion-box .__suggestion-item {
+  padding: 2px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.suggestion-box .__suggestion-item.__selected__ {
+  background-color: color-mix(var(--mac-accent) 10%, transparent);
+}
+.suggestion-box .__suggestion-item .__left {
+  display: flex;
+  gap: 2px;
+  justify-content: flex-start;
+  align-items: center;
+}
+.suggestion-box .__suggestion-item .__left .__icon svg {
+  width: 17px;
+  height: 17px;
+}
+.suggestion-box .__suggestion-item .__left .__text {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  font-family: var(--code-font);
+}
+.suggestion-box .__suggestion-item .__right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px;
+}
+.suggestion-box .__suggestion-item .__right .__description {
+  color: color-mix(var(--mac-text) 50%, transparent);
+  font-size: var(--font-size-smaller);
+  font-family: var(--code-font);
+}
+.suggestion-box .__suggestion-item .__right .__enterIcon svg {
+  width: 12px;
+  height: 12px;
+  stroke: color-mix(var(--mac-text) 30%, transparent);
+}
+
 .__string__ {
-  color: green;
+  color: var(--code-editor-green);
 }
 
 :root {
@@ -579,6 +584,7 @@ form textarea {
   --font-size-small: 12px;
   --font-size-smaller: 11px;
   --mac-divider: rgba(100, 100, 100, 0.1);
+  --code-editor-green: #0c7927;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -590,6 +596,7 @@ form textarea {
     --mac-secondary-text: rgba(255, 255, 255, 0.56);
     --mac-separator: rgba(255, 255, 255, 0.3);
     --mac-separator-soft: rgba(255, 255, 255, 0.1);
+    --code-editor-green: #30d158;
   }
 }
 body,

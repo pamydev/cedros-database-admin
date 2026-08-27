@@ -87,6 +87,7 @@ export const suggestionSelect = (args0: {
   codeEditor: string;
   output: string;
 }) => {
+  if (!suggestionsIsVisible) return;
   const key = args0.e.key;
   if (key === "ArrowDown") {
     args0.e.preventDefault();
@@ -109,7 +110,6 @@ export const suggestionSelect = (args0: {
   }
 
   if (key === "Enter") {
-    if (!suggestionsIsVisible) return;
     args0.e.preventDefault();
     const selectedEl = document.querySelector(
       `[data-position="${selectedPosition}"]`,

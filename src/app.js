@@ -1957,6 +1957,7 @@ var removeSelectedFromAllItems = () => {
   });
 };
 var suggestionSelect = (args0) => {
+  if (!suggestionsIsVisible) return;
   const key = args0.e.key;
   if (key === "ArrowDown") {
     args0.e.preventDefault();
@@ -1973,7 +1974,6 @@ var suggestionSelect = (args0) => {
     const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
   }
   if (key === "Enter") {
-    if (!suggestionsIsVisible) return;
     args0.e.preventDefault();
     const selectedEl = document.querySelector(
       `[data-position="${selectedPosition}"]`
@@ -2137,24 +2137,25 @@ var mongify_sendQuery = async (args0) => {
 // source-code/project/home/colorize.ts
 var isAwaiting = false;
 var colorize = async (args0) => {
+  const { e, codeEditorDiv } = args0;
   if (isAwaiting) return;
   isAwaiting = true;
   await new Promise((resolve) => setTimeout(() => resolve(true), 500));
   isAwaiting = false;
   if (isSuggestionBoxVisible()) return;
-  const { e, codeEditorDiv } = args0;
   const textEl = document.getElementById(codeEditorDiv);
   const innerText = textEl.innerText;
+  const innerHTML = textEl.innerHTML;
   let res = quotes(innerText);
-  if (res === innerText) return;
+  console.table({
+    res,
+    innerText,
+    innerHTML
+  });
+  if (res === innerText || res === innerHTML) return;
+  const cursorPosition = saveCursorPosition(textEl);
   textEl.innerHTML = res;
-  textEl.focus();
-  const range = document.createRange();
-  range.selectNodeContents(textEl);
-  range.collapse(false);
-  const selection = window.getSelection();
-  selection == null ? void 0 : selection.removeAllRanges();
-  selection == null ? void 0 : selection.addRange(range);
+  restoreCursorPosition(textEl, cursorPosition);
 };
 var quotes = (text) => {
   const regex = /("[^"]+")/g;
@@ -2162,13 +2163,66 @@ var quotes = (text) => {
   for (const match of matches) {
     text = text.replace(
       match[0],
-      `<span class='__string__'>${match[0]}</span>`
+      `<span class="__string__">${match[0]}</span>`
     );
   }
   return text;
 };
 var isSuggestionBoxVisible = () => {
   return document.getElementById("div-win-suggestion-box") !== null;
+};
+var saveCursorPosition = (textEl) => {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    return null;
+  }
+  const currentRange = selection.getRangeAt(0);
+  if (!textEl.contains(currentRange.startContainer) || !textEl.contains(currentRange.endContainer)) {
+    return null;
+  }
+  const startRange = document.createRange();
+  startRange.selectNodeContents(textEl);
+  startRange.setEnd(currentRange.startContainer, currentRange.startOffset);
+  const endRange = document.createRange();
+  endRange.selectNodeContents(textEl);
+  endRange.setEnd(currentRange.endContainer, currentRange.endOffset);
+  return {
+    start: startRange.toString().length,
+    end: endRange.toString().length
+  };
+};
+var restoreCursorPosition = (textEl, position2) => {
+  if (!position2) return;
+  const findPosition = (targetOffset) => {
+    var _a;
+    const walker = document.createTreeWalker(textEl, NodeFilter.SHOW_TEXT);
+    let currentOffset = 0;
+    let node = walker.nextNode();
+    while (node) {
+      const nodeLength = ((_a = node.textContent) == null ? void 0 : _a.length) ?? 0;
+      if (targetOffset <= currentOffset + nodeLength) {
+        return {
+          node,
+          offset: targetOffset - currentOffset
+        };
+      }
+      currentOffset += nodeLength;
+      node = walker.nextNode();
+    }
+    return {
+      node: textEl,
+      offset: textEl.childNodes.length
+    };
+  };
+  const start = findPosition(position2.start);
+  const end = findPosition(position2.end);
+  const range = document.createRange();
+  range.setStart(start.node, start.offset);
+  range.setEnd(end.node, end.offset);
+  const selection = window.getSelection();
+  textEl.focus();
+  selection == null ? void 0 : selection.removeAllRanges();
+  selection == null ? void 0 : selection.addRange(range);
 };
 
 // source-code/project/home/homeScreen.ts
