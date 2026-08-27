@@ -834,7 +834,6 @@ var $codeEditor = class _$codeEditor extends Constructos {
    * @param {object} [elements]
    * @param {any} [elements.oninput]  
    * @param {any} [elements.style]  
-   * @param {any} [elements.content]  
    * @param {object} [options]
    * @param {string} [options.identifier]
    */
@@ -861,13 +860,11 @@ var $codeEditor = class _$codeEditor extends Constructos {
   code(props) {
     return `
   <div id="codeEditor-win-${this.identifier}" class="code-editor-container">
-    <div       id="contentEditable-win-${this.identifier}"
+    <pre       id="contentEditable-win-${this.identifier}"
       class="code-editor"
       contenteditable="true"
       oninput="${(props == null ? void 0 : props.oninput) || ""}"
-      style="${(props == null ? void 0 : props.style) || ""}">
-      ${(props == null ? void 0 : props.content) || ""}
-    </div>
+      style="${(props == null ? void 0 : props.style) || ""}"></pre>
   </div>
 `;
   }
@@ -2138,6 +2135,14 @@ var mongify_sendQuery = async (args0) => {
 var isAwaiting = false;
 var colorize = async (args0) => {
   const { e, codeEditorDiv } = args0;
+  if (e.key === "Tab") {
+    insertTab(e, codeEditorDiv);
+    return;
+  }
+  if (isDeniedKeyPressed(e)) {
+    console.log("denied key pressed", e.key);
+    return;
+  }
   if (isAwaiting) return;
   isAwaiting = true;
   await new Promise((resolve) => setTimeout(() => resolve(true), 500));
@@ -2146,21 +2151,29 @@ var colorize = async (args0) => {
   const textEl = document.getElementById(codeEditorDiv);
   const innerText = textEl.innerText;
   const innerHTML = textEl.innerHTML;
-  let res = quotes(innerText);
-  console.table({
-    res,
-    innerText,
-    innerHTML
-  });
+  let res = quotes(innerText, innerHTML);
+  console.log(
+    JSON.stringify(
+      {
+        res,
+        innerText,
+        innerHTML
+      },
+      null,
+      2
+    )
+  );
   if (res === innerText || res === innerHTML) return;
   const cursorPosition = saveCursorPosition(textEl);
   textEl.innerHTML = res;
   restoreCursorPosition(textEl, cursorPosition);
 };
-var quotes = (text) => {
+var quotes = (text, html) => {
   const regex = /("[^"]+")/g;
   const matches = text.matchAll(regex);
+  text = text.replace(/\n/g, "<br />");
   for (const match of matches) {
+    console.log("match", match[0]);
     text = text.replace(
       match[0],
       `<span class="__string__">${match[0]}</span>`
@@ -2224,6 +2237,23 @@ var restoreCursorPosition = (textEl, position2) => {
   selection == null ? void 0 : selection.removeAllRanges();
   selection == null ? void 0 : selection.addRange(range);
 };
+var insertTab = (e, codeEditorDiv) => {
+  var _a;
+  e.preventDefault();
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return;
+  const range = selection.getRangeAt(0);
+  if (!((_a = document.getElementById(codeEditorDiv)) == null ? void 0 : _a.contains(range.commonAncestorContainer)))
+    return;
+  range.deleteContents();
+  const spaces = document.createTextNode("	");
+  range.insertNode(spaces);
+  range.setStartAfter(spaces);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
+var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Tab" || e.key === "Meta" || e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" || e.key === "Insert" || e.key === "Home" || e.key === "End" || e.key === "PageUp" || e.key === "PageDown";
 
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
@@ -2342,12 +2372,12 @@ var ProjectHomeScreen = class extends Screen {
         codeEditor: codeEditorDiv,
         output
       });
-    });
-    document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
       colorize({
         e,
         codeEditorDiv
       });
+    });
+    document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
       suggestions({
         e,
         codeEditor: codeEditorDiv,

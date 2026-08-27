@@ -155,13 +155,14 @@ class ProjectHomeScreen extends Screen {
         codeEditor: codeEditorDiv,
         output,
       });
-    });
 
-    document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
       colorize({
         e,
         codeEditorDiv,
       });
+    });
+
+    document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
       suggestions({
         e,
         codeEditor: codeEditorDiv,

@@ -452,7 +452,8 @@ form textarea {
   padding: 10px;
 }
 
-.code-editor {
+.code-editor,
+.code-editor div {
   width: 100%;
   height: 100%;
   background-color: transparent;
@@ -460,11 +461,17 @@ form textarea {
   outline: none;
   font-family: var(--code-font);
   font-size: var(--font-size-small);
-}
-.code-editor:focus {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 4;
   outline: none;
 }
-.code-editor span {
+.code-editor:focus,
+.code-editor div:focus {
+  outline: none;
+}
+.code-editor span,
+.code-editor div span {
   font-family: var(--code-font);
   font-size: var(--font-size-small);
 }

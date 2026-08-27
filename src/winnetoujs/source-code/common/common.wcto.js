@@ -639,7 +639,6 @@ export class $codeEditor extends Constructos {
   * @param {object} [elements]
   * @param {any} [elements.oninput]  
   * @param {any} [elements.style]  
-  * @param {any} [elements.content]  
   * @param {object} [options]
   * @param {string} [options.identifier]
   */
@@ -666,13 +665,11 @@ export class $codeEditor extends Constructos {
  code (props) {
   return `
   <div id="codeEditor-win-${this.identifier}" class="code-editor-container">
-    <div       id="contentEditable-win-${this.identifier}"
+    <pre       id="contentEditable-win-${this.identifier}"
       class="code-editor"
       contenteditable="true"
       oninput="${props?.oninput || ""}"
-      style="${props?.style || ""}">
-      ${props?.content || ""}
-    </div>
+      style="${props?.style || ""}"></pre>
   </div>
 `;
  }
