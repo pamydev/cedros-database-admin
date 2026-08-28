@@ -2003,7 +2003,6 @@ var colorizeAndFormat = async (args0) => {
   let res = stylish.quotes(innerText);
   res = stylish.db(res);
   res = res.replace(/\n/g, "<br>");
-  console.log(JSON.stringify({ innerText, innerHTML, res }, null, 2));
   if (res === innerText || res === innerHTML) return;
   console.log("colorize set cursor position");
   const cursorPosition = saveCursorPosition(textEl);
@@ -2098,6 +2097,7 @@ var selectedPosition = 0;
 var totalItems = 0;
 var suggestionsIsVisible = false;
 var collectionsList = /* @__PURE__ */ new Map();
+var fieldsList = /* @__PURE__ */ new Map();
 var getCollectionsList = async (args0) => {
   const identifier = `${args0.projectId}-${args0.databaseId}`;
   if (collectionsList.has(identifier)) return collectionsList.get(identifier);
@@ -2108,6 +2108,20 @@ var getCollectionsList = async (args0) => {
   });
   collectionsList.set(identifier, res);
   return res;
+};
+var getFieldsList = async (args0) => {
+  const { collectionName, databaseId, projectId } = args0;
+  const identifier = `${args0.projectId}-${args0.databaseId}`;
+  if (fieldsList.has(identifier)) return fieldsList.get(identifier);
+  let res = await window.database.mongify.sendQuery({
+    command: `db.getCollection("${collectionName}").findOne()`,
+    databaseId,
+    projectId
+  });
+  console.log("findOne getFieldsList result", res);
+  const fields = Object.keys(res || {});
+  fieldsList.set(identifier, fields);
+  return fields;
 };
 var addSuggestionItem = (args0) => {
   const item = new $div({
@@ -2196,7 +2210,7 @@ var suggestionSelect = (args0) => {
   }
 };
 var suggestions = async (args0) => {
-  var _a, _b;
+  var _a, _b, _c, _d, _e, _f, _g;
   const key = args0.e.key;
   if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") return;
   const { codeEditor, output } = args0;
@@ -2210,29 +2224,49 @@ var suggestions = async (args0) => {
   const getCollectionText = ((_b = text.match(getCollectionRegex)) == null ? void 0 : _b[1]) || "";
   let collections;
   const command = text.split("db.")[1];
+  const listFieldsRegex = /db\.getCollection\(".+"\).find\({\s+(.+)/;
+  const collectionNameRegex = /db\.getCollection\("(.+)"\)/;
+  const collectionName = ((_c = text.match(collectionNameRegex)) == null ? void 0 : _c[1]) || "";
+  const fieldTextMatched = ((_d = text.match(listFieldsRegex)) == null ? void 0 : _d[1]) || "";
   let suggestionsAvailable = [];
   let type;
-  if (text.match(regExPreFunction)) {
-    type = "function";
-    suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
-      if (method.startsWith(functionText) || functionText === "") return true;
-      return false;
-    });
-  } else if (text.match(getCollectionPreRegex)) {
-    type = "collection";
-    collections = await getCollectionsList({
-      databaseId: args0.databaseId,
-      projectId: args0.projectId
-    });
-    suggestionsAvailable = collections.filter(
-      (coll) => coll.startsWith(getCollectionText) || getCollectionText === ""
-    );
-  } else {
-    type = "method";
-    suggestionsAvailable = mongify.methods.filter((method) => {
-      if (method.startsWith(command) || command === "") return true;
-      return false;
-    });
+  switch (true) {
+    case ((_e = text.match(listFieldsRegex)) == null ? void 0 : _e.length) > 0:
+      console.log("entrou no listFields");
+      type = "field";
+      const fieldsAvailable = await getFieldsList({
+        collectionName,
+        databaseId: args0.databaseId,
+        projectId: args0.projectId
+      });
+      suggestionsAvailable = fieldsAvailable.filter(
+        (fields) => fields.startsWith(fieldTextMatched) || fieldTextMatched === ""
+      );
+      break;
+    case ((_f = text.match(regExPreFunction)) == null ? void 0 : _f.length) > 0:
+      type = "function";
+      suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
+        if (method.startsWith(functionText) || functionText === "") return true;
+        return false;
+      });
+      break;
+    case ((_g = text.match(getCollectionPreRegex)) == null ? void 0 : _g.length) > 0:
+      type = "collection";
+      collections = await getCollectionsList({
+        databaseId: args0.databaseId,
+        projectId: args0.projectId
+      });
+      suggestionsAvailable = collections.filter(
+        (coll) => coll.startsWith(getCollectionText) || getCollectionText === ""
+      );
+      break;
+    default:
+      type = "method";
+      suggestionsAvailable = mongify.methods.filter((method) => {
+        if (method.startsWith(command) || command === "") return true;
+        return false;
+      });
+      break;
   }
   totalItems = suggestionsAvailable.length;
   const cursorPosition = getCursorPosition();

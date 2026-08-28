@@ -23,6 +23,7 @@ let selectedPosition = 0;
 let totalItems = 0;
 let suggestionsIsVisible = false;
 let collectionsList = new Map<string, string[]>();
+let fieldsList = new Map<string, string[]>();
 
 const getCollectionsList = async (args0: {
   projectId: string;
@@ -41,10 +42,32 @@ const getCollectionsList = async (args0: {
   return res;
 };
 
+const getFieldsList = async (args0: {
+  collectionName: string;
+  databaseId: string;
+  projectId: string;
+}): Promise<string[]> => {
+  const { collectionName, databaseId, projectId } = args0;
+  const identifier = `${args0.projectId}-${args0.databaseId}`;
+  if (fieldsList.has(identifier)) return fieldsList.get(identifier);
+
+  let res = await window.database.mongify.sendQuery({
+    command: `db.getCollection("${collectionName}").findOne()`,
+    databaseId,
+    projectId,
+  });
+
+  console.log("findOne getFieldsList result", res);
+
+  const fields = Object.keys(res || {});
+  fieldsList.set(identifier, fields);
+  return fields;
+};
+
 const addSuggestionItem = (args0: {
   method: string;
   output: string;
-  type: "method" | "collection" | "function";
+  type: "method" | "collection" | "function" | "field";
 }) => {
   const item = new $div({
     class: `__suggestion-item ${selectedPosition === position ? "__selected__" : ""}`,
@@ -171,41 +194,77 @@ export const suggestions = async (args0: {
   const codeEditorElement = document.getElementById(codeEditor);
   const text = codeEditorElement.innerText;
 
+  // regex to match .find, .insert, ...
   const regExPreFunction = /db\.[^.]+\./;
   const regExFunction = /db\.[^.]+\.(.+)/;
   const functionText = text.match(regExFunction)?.[1] || "";
 
+  // regex to match db.getCollection(" to shows collections available
   const getCollectionPreRegex = /db\.getCollection\(\"/;
   const getCollectionRegex = /db\.getCollection\(\"([^.]+)/;
   const getCollectionText = text.match(getCollectionRegex)?.[1] || "";
   let collections: string[];
 
+  // to match db. to show available database methods like listCollections, ...
   const command = text.split("db.")[1];
 
-  let suggestionsAvailable: string[] = [];
-  let type: "method" | "collection" | "function";
+  // regex to match db.getCollection("...").find({
+  // to show fields available in that collection
+  const listFieldsRegex = /db\.getCollection\(".+"\).find\({\s+(.+)/;
+  const collectionNameRegex = /db\.getCollection\("(.+)"\)/;
+  const collectionName = text.match(collectionNameRegex)?.[1] || "";
+  const fieldTextMatched = text.match(listFieldsRegex)?.[1] || "";
 
-  if (text.match(regExPreFunction)) {
-    type = "function";
-    suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
-      if (method.startsWith(functionText) || functionText === "") return true;
-      return false;
-    });
-  } else if (text.match(getCollectionPreRegex)) {
-    type = "collection";
-    collections = await getCollectionsList({
-      databaseId: args0.databaseId,
-      projectId: args0.projectId,
-    });
-    suggestionsAvailable = collections.filter(
-      (coll) => coll.startsWith(getCollectionText) || getCollectionText === "",
-    );
-  } else {
-    type = "method";
-    suggestionsAvailable = mongify.methods.filter((method) => {
-      if (method.startsWith(command) || command === "") return true;
-      return false;
-    });
+  let suggestionsAvailable: string[] = [];
+  let type: "method" | "collection" | "function" | "field";
+
+  // fills suggestionsAvailable List
+  // defines type added to list item
+  switch (true) {
+    case text.match(listFieldsRegex)?.length > 0:
+      console.log("entrou no listFields");
+      type = "field";
+
+      const fieldsAvailable: string[] = await getFieldsList({
+        collectionName,
+        databaseId: args0.databaseId,
+        projectId: args0.projectId,
+      });
+
+      suggestionsAvailable = fieldsAvailable.filter(
+        (fields) =>
+          fields.startsWith(fieldTextMatched) || fieldTextMatched === "",
+      );
+
+      break;
+
+    case text.match(regExPreFunction)?.length > 0:
+      type = "function";
+      suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
+        if (method.startsWith(functionText) || functionText === "") return true;
+        return false;
+      });
+      break;
+
+    case text.match(getCollectionPreRegex)?.length > 0:
+      type = "collection";
+      collections = await getCollectionsList({
+        databaseId: args0.databaseId,
+        projectId: args0.projectId,
+      });
+      suggestionsAvailable = collections.filter(
+        (coll) =>
+          coll.startsWith(getCollectionText) || getCollectionText === "",
+      );
+      break;
+
+    default:
+      type = "method";
+      suggestionsAvailable = mongify.methods.filter((method) => {
+        if (method.startsWith(command) || command === "") return true;
+        return false;
+      });
+      break;
   }
 
   totalItems = suggestionsAvailable.length;

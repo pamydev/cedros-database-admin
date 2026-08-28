@@ -65,7 +65,7 @@ export const colorizeAndFormat = async (args0: {
   res = stylish.db(res);
   res = res.replace(/\n/g, "<br>");
 
-  console.log(JSON.stringify({ innerText, innerHTML, res }, null, 2));
+  // console.log(JSON.stringify({ innerText, innerHTML, res }, null, 2));
 
   if (res === innerText || res === innerHTML) return;
 
