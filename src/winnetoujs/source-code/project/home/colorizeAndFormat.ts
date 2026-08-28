@@ -78,25 +78,17 @@ export const colorizeAndFormat = async (args0: {
 const stylish = {
   quotes(text: string) {
     const regex = /("[^"]+")/g;
-    const matches = text.matchAll(regex);
-    for (const match of matches) {
-      text = text.replace(
-        match[0],
-        `<span class="__c0001__">${match[0]}</span>`,
-      );
-    }
-    return text;
+    return text.replace(
+      regex,
+      (match) => `<span class="__c0001__">${match}</span>`,
+    );
   },
   db(text: string) {
     const regex = /(db)/g;
-    const matches = text.matchAll(regex);
-    for (const match of matches) {
-      text = text.replace(
-        match[0],
-        `<span class="__c0002__">${match[0]}</span>`,
-      );
-    }
-    return text;
+    return text.replace(
+      regex,
+      (match) => `<span class="__c0002__">${match}</span>`,
+    );
   },
 };
 
