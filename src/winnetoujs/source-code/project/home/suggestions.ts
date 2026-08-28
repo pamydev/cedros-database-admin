@@ -2,6 +2,11 @@ import { mongify } from "./mongify.suggestions";
 import { createIcon } from "@icons";
 import { $div } from "@common";
 import { Box, CornerDownLeft } from "lucide";
+import {
+  restoreCursorPosition,
+  saveCursorPosition,
+  setCursorPositionInEndOfLine,
+} from "./cursor";
 
 const getCursorPosition = () => {
   const selection = window.getSelection();
@@ -143,18 +148,8 @@ export const suggestionSelect = (args0: {
         editor.innerText = text.replace(toBeReplaced, content) + "(";
       }
     }
-    editor.focus();
 
-    const range = document.createRange();
-    range.selectNodeContents(editor);
-    range.collapse(false); // false significa final
-
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-
-    position = 0;
-    selectedPosition = 0;
+    setCursorPositionInEndOfLine(editor);
     removeSuggestionBox();
   }
 };

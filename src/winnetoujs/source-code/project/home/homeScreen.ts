@@ -7,7 +7,7 @@ import { W } from "winnetoujs";
 import { digestOutput } from "./digestOutput";
 import { suggestions, suggestionSelect } from "./suggestions";
 import { mongify_sendQuery } from "./mongify.sendQuery";
-import { colorize } from "./colorize";
+import { colorizeAndFormat } from "./colorizeAndFormat";
 
 class ProjectHomeScreen extends Screen {
   private output: string;
@@ -156,9 +156,9 @@ class ProjectHomeScreen extends Screen {
         output,
       });
 
-      colorize({
+      colorizeAndFormat({
         e,
-        codeEditorDiv,
+        codeEditor: codeEditorDiv,
       });
     });
 

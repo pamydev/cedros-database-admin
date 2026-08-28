@@ -1895,6 +1895,70 @@ var mongify = {
   getCollectionFunctions: ["find", "findOne", "insert", "update", "delete"]
 };
 
+// source-code/project/home/cursor.ts
+var saveCursorPosition = (textEl) => {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    return null;
+  }
+  const currentRange = selection.getRangeAt(0);
+  if (!textEl.contains(currentRange.startContainer) || !textEl.contains(currentRange.endContainer)) {
+    return null;
+  }
+  const startRange = document.createRange();
+  startRange.selectNodeContents(textEl);
+  startRange.setEnd(currentRange.startContainer, currentRange.startOffset);
+  const endRange = document.createRange();
+  endRange.selectNodeContents(textEl);
+  endRange.setEnd(currentRange.endContainer, currentRange.endOffset);
+  return {
+    start: startRange.toString().length,
+    end: endRange.toString().length
+  };
+};
+var restoreCursorPosition = (textEl, position2) => {
+  if (!position2) return;
+  const findPosition = (targetOffset) => {
+    var _a;
+    const walker = document.createTreeWalker(textEl, NodeFilter.SHOW_TEXT);
+    let currentOffset = 0;
+    let node = walker.nextNode();
+    while (node) {
+      const nodeLength = ((_a = node.textContent) == null ? void 0 : _a.length) ?? 0;
+      if (targetOffset <= currentOffset + nodeLength) {
+        return {
+          node,
+          offset: targetOffset - currentOffset
+        };
+      }
+      currentOffset += nodeLength;
+      node = walker.nextNode();
+    }
+    return {
+      node: textEl,
+      offset: textEl.childNodes.length
+    };
+  };
+  const start = findPosition(position2.start);
+  const end = findPosition(position2.end);
+  const range = document.createRange();
+  range.setStart(start.node, start.offset);
+  range.setEnd(end.node, end.offset);
+  const selection = window.getSelection();
+  textEl.focus();
+  selection == null ? void 0 : selection.removeAllRanges();
+  selection == null ? void 0 : selection.addRange(range);
+};
+var setCursorPositionInEndOfLine = (textEl) => {
+  const range = document.createRange();
+  range.selectNodeContents(textEl);
+  range.collapse(false);
+  const selection = window.getSelection();
+  selection == null ? void 0 : selection.removeAllRanges();
+  selection == null ? void 0 : selection.addRange(range);
+  textEl.focus();
+};
+
 // source-code/project/home/suggestions.ts
 var getCursorPosition = () => {
   const selection = window.getSelection();
@@ -2000,15 +2064,7 @@ var suggestionSelect = (args0) => {
         editor.innerText = text.replace(toBeReplaced, content) + "(";
       }
     }
-    editor.focus();
-    const range = document.createRange();
-    range.selectNodeContents(editor);
-    range.collapse(false);
-    const selection = window.getSelection();
-    selection == null ? void 0 : selection.removeAllRanges();
-    selection == null ? void 0 : selection.addRange(range);
-    position = 0;
-    selectedPosition = 0;
+    setCursorPositionInEndOfLine(editor);
     removeSuggestionBox();
   }
 };
@@ -2131,39 +2187,41 @@ var mongify_sendQuery = async (args0) => {
   });
 };
 
-// source-code/project/home/colorize.ts
+// source-code/project/home/colorizeAndFormat.ts
 var isAwaiting = false;
-var colorize = async (args0) => {
-  const { e, codeEditorDiv } = args0;
+var tabCount = 0;
+var colorizeAndFormat = async (args0) => {
+  const { e, codeEditor } = args0;
+  if (e.key === "{") {
+    tabCount++;
+  }
+  if (e.key === "}") {
+    tabCount--;
+    removeTab({ e, codeEditor, str: "}" });
+  }
   if (e.key === "Tab") {
-    insertTab(e, codeEditorDiv);
+    insertTab({ e, codeEditor });
     return;
   }
+  if (e.key === "Enter") {
+    insertTab({ e, codeEditor, onPressEnter: true });
+  }
   if (isDeniedKeyPressed(e)) {
-    console.log("denied key pressed", e.key);
     return;
   }
   if (isAwaiting) return;
   isAwaiting = true;
-  await new Promise((resolve) => setTimeout(() => resolve(true), 500));
+  await new Promise((resolve) => setTimeout(() => resolve(true), 10));
   isAwaiting = false;
   if (isSuggestionBoxVisible()) return;
-  const textEl = document.getElementById(codeEditorDiv);
+  const textEl = document.getElementById(codeEditor);
   const innerText = textEl.innerText;
   const innerHTML = textEl.innerHTML;
   let res = quotes(innerText, innerHTML);
-  console.log(
-    JSON.stringify(
-      {
-        res,
-        innerText,
-        innerHTML
-      },
-      null,
-      2
-    )
-  );
+  res = res.replace(/\n/g, "<br>");
+  console.log(JSON.stringify({ innerText, innerHTML, res }, null, 2));
   if (res === innerText || res === innerHTML) return;
+  console.log("colorize set cursor position");
   const cursorPosition = saveCursorPosition(textEl);
   textEl.innerHTML = res;
   restoreCursorPosition(textEl, cursorPosition);
@@ -2171,7 +2229,6 @@ var colorize = async (args0) => {
 var quotes = (text, html) => {
   const regex = /("[^"]+")/g;
   const matches = text.matchAll(regex);
-  text = text.replace(/\n/g, "<br />");
   for (const match of matches) {
     console.log("match", match[0]);
     text = text.replace(
@@ -2184,76 +2241,53 @@ var quotes = (text, html) => {
 var isSuggestionBoxVisible = () => {
   return document.getElementById("div-win-suggestion-box") !== null;
 };
-var saveCursorPosition = (textEl) => {
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) {
-    return null;
-  }
-  const currentRange = selection.getRangeAt(0);
-  if (!textEl.contains(currentRange.startContainer) || !textEl.contains(currentRange.endContainer)) {
-    return null;
-  }
-  const startRange = document.createRange();
-  startRange.selectNodeContents(textEl);
-  startRange.setEnd(currentRange.startContainer, currentRange.startOffset);
-  const endRange = document.createRange();
-  endRange.selectNodeContents(textEl);
-  endRange.setEnd(currentRange.endContainer, currentRange.endOffset);
-  return {
-    start: startRange.toString().length,
-    end: endRange.toString().length
-  };
-};
-var restoreCursorPosition = (textEl, position2) => {
-  if (!position2) return;
-  const findPosition = (targetOffset) => {
-    var _a;
-    const walker = document.createTreeWalker(textEl, NodeFilter.SHOW_TEXT);
-    let currentOffset = 0;
-    let node = walker.nextNode();
-    while (node) {
-      const nodeLength = ((_a = node.textContent) == null ? void 0 : _a.length) ?? 0;
-      if (targetOffset <= currentOffset + nodeLength) {
-        return {
-          node,
-          offset: targetOffset - currentOffset
-        };
-      }
-      currentOffset += nodeLength;
-      node = walker.nextNode();
-    }
-    return {
-      node: textEl,
-      offset: textEl.childNodes.length
-    };
-  };
-  const start = findPosition(position2.start);
-  const end = findPosition(position2.end);
-  const range = document.createRange();
-  range.setStart(start.node, start.offset);
-  range.setEnd(end.node, end.offset);
-  const selection = window.getSelection();
-  textEl.focus();
-  selection == null ? void 0 : selection.removeAllRanges();
-  selection == null ? void 0 : selection.addRange(range);
-};
-var insertTab = (e, codeEditorDiv) => {
+var insertTab = async (args0) => {
   var _a;
-  e.preventDefault();
+  const { e, codeEditor, onPressEnter } = args0;
+  if (onPressEnter && tabCount === 0) return;
+  if (!onPressEnter) e.preventDefault();
+  await new Promise(
+    (resolve) => setTimeout(() => {
+      resolve(true);
+    }, 10)
+  );
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0) return;
   const range = selection.getRangeAt(0);
-  if (!((_a = document.getElementById(codeEditorDiv)) == null ? void 0 : _a.contains(range.commonAncestorContainer)))
+  if (!((_a = document.getElementById(codeEditor)) == null ? void 0 : _a.contains(range.commonAncestorContainer)))
     return;
   range.deleteContents();
-  const spaces = document.createTextNode("	");
+  let spaces;
+  if (!onPressEnter) {
+    tabCount++;
+    spaces = document.createTextNode("	");
+  } else {
+    console.log({ tabCount });
+    spaces = document.createTextNode("	".repeat(tabCount));
+  }
   range.insertNode(spaces);
   range.setStartAfter(spaces);
   range.collapse(true);
   selection.removeAllRanges();
   selection.addRange(range);
 };
-var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Tab" || e.key === "Meta" || e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" || e.key === "Insert" || e.key === "Home" || e.key === "End" || e.key === "PageUp" || e.key === "PageDown";
+var removeTab = (args0) => {
+  const { e, codeEditor, str } = args0;
+  e.preventDefault();
+  const el = document.getElementById(codeEditor);
+  const text = el.innerText;
+  console.log(JSON.stringify({ text }, null, 2));
+  let newText = text;
+  if (newText.endsWith("\n")) {
+    newText = newText.slice(0, -1);
+  }
+  if (newText.endsWith("	")) {
+    newText = newText.slice(0, -1);
+  }
+  el.innerText = newText + str;
+  setCursorPositionInEndOfLine(el);
+};
+var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Tab" || e.key === "Meta" || e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" || e.key === "Insert" || e.key === "Home" || e.key === "End" || e.key === "PageUp" || e.key === "PageDown" || e.key === "Backspace";
 
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
@@ -2372,9 +2406,9 @@ var ProjectHomeScreen = class extends Screen {
         codeEditor: codeEditorDiv,
         output
       });
-      colorize({
+      colorizeAndFormat({
         e,
-        codeEditorDiv
+        codeEditor: codeEditorDiv
       });
     });
     document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {

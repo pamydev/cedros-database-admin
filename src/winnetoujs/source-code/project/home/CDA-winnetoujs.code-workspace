@@ -40,6 +40,20 @@
             "foreground": "#99ffaa",
           },
         },
+        {
+          "scope": ["entity.name.function.ts"],
+          "settings": {
+            "fontStyle": "underline",
+            "foreground": "#99aaFF",
+          },
+        },
+        {
+          "scope": ["entity.name.type.alias.ts"],
+          "settings": {
+            "fontStyle": "underline",
+            "foreground": "#ffaaFF",
+          },
+        },
       ],
     },
   },
