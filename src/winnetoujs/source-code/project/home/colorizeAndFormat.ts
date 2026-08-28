@@ -7,35 +7,48 @@ import {
 let isAwaiting = false;
 let tabCount = 0;
 
+const tabDecrement = () => {
+  if (tabCount > 0) tabCount--;
+};
+
+const tabIncrement = () => {
+  tabCount++;
+};
+
 export const colorizeAndFormat = async (args0: {
-  e: KeyboardEvent;
+  e?: KeyboardEvent;
   codeEditor: string;
 }) => {
   const { e, codeEditor: codeEditor } = args0;
 
   //   console.log("key", e.key);
 
-  if (e.key === "{") {
-    tabCount++;
+  if (e?.key === "{") {
+    tabIncrement();
   }
 
-  if (e.key === "}") {
-    tabCount--;
+  if (e?.key === "}") {
+    tabDecrement();
     removeTab({ e, codeEditor, str: "}" });
   }
 
-  if (e.key === "Tab") {
+  if (e?.key === "Tab") {
     insertTab({ e, codeEditor });
     return;
   }
 
-  if (e.key === "Enter") {
+  if (e?.key === "Backspace") {
+    backspacePressed({ e, codeEditor });
+  }
+
+  if (e?.key === "Enter") {
     insertTab({ e, codeEditor, onPressEnter: true });
   }
 
-  if (isDeniedKeyPressed(e)) {
-    return;
-  }
+  if (e)
+    if (isDeniedKeyPressed(e)) {
+      return;
+    }
 
   if (isAwaiting) return;
   isAwaiting = true;
@@ -48,8 +61,8 @@ export const colorizeAndFormat = async (args0: {
   const innerText = textEl.innerText;
   const innerHTML = textEl.innerHTML;
 
-  let res = quotes(innerText, innerHTML);
-
+  let res = stylish.quotes(innerText);
+  res = stylish.db(res);
   res = res.replace(/\n/g, "<br>");
 
   console.log(JSON.stringify({ innerText, innerHTML, res }, null, 2));
@@ -62,18 +75,29 @@ export const colorizeAndFormat = async (args0: {
   restoreCursorPosition(textEl, cursorPosition);
 };
 
-const quotes = (text: string, html: string) => {
-  const regex = /("[^"]+")/g;
-  const matches = text.matchAll(regex);
-  for (const match of matches) {
-    console.log("match", match[0]);
-
-    text = text.replace(
-      match[0],
-      `<span class="__string__">${match[0]}</span>`,
-    );
-  }
-  return text;
+const stylish = {
+  quotes(text: string) {
+    const regex = /("[^"]+")/g;
+    const matches = text.matchAll(regex);
+    for (const match of matches) {
+      text = text.replace(
+        match[0],
+        `<span class="__c0001__">${match[0]}</span>`,
+      );
+    }
+    return text;
+  },
+  db(text: string) {
+    const regex = /(db)/g;
+    const matches = text.matchAll(regex);
+    for (const match of matches) {
+      text = text.replace(
+        match[0],
+        `<span class="__c0002__">${match[0]}</span>`,
+      );
+    }
+    return text;
+  },
 };
 
 const isSuggestionBoxVisible = () => {
@@ -115,7 +139,7 @@ const insertTab = async (args0: {
   let spaces: Text;
 
   if (!onPressEnter) {
-    tabCount++;
+    tabIncrement();
     spaces = document.createTextNode("\t");
   } else {
     console.log({ tabCount });
@@ -159,6 +183,18 @@ const removeTab = (args0: {
   el.innerText = newText + str;
 
   setCursorPositionInEndOfLine(el);
+};
+
+const backspacePressed = (args0: { e: KeyboardEvent; codeEditor: string }) => {
+  const { e, codeEditor } = args0;
+  const el = document.getElementById(codeEditor) as HTMLElement;
+  const text = el.innerText;
+
+  // console.log("backspace", JSON.stringify({ text }, null, 2));
+
+  if (text.endsWith("\t") || text.endsWith("\t\n")) {
+    tabDecrement();
+  }
 };
 
 const isDeniedKeyPressed = (e: KeyboardEvent) =>

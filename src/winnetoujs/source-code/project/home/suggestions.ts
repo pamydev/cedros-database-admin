@@ -7,6 +7,7 @@ import {
   saveCursorPosition,
   setCursorPositionInEndOfLine,
 } from "./cursor";
+import { colorizeAndFormat } from "./colorizeAndFormat";
 
 const getCursorPosition = () => {
   const selection = window.getSelection();
@@ -151,6 +152,7 @@ export const suggestionSelect = (args0: {
 
     setCursorPositionInEndOfLine(editor);
     removeSuggestionBox();
+    colorizeAndFormat({ codeEditor: args0.codeEditor });
   }
 };
 

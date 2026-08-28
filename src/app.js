@@ -1959,6 +1959,140 @@ var setCursorPositionInEndOfLine = (textEl) => {
   textEl.focus();
 };
 
+// source-code/project/home/colorizeAndFormat.ts
+var isAwaiting = false;
+var tabCount = 0;
+var tabDecrement = () => {
+  if (tabCount > 0) tabCount--;
+};
+var tabIncrement = () => {
+  tabCount++;
+};
+var colorizeAndFormat = async (args0) => {
+  const { e, codeEditor } = args0;
+  if ((e == null ? void 0 : e.key) === "{") {
+    tabIncrement();
+  }
+  if ((e == null ? void 0 : e.key) === "}") {
+    tabDecrement();
+    removeTab({ e, codeEditor, str: "}" });
+  }
+  if ((e == null ? void 0 : e.key) === "Tab") {
+    insertTab({ e, codeEditor });
+    return;
+  }
+  if ((e == null ? void 0 : e.key) === "Backspace") {
+    backspacePressed({ e, codeEditor });
+  }
+  if ((e == null ? void 0 : e.key) === "Enter") {
+    insertTab({ e, codeEditor, onPressEnter: true });
+  }
+  if (e) {
+    if (isDeniedKeyPressed(e)) {
+      return;
+    }
+  }
+  if (isAwaiting) return;
+  isAwaiting = true;
+  await new Promise((resolve) => setTimeout(() => resolve(true), 10));
+  isAwaiting = false;
+  if (isSuggestionBoxVisible()) return;
+  const textEl = document.getElementById(codeEditor);
+  const innerText = textEl.innerText;
+  const innerHTML = textEl.innerHTML;
+  let res = stylish.quotes(innerText);
+  res = stylish.db(res);
+  res = res.replace(/\n/g, "<br>");
+  console.log(JSON.stringify({ innerText, innerHTML, res }, null, 2));
+  if (res === innerText || res === innerHTML) return;
+  console.log("colorize set cursor position");
+  const cursorPosition = saveCursorPosition(textEl);
+  textEl.innerHTML = res;
+  restoreCursorPosition(textEl, cursorPosition);
+};
+var stylish = {
+  quotes(text) {
+    const regex = /("[^"]+")/g;
+    const matches = text.matchAll(regex);
+    for (const match of matches) {
+      text = text.replace(
+        match[0],
+        `<span class="__c0001__">${match[0]}</span>`
+      );
+    }
+    return text;
+  },
+  db(text) {
+    const regex = /(db)/g;
+    const matches = text.matchAll(regex);
+    for (const match of matches) {
+      text = text.replace(
+        match[0],
+        `<span class="__c0002__">${match[0]}</span>`
+      );
+    }
+    return text;
+  }
+};
+var isSuggestionBoxVisible = () => {
+  return document.getElementById("div-win-suggestion-box") !== null;
+};
+var insertTab = async (args0) => {
+  var _a;
+  const { e, codeEditor, onPressEnter } = args0;
+  if (onPressEnter && tabCount === 0) return;
+  if (!onPressEnter) e.preventDefault();
+  await new Promise(
+    (resolve) => setTimeout(() => {
+      resolve(true);
+    }, 10)
+  );
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return;
+  const range = selection.getRangeAt(0);
+  if (!((_a = document.getElementById(codeEditor)) == null ? void 0 : _a.contains(range.commonAncestorContainer)))
+    return;
+  range.deleteContents();
+  let spaces;
+  if (!onPressEnter) {
+    tabIncrement();
+    spaces = document.createTextNode("	");
+  } else {
+    console.log({ tabCount });
+    spaces = document.createTextNode("	".repeat(tabCount));
+  }
+  range.insertNode(spaces);
+  range.setStartAfter(spaces);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
+var removeTab = (args0) => {
+  const { e, codeEditor, str } = args0;
+  e.preventDefault();
+  const el = document.getElementById(codeEditor);
+  const text = el.innerText;
+  console.log(JSON.stringify({ text }, null, 2));
+  let newText = text;
+  if (newText.endsWith("\n")) {
+    newText = newText.slice(0, -1);
+  }
+  if (newText.endsWith("	")) {
+    newText = newText.slice(0, -1);
+  }
+  el.innerText = newText + str;
+  setCursorPositionInEndOfLine(el);
+};
+var backspacePressed = (args0) => {
+  const { e, codeEditor } = args0;
+  const el = document.getElementById(codeEditor);
+  const text = el.innerText;
+  if (text.endsWith("	") || text.endsWith("	\n")) {
+    tabDecrement();
+  }
+};
+var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Tab" || e.key === "Meta" || e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" || e.key === "Insert" || e.key === "Home" || e.key === "End" || e.key === "PageUp" || e.key === "PageDown" || e.key === "Backspace";
+
 // source-code/project/home/suggestions.ts
 var getCursorPosition = () => {
   const selection = window.getSelection();
@@ -2066,6 +2200,7 @@ var suggestionSelect = (args0) => {
     }
     setCursorPositionInEndOfLine(editor);
     removeSuggestionBox();
+    colorizeAndFormat({ codeEditor: args0.codeEditor });
   }
 };
 var suggestions = async (args0) => {
@@ -2186,108 +2321,6 @@ var mongify_sendQuery = async (args0) => {
     result: res
   });
 };
-
-// source-code/project/home/colorizeAndFormat.ts
-var isAwaiting = false;
-var tabCount = 0;
-var colorizeAndFormat = async (args0) => {
-  const { e, codeEditor } = args0;
-  if (e.key === "{") {
-    tabCount++;
-  }
-  if (e.key === "}") {
-    tabCount--;
-    removeTab({ e, codeEditor, str: "}" });
-  }
-  if (e.key === "Tab") {
-    insertTab({ e, codeEditor });
-    return;
-  }
-  if (e.key === "Enter") {
-    insertTab({ e, codeEditor, onPressEnter: true });
-  }
-  if (isDeniedKeyPressed(e)) {
-    return;
-  }
-  if (isAwaiting) return;
-  isAwaiting = true;
-  await new Promise((resolve) => setTimeout(() => resolve(true), 10));
-  isAwaiting = false;
-  if (isSuggestionBoxVisible()) return;
-  const textEl = document.getElementById(codeEditor);
-  const innerText = textEl.innerText;
-  const innerHTML = textEl.innerHTML;
-  let res = quotes(innerText, innerHTML);
-  res = res.replace(/\n/g, "<br>");
-  console.log(JSON.stringify({ innerText, innerHTML, res }, null, 2));
-  if (res === innerText || res === innerHTML) return;
-  console.log("colorize set cursor position");
-  const cursorPosition = saveCursorPosition(textEl);
-  textEl.innerHTML = res;
-  restoreCursorPosition(textEl, cursorPosition);
-};
-var quotes = (text, html) => {
-  const regex = /("[^"]+")/g;
-  const matches = text.matchAll(regex);
-  for (const match of matches) {
-    console.log("match", match[0]);
-    text = text.replace(
-      match[0],
-      `<span class="__string__">${match[0]}</span>`
-    );
-  }
-  return text;
-};
-var isSuggestionBoxVisible = () => {
-  return document.getElementById("div-win-suggestion-box") !== null;
-};
-var insertTab = async (args0) => {
-  var _a;
-  const { e, codeEditor, onPressEnter } = args0;
-  if (onPressEnter && tabCount === 0) return;
-  if (!onPressEnter) e.preventDefault();
-  await new Promise(
-    (resolve) => setTimeout(() => {
-      resolve(true);
-    }, 10)
-  );
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) return;
-  const range = selection.getRangeAt(0);
-  if (!((_a = document.getElementById(codeEditor)) == null ? void 0 : _a.contains(range.commonAncestorContainer)))
-    return;
-  range.deleteContents();
-  let spaces;
-  if (!onPressEnter) {
-    tabCount++;
-    spaces = document.createTextNode("	");
-  } else {
-    console.log({ tabCount });
-    spaces = document.createTextNode("	".repeat(tabCount));
-  }
-  range.insertNode(spaces);
-  range.setStartAfter(spaces);
-  range.collapse(true);
-  selection.removeAllRanges();
-  selection.addRange(range);
-};
-var removeTab = (args0) => {
-  const { e, codeEditor, str } = args0;
-  e.preventDefault();
-  const el = document.getElementById(codeEditor);
-  const text = el.innerText;
-  console.log(JSON.stringify({ text }, null, 2));
-  let newText = text;
-  if (newText.endsWith("\n")) {
-    newText = newText.slice(0, -1);
-  }
-  if (newText.endsWith("	")) {
-    newText = newText.slice(0, -1);
-  }
-  el.innerText = newText + str;
-  setCursorPositionInEndOfLine(el);
-};
-var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Tab" || e.key === "Meta" || e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" || e.key === "Insert" || e.key === "Home" || e.key === "End" || e.key === "PageUp" || e.key === "PageDown" || e.key === "Backspace";
 
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {

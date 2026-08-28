@@ -563,8 +563,12 @@ form textarea {
   stroke: color-mix(var(--mac-text) 30%, transparent);
 }
 
-.__string__ {
+.__c0001__ {
   color: var(--code-editor-green);
+}
+
+.__c0002__ {
+  color: var(--code-editor-red);
 }
 
 :root {
@@ -592,6 +596,7 @@ form textarea {
   --font-size-smaller: 11px;
   --mac-divider: rgba(100, 100, 100, 0.1);
   --code-editor-green: #0c7927;
+  --code-editor-red: #83142a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -604,6 +609,7 @@ form textarea {
     --mac-separator: rgba(255, 255, 255, 0.3);
     --mac-separator-soft: rgba(255, 255, 255, 0.1);
     --code-editor-green: #30d158;
+    --code-editor-red: #fe8099;
   }
 }
 body,
