@@ -8,6 +8,7 @@ import {
   setCursorPositionInEndOfLine,
 } from "./cursor";
 import { colorizeAndFormat } from "./colorizeAndFormat";
+import { params } from "./params";
 
 const getCursorPosition = () => {
   const selection = window.getSelection();
@@ -224,15 +225,22 @@ export const suggestionSelect = (args0: {
       case type === "field":
         (() => {
           const text = editor.innerText;
-          const listFieldsRegex = /(db\.getCollection\(".+"\).find\({\s+)(.+)/;
+          console.log(
+            "innerText inside field",
+            JSON.stringify({ text }, null, 2),
+          );
+          const listFieldsRegex =
+            /(db\.getCollection\(".+"\).find\({[\s\t\n]*)(.+)/;
           const match = text.match(listFieldsRegex);
           const toBeReplaced = match?.[1] || "";
           if (toBeReplaced === "" || !toBeReplaced) {
             editor.innerText = text + content + ":";
           } else {
+            const tabCount = params.tabCount;
             editor.innerText = text.replace(
               listFieldsRegex,
-              (completeMatch, group1, group2) => `${group1}${content}:`,
+              (completeMatch, group1, group2) =>
+                `${group1}${"\t".repeat(tabCount)}${content}:`,
             );
           }
         })();

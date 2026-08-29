@@ -1959,14 +1959,19 @@ var setCursorPositionInEndOfLine = (textEl) => {
   textEl.focus();
 };
 
+// source-code/project/home/params.ts
+var Params = class {
+  tabCount = 0;
+};
+var params = new Params();
+
 // source-code/project/home/colorizeAndFormat.ts
 var isAwaiting = false;
-var tabCount = 0;
 var tabDecrement = () => {
-  if (tabCount > 0) tabCount--;
+  if (params.tabCount > 0) params.tabCount--;
 };
 var tabIncrement = () => {
-  tabCount++;
+  params.tabCount++;
 };
 var colorizeAndFormat = async (args0) => {
   const { e, codeEditor } = args0;
@@ -2031,7 +2036,7 @@ var insertTab = async (args0) => {
   var _a;
   console.warn(new Error("tab inserted"));
   const { e, codeEditor, onPressEnter } = args0;
-  if (onPressEnter && tabCount === 0) return;
+  if (onPressEnter && params.tabCount === 0) return;
   if (document.getElementById("div-win-suggestion-box")) return;
   if (!onPressEnter) e.preventDefault();
   await new Promise(
@@ -2050,8 +2055,8 @@ var insertTab = async (args0) => {
     tabIncrement();
     spaces = document.createTextNode("	");
   } else {
-    console.log({ tabCount });
-    spaces = document.createTextNode("	".repeat(tabCount));
+    console.log({ tabCount: params.tabCount });
+    spaces = document.createTextNode("	".repeat(params.tabCount));
   }
   range.insertNode(spaces);
   range.setStartAfter(spaces);
@@ -2244,15 +2249,20 @@ var suggestionSelect = (args0) => {
       case type === "field":
         (() => {
           const text = editor.innerText;
-          const listFieldsRegex = /(db\.getCollection\(".+"\).find\({\s+)(.+)/;
+          console.log(
+            "innerText inside field",
+            JSON.stringify({ text }, null, 2)
+          );
+          const listFieldsRegex = /(db\.getCollection\(".+"\).find\({[\s\t\n]*)(.+)/;
           const match = text.match(listFieldsRegex);
           const toBeReplaced = (match == null ? void 0 : match[1]) || "";
           if (toBeReplaced === "" || !toBeReplaced) {
             editor.innerText = text + content + ":";
           } else {
+            const tabCount = params.tabCount;
             editor.innerText = text.replace(
               listFieldsRegex,
-              (completeMatch, group1, group2) => `${group1}${content}:`
+              (completeMatch, group1, group2) => `${group1}${"	".repeat(tabCount)}${content}:`
             );
           }
         })();

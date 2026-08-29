@@ -5,14 +5,14 @@ import {
 } from "./cursor";
 
 let isAwaiting = false;
-let tabCount = 0;
+import { params } from "./params";
 
 const tabDecrement = () => {
-  if (tabCount > 0) tabCount--;
+  if (params.tabCount > 0) params.tabCount--;
 };
 
 const tabIncrement = () => {
-  tabCount++;
+  params.tabCount++;
 };
 
 export const colorizeAndFormat = async (args0: {
@@ -102,7 +102,7 @@ const insertTab = async (args0: {
   console.warn(new Error("tab inserted"));
 
   const { e, codeEditor, onPressEnter } = args0;
-  if (onPressEnter && tabCount === 0) return;
+  if (onPressEnter && params.tabCount === 0) return;
 
   if (document.getElementById("div-win-suggestion-box")) return;
 
@@ -136,8 +136,8 @@ const insertTab = async (args0: {
     tabIncrement();
     spaces = document.createTextNode("\t");
   } else {
-    console.log({ tabCount });
-    spaces = document.createTextNode("\t".repeat(tabCount));
+    console.log({ tabCount: params.tabCount });
+    spaces = document.createTextNode("\t".repeat(params.tabCount));
   }
   range.insertNode(spaces);
 
