@@ -2212,38 +2212,48 @@ var suggestionSelect = (args0) => {
       case type === "collection":
         (() => {
           const text = editor.innerText;
-          const regex = /db\.getCollection\(\"([^.]+)/;
+          const regex = /(db\.getCollection\(\")([^.]+)/;
           const match = text.match(regex);
           const toBeReplaced = match == null ? void 0 : match[1];
           if (toBeReplaced === "" || !toBeReplaced) {
             editor.innerText = `db.getCollection("${content}")`;
           } else {
-            editor.innerText = text.replace(toBeReplaced, content) + '")';
+            editor.innerText = text.replace(
+              regex,
+              (completeMatch, group1, group2) => `${group1}${content}`
+            ) + '")';
           }
         })();
         break;
       case type === "function":
         (() => {
           const text = editor.innerText;
-          const match = text.match(/db\.[^.]+\.(.+)/);
+          const functionRegex = /(db\.[^.]+\.)(.*)/;
+          const match = text.match(functionRegex);
           const toBeReplaced = (match == null ? void 0 : match[1]) || "";
           if (toBeReplaced === "" || !toBeReplaced) {
             editor.innerText = text + content + "(";
           } else {
-            editor.innerText = text.replace(toBeReplaced, content) + "(";
+            editor.innerText = text.replace(
+              functionRegex,
+              (completeMatch, group1, group2) => `${group1}${content}(`
+            );
           }
         })();
         break;
       case type === "field":
         (() => {
           const text = editor.innerText;
-          const listFieldsRegex = /db\.getCollection\(".+"\).find\({\s+(.+)/;
+          const listFieldsRegex = /(db\.getCollection\(".+"\).find\({\s+)(.+)/;
           const match = text.match(listFieldsRegex);
           const toBeReplaced = (match == null ? void 0 : match[1]) || "";
           if (toBeReplaced === "" || !toBeReplaced) {
             editor.innerText = text + content + ":";
           } else {
-            editor.innerText = text.replace(toBeReplaced, content + ":");
+            editor.innerText = text.replace(
+              listFieldsRegex,
+              (completeMatch, group1, group2) => `${group1}${content}:`
+            );
           }
         })();
         break;
