@@ -135,32 +135,40 @@ class ProjectHomeScreen extends Screen {
     const codeEditorDiv = new $codeEditor().create(output).ids.contentEditable;
 
     let leftAltPressed = false;
-    document.getElementById(codeEditorDiv).addEventListener("keydown", (e) => {
-      if (e.repeat) return;
-      const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
+    document
+      .getElementById(codeEditorDiv)
+      .addEventListener("keydown", async (e) => {
+        if (e.repeat) return;
+        const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
 
-      if (sendShortcut) {
-        e.preventDefault();
+        if (sendShortcut) {
+          e.preventDefault();
 
-        mongify_sendQuery({
-          command: codeEditorDiv,
-          databaseId: db.databaseId,
+          mongify_sendQuery({
+            command: codeEditorDiv,
+            databaseId: db.databaseId,
+            output,
+            projectId: db.projectId,
+          });
+
+          return;
+        }
+
+        const enterWasPressed = suggestionSelect({
+          e,
+          codeEditor: codeEditorDiv,
           output,
-          projectId: db.projectId,
         });
-      }
 
-      suggestionSelect({
-        e,
-        codeEditor: codeEditorDiv,
-        output,
-      });
+        // to not add tab when user clicks
+        // enter to select a suggestion
+        if (enterWasPressed) return;
 
-      colorizeAndFormat({
-        e,
-        codeEditor: codeEditorDiv,
+        colorizeAndFormat({
+          e,
+          codeEditor: codeEditorDiv,
+        });
       });
-    });
 
     document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
       suggestions({

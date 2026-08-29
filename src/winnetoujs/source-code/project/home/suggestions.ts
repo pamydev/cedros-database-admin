@@ -11,11 +11,40 @@ import { colorizeAndFormat } from "./colorizeAndFormat";
 
 const getCursorPosition = () => {
   const selection = window.getSelection();
-  const range = selection.getRangeAt(0).cloneRange();
-  range.collapse(true);
 
-  const caretRect = range.getBoundingClientRect();
-  return { left: caretRect.left, bottom: caretRect.bottom + 4 };
+  if (!selection || selection.rangeCount === 0) {
+    return { left: 0, bottom: 0 };
+  }
+
+  const originalRange = selection.getRangeAt(0).cloneRange();
+  const measurementRange = originalRange.cloneRange();
+  measurementRange.collapse(true);
+
+  const marker = document.createElement("span");
+  marker.textContent = "\u200b";
+  marker.style.cssText = `
+    visibility: hidden;
+    pointer-events: none;
+  `;
+
+  measurementRange.insertNode(marker);
+
+  const markerParent = marker.parentNode;
+  const markerRect = marker.getBoundingClientRect();
+
+  marker.remove();
+
+  // Reúne os nós de texto que podem ter sido separados pelo insertNode.
+  markerParent?.normalize();
+
+  // Restaura o cursor original.
+  selection.removeAllRanges();
+  selection.addRange(originalRange);
+
+  return {
+    left: markerRect.left,
+    bottom: markerRect.bottom + 4,
+  };
 };
 
 let position = 0;
@@ -115,8 +144,9 @@ export const suggestionSelect = (args0: {
   e: KeyboardEvent;
   codeEditor: string;
   output: string;
-}) => {
-  if (!suggestionsIsVisible) return;
+}): boolean => {
+  let enterPressed = false;
+  if (!suggestionsIsVisible) return enterPressed;
   const key = args0.e.key;
   if (key === "ArrowDown") {
     args0.e.preventDefault();
@@ -139,43 +169,69 @@ export const suggestionSelect = (args0: {
   }
 
   if (key === "Enter") {
+    enterPressed = true;
     args0.e.preventDefault();
+    args0.e.stopPropagation();
     const selectedEl = document.querySelector(
       `[data-position="${selectedPosition}"]`,
     ) as HTMLElement;
     const content = selectedEl.dataset.content;
-    const type: "method" | "collection" | "function" = selectedEl.dataset
-      .type as "method" | "collection" | "function";
+    const type: "method" | "collection" | "function" | "field" = selectedEl
+      .dataset.type as "method" | "collection" | "function" | "field";
 
     const editor = document.getElementById(args0.codeEditor) as HTMLElement;
 
-    if (type === "method") {
-      editor.innerText = "db." + content;
-    } else if (type === "collection") {
-      const text = editor.innerText;
-      const regex = /db\.getCollection\(\"([^.]+)/;
-      const match = text.match(regex);
-      const toBeReplaced = match?.[1];
+    switch (true) {
+      case type === "method":
+        editor.innerText = "db." + content + '("';
+        break;
 
-      if (toBeReplaced === "" || !toBeReplaced) {
-        editor.innerText = `db.getCollection("${content}")`;
-      } else {
-        editor.innerText = text.replace(toBeReplaced, content) + '")';
-      }
-    } else if (type === "function") {
-      const text = editor.innerText;
-      const match = text.match(/db\.[^.]+\.(.+)/);
-      const toBeReplaced = match?.[1] || "";
-      if (toBeReplaced === "" || !toBeReplaced) {
-        editor.innerText = text + content + "(";
-      } else {
-        editor.innerText = text.replace(toBeReplaced, content) + "(";
-      }
+      case type === "collection":
+        (() => {
+          const text = editor.innerText;
+          const regex = /db\.getCollection\(\"([^.]+)/;
+          const match = text.match(regex);
+          const toBeReplaced = match?.[1];
+          if (toBeReplaced === "" || !toBeReplaced) {
+            editor.innerText = `db.getCollection("${content}")`;
+          } else {
+            editor.innerText = text.replace(toBeReplaced, content) + '")';
+          }
+        })();
+        break;
+
+      case type === "function":
+        (() => {
+          const text = editor.innerText;
+          const match = text.match(/db\.[^.]+\.(.+)/);
+          const toBeReplaced = match?.[1] || "";
+          if (toBeReplaced === "" || !toBeReplaced) {
+            editor.innerText = text + content + "(";
+          } else {
+            editor.innerText = text.replace(toBeReplaced, content) + "(";
+          }
+        })();
+        break;
+
+      case type === "field":
+        (() => {
+          const text = editor.innerText;
+          const listFieldsRegex = /db\.getCollection\(".+"\).find\({\s+(.+)/;
+          const match = text.match(listFieldsRegex);
+          const toBeReplaced = match?.[1] || "";
+          if (toBeReplaced === "" || !toBeReplaced) {
+            editor.innerText = text + content + ":";
+          } else {
+            editor.innerText = text.replace(toBeReplaced, content + ":");
+          }
+        })();
+        break;
     }
 
     setCursorPositionInEndOfLine(editor);
     removeSuggestionBox();
     colorizeAndFormat({ codeEditor: args0.codeEditor });
+    return enterPressed;
   }
 };
 
@@ -188,7 +244,7 @@ export const suggestions = async (args0: {
 }) => {
   const key = args0.e.key;
 
-  if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") return;
+  if (key === "ArrowDown" || key === "ArrowUp") return;
 
   const { codeEditor, output } = args0;
   const codeEditorElement = document.getElementById(codeEditor);
@@ -210,7 +266,8 @@ export const suggestions = async (args0: {
 
   // regex to match db.getCollection("...").find({
   // to show fields available in that collection
-  const listFieldsRegex = /db\.getCollection\(".+"\).find\({\s+(.+)/;
+  const listFieldsPreRegex = /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/;
+  const listFieldsRegex = /db\.getCollection\(".+"\).find\({[\s\n\t]+(.*)/;
   const collectionNameRegex = /db\.getCollection\("(.+)"\)/;
   const collectionName = text.match(collectionNameRegex)?.[1] || "";
   const fieldTextMatched = text.match(listFieldsRegex)?.[1] || "";
@@ -221,8 +278,7 @@ export const suggestions = async (args0: {
   // fills suggestionsAvailable List
   // defines type added to list item
   switch (true) {
-    case text.match(listFieldsRegex)?.length > 0:
-      console.log("entrou no listFields");
+    case text.match(listFieldsPreRegex)?.length > 0:
       type = "field";
 
       const fieldsAvailable: string[] = await getFieldsList({
@@ -269,9 +325,11 @@ export const suggestions = async (args0: {
 
   totalItems = suggestionsAvailable.length;
 
+  await new Promise((resolve) => setTimeout(resolve, 100));
   const cursorPosition = getCursorPosition();
   removeSuggestionBox();
   suggestionsIsVisible = true;
+  console.log("suggestion box position", cursorPosition);
   const suggestionBox = new $div(
     {
       style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,

@@ -2004,7 +2004,6 @@ var colorizeAndFormat = async (args0) => {
   res = stylish.db(res);
   res = res.replace(/\n/g, "<br>");
   if (res === innerText || res === innerHTML) return;
-  console.log("colorize set cursor position");
   const cursorPosition = saveCursorPosition(textEl);
   textEl.innerHTML = res;
   restoreCursorPosition(textEl, cursorPosition);
@@ -2030,8 +2029,10 @@ var isSuggestionBoxVisible = () => {
 };
 var insertTab = async (args0) => {
   var _a;
+  console.warn(new Error("tab inserted"));
   const { e, codeEditor, onPressEnter } = args0;
   if (onPressEnter && tabCount === 0) return;
+  if (document.getElementById("div-win-suggestion-box")) return;
   if (!onPressEnter) e.preventDefault();
   await new Promise(
     (resolve) => setTimeout(() => {
@@ -2087,10 +2088,29 @@ var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || 
 // source-code/project/home/suggestions.ts
 var getCursorPosition = () => {
   const selection = window.getSelection();
-  const range = selection.getRangeAt(0).cloneRange();
-  range.collapse(true);
-  const caretRect = range.getBoundingClientRect();
-  return { left: caretRect.left, bottom: caretRect.bottom + 4 };
+  if (!selection || selection.rangeCount === 0) {
+    return { left: 0, bottom: 0 };
+  }
+  const originalRange = selection.getRangeAt(0).cloneRange();
+  const measurementRange = originalRange.cloneRange();
+  measurementRange.collapse(true);
+  const marker = document.createElement("span");
+  marker.textContent = "\u200B";
+  marker.style.cssText = `
+    visibility: hidden;
+    pointer-events: none;
+  `;
+  measurementRange.insertNode(marker);
+  const markerParent = marker.parentNode;
+  const markerRect = marker.getBoundingClientRect();
+  marker.remove();
+  markerParent == null ? void 0 : markerParent.normalize();
+  selection.removeAllRanges();
+  selection.addRange(originalRange);
+  return {
+    left: markerRect.left,
+    bottom: markerRect.bottom + 4
+  };
 };
 var position = 0;
 var selectedPosition = 0;
@@ -2158,7 +2178,8 @@ var removeSelectedFromAllItems = () => {
   });
 };
 var suggestionSelect = (args0) => {
-  if (!suggestionsIsVisible) return;
+  let enterPressed = false;
+  if (!suggestionsIsVisible) return enterPressed;
   const key = args0.e.key;
   if (key === "ArrowDown") {
     args0.e.preventDefault();
@@ -2175,44 +2196,68 @@ var suggestionSelect = (args0) => {
     const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
   }
   if (key === "Enter") {
+    enterPressed = true;
     args0.e.preventDefault();
+    args0.e.stopPropagation();
     const selectedEl = document.querySelector(
       `[data-position="${selectedPosition}"]`
     );
     const content = selectedEl.dataset.content;
     const type = selectedEl.dataset.type;
     const editor = document.getElementById(args0.codeEditor);
-    if (type === "method") {
-      editor.innerText = "db." + content;
-    } else if (type === "collection") {
-      const text = editor.innerText;
-      const regex = /db\.getCollection\(\"([^.]+)/;
-      const match = text.match(regex);
-      const toBeReplaced = match == null ? void 0 : match[1];
-      if (toBeReplaced === "" || !toBeReplaced) {
-        editor.innerText = `db.getCollection("${content}")`;
-      } else {
-        editor.innerText = text.replace(toBeReplaced, content) + '")';
-      }
-    } else if (type === "function") {
-      const text = editor.innerText;
-      const match = text.match(/db\.[^.]+\.(.+)/);
-      const toBeReplaced = (match == null ? void 0 : match[1]) || "";
-      if (toBeReplaced === "" || !toBeReplaced) {
-        editor.innerText = text + content + "(";
-      } else {
-        editor.innerText = text.replace(toBeReplaced, content) + "(";
-      }
+    switch (true) {
+      case type === "method":
+        editor.innerText = "db." + content + '("';
+        break;
+      case type === "collection":
+        (() => {
+          const text = editor.innerText;
+          const regex = /db\.getCollection\(\"([^.]+)/;
+          const match = text.match(regex);
+          const toBeReplaced = match == null ? void 0 : match[1];
+          if (toBeReplaced === "" || !toBeReplaced) {
+            editor.innerText = `db.getCollection("${content}")`;
+          } else {
+            editor.innerText = text.replace(toBeReplaced, content) + '")';
+          }
+        })();
+        break;
+      case type === "function":
+        (() => {
+          const text = editor.innerText;
+          const match = text.match(/db\.[^.]+\.(.+)/);
+          const toBeReplaced = (match == null ? void 0 : match[1]) || "";
+          if (toBeReplaced === "" || !toBeReplaced) {
+            editor.innerText = text + content + "(";
+          } else {
+            editor.innerText = text.replace(toBeReplaced, content) + "(";
+          }
+        })();
+        break;
+      case type === "field":
+        (() => {
+          const text = editor.innerText;
+          const listFieldsRegex = /db\.getCollection\(".+"\).find\({\s+(.+)/;
+          const match = text.match(listFieldsRegex);
+          const toBeReplaced = (match == null ? void 0 : match[1]) || "";
+          if (toBeReplaced === "" || !toBeReplaced) {
+            editor.innerText = text + content + ":";
+          } else {
+            editor.innerText = text.replace(toBeReplaced, content + ":");
+          }
+        })();
+        break;
     }
     setCursorPositionInEndOfLine(editor);
     removeSuggestionBox();
     colorizeAndFormat({ codeEditor: args0.codeEditor });
+    return enterPressed;
   }
 };
 var suggestions = async (args0) => {
   var _a, _b, _c, _d, _e, _f, _g;
   const key = args0.e.key;
-  if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") return;
+  if (key === "ArrowDown" || key === "ArrowUp") return;
   const { codeEditor, output } = args0;
   const codeEditorElement = document.getElementById(codeEditor);
   const text = codeEditorElement.innerText;
@@ -2224,15 +2269,15 @@ var suggestions = async (args0) => {
   const getCollectionText = ((_b = text.match(getCollectionRegex)) == null ? void 0 : _b[1]) || "";
   let collections;
   const command = text.split("db.")[1];
-  const listFieldsRegex = /db\.getCollection\(".+"\).find\({\s+(.+)/;
+  const listFieldsPreRegex = /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/;
+  const listFieldsRegex = /db\.getCollection\(".+"\).find\({[\s\n\t]+(.*)/;
   const collectionNameRegex = /db\.getCollection\("(.+)"\)/;
   const collectionName = ((_c = text.match(collectionNameRegex)) == null ? void 0 : _c[1]) || "";
   const fieldTextMatched = ((_d = text.match(listFieldsRegex)) == null ? void 0 : _d[1]) || "";
   let suggestionsAvailable = [];
   let type;
   switch (true) {
-    case ((_e = text.match(listFieldsRegex)) == null ? void 0 : _e.length) > 0:
-      console.log("entrou no listFields");
+    case ((_e = text.match(listFieldsPreRegex)) == null ? void 0 : _e.length) > 0:
       type = "field";
       const fieldsAvailable = await getFieldsList({
         collectionName,
@@ -2269,9 +2314,11 @@ var suggestions = async (args0) => {
       break;
   }
   totalItems = suggestionsAvailable.length;
+  await new Promise((resolve) => setTimeout(resolve, 100));
   const cursorPosition = getCursorPosition();
   removeSuggestionBox();
   suggestionsIsVisible = true;
+  console.log("suggestion box position", cursorPosition);
   const suggestionBox = new $div(
     {
       style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,
@@ -2448,7 +2495,7 @@ var ProjectHomeScreen = class extends Screen {
     }).create(output);
     const codeEditorDiv = new $codeEditor().create(output).ids.contentEditable;
     let leftAltPressed = false;
-    document.getElementById(codeEditorDiv).addEventListener("keydown", (e) => {
+    document.getElementById(codeEditorDiv).addEventListener("keydown", async (e) => {
       if (e.repeat) return;
       const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
       if (sendShortcut) {
@@ -2459,12 +2506,14 @@ var ProjectHomeScreen = class extends Screen {
           output,
           projectId: db.projectId
         });
+        return;
       }
-      suggestionSelect({
+      const enterWasPressed = suggestionSelect({
         e,
         codeEditor: codeEditorDiv,
         output
       });
+      if (enterWasPressed) return;
       colorizeAndFormat({
         e,
         codeEditor: codeEditorDiv

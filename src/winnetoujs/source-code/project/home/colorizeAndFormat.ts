@@ -56,7 +56,6 @@ export const colorizeAndFormat = async (args0: {
   isAwaiting = false;
 
   if (isSuggestionBoxVisible()) return;
-
   const textEl = document.getElementById(codeEditor);
   const innerText = textEl.innerText;
   const innerHTML = textEl.innerHTML;
@@ -69,7 +68,6 @@ export const colorizeAndFormat = async (args0: {
 
   if (res === innerText || res === innerHTML) return;
 
-  console.log("colorize set cursor position");
   const cursorPosition = saveCursorPosition(textEl);
   textEl.innerHTML = res;
   restoreCursorPosition(textEl, cursorPosition);
@@ -101,8 +99,12 @@ const insertTab = async (args0: {
   codeEditor: string;
   onPressEnter?: boolean;
 }) => {
+  console.warn(new Error("tab inserted"));
+
   const { e, codeEditor, onPressEnter } = args0;
   if (onPressEnter && tabCount === 0) return;
+
+  if (document.getElementById("div-win-suggestion-box")) return;
 
   if (!onPressEnter) e.preventDefault();
 
