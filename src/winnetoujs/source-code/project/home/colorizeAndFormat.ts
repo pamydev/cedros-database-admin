@@ -8,10 +8,12 @@ let isAwaiting = false;
 import { params } from "./params";
 
 const tabDecrement = () => {
+  console.log("tabDecrement called --");
   if (params.tabCount > 0) params.tabCount--;
 };
 
 const tabIncrement = () => {
+  console.log("tabIncrement called ++");
   params.tabCount++;
 };
 
@@ -184,9 +186,15 @@ const backspacePressed = (args0: { e: KeyboardEvent; codeEditor: string }) => {
   const el = document.getElementById(codeEditor) as HTMLElement;
   const text = el.innerText;
 
-  // console.log("backspace", JSON.stringify({ text }, null, 2));
+  console.log("backspace", JSON.stringify({ text }, null, 2));
 
-  if (text.endsWith("\t") || text.endsWith("\t\n")) {
+  if (
+    text.endsWith("\t") ||
+    text.endsWith("\t\n") ||
+    text.endsWith("{") ||
+    text.endsWith("{\n")
+  ) {
+    console.log("tab decrement triggered by backspace");
     tabDecrement();
   }
 };

@@ -1968,9 +1968,11 @@ var params = new Params();
 // source-code/project/home/colorizeAndFormat.ts
 var isAwaiting = false;
 var tabDecrement = () => {
+  console.log("tabDecrement called --");
   if (params.tabCount > 0) params.tabCount--;
 };
 var tabIncrement = () => {
+  console.log("tabIncrement called ++");
   params.tabCount++;
 };
 var colorizeAndFormat = async (args0) => {
@@ -2084,11 +2086,92 @@ var backspacePressed = (args0) => {
   const { e, codeEditor } = args0;
   const el = document.getElementById(codeEditor);
   const text = el.innerText;
-  if (text.endsWith("	") || text.endsWith("	\n")) {
+  console.log("backspace", JSON.stringify({ text }, null, 2));
+  if (text.endsWith("	") || text.endsWith("	\n") || text.endsWith("{") || text.endsWith("{\n")) {
+    console.log("tab decrement triggered by backspace");
     tabDecrement();
   }
 };
 var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Tab" || e.key === "Meta" || e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" || e.key === "Insert" || e.key === "Home" || e.key === "End" || e.key === "PageUp" || e.key === "PageDown" || e.key === "Backspace";
+
+// source-code/project/home/fields.suggestions.ts
+var FieldsSuggestions = class {
+  regex = {
+    trigger: /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/,
+    collectionName: /db\.getCollection\("(.+)"\)/,
+    filters: {
+      next: /^\t([^,:\r\n]*)$/gm
+    },
+    select: /(^\t+)([^,:\r\n]+)$/gm
+  };
+  storage = {
+    fieldsList: /* @__PURE__ */ new Map()
+  };
+  collectionName;
+  getCollectionName(text) {
+    var _a;
+    return ((_a = text.match(this.regex.collectionName)) == null ? void 0 : _a[1]) || "";
+  }
+  async getFieldsList(args0) {
+    const { collectionName, databaseId, projectId } = args0;
+    const identifier = `${args0.projectId}-${args0.databaseId}-${collectionName}`;
+    if (this.storage.fieldsList.has(identifier)) {
+      return this.storage.fieldsList.get(identifier);
+    }
+    let res = await window.database.mongify.sendQuery({
+      command: `db.getCollection("${collectionName}").findOne()`,
+      databaseId,
+      projectId
+    });
+    const fields = Object.keys(res || {});
+    this.storage.fieldsList.set(identifier, fields);
+    return fields;
+  }
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  trigger(args0) {
+    var _a;
+    const { text } = args0;
+    this.collectionName = this.getCollectionName(text);
+    if (((_a = text.match(this.regex.trigger)) == null ? void 0 : _a.length) > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  async filterSuggestions(args0) {
+    var _a;
+    const fieldsAvailable = await this.getFieldsList({
+      collectionName: this.collectionName,
+      databaseId: args0.databaseId,
+      projectId: args0.projectId
+    });
+    const nextMatch = ((_a = args0.text.match(this.regex.filters.next)) == null ? void 0 : _a[0]) || "";
+    const suggestionsAvailable = fieldsAvailable.filter((field) => {
+      if (nextMatch.trim() === "") return false;
+      if (field.startsWith(nextMatch.trim())) return true;
+    });
+    return suggestionsAvailable;
+  }
+  selectSuggestion(args0) {
+    const { editor, content } = args0;
+    const text = editor.innerText;
+    const nextRegex = this.regex.select;
+    const match = text.match(nextRegex);
+    const toBeReplaced = (match == null ? void 0 : match[0]) || "";
+    if (toBeReplaced === "" || !toBeReplaced) {
+      editor.innerText = text + content + ":";
+    } else {
+      let tabCount = params.tabCount;
+      editor.innerText = text.replace(
+        nextRegex,
+        (completeMatch, group1, group2) => {
+          return `${group1}${content}:`;
+        }
+      );
+    }
+  }
+};
+var fieldsSuggestionsModel = new FieldsSuggestions();
 
 // source-code/project/home/suggestions.ts
 var getCursorPosition = () => {
@@ -2122,7 +2205,6 @@ var selectedPosition = 0;
 var totalItems = 0;
 var suggestionsIsVisible = false;
 var collectionsList = /* @__PURE__ */ new Map();
-var fieldsList = /* @__PURE__ */ new Map();
 var getCollectionsList = async (args0) => {
   const identifier = `${args0.projectId}-${args0.databaseId}`;
   if (collectionsList.has(identifier)) return collectionsList.get(identifier);
@@ -2133,20 +2215,6 @@ var getCollectionsList = async (args0) => {
   });
   collectionsList.set(identifier, res);
   return res;
-};
-var getFieldsList = async (args0) => {
-  const { collectionName, databaseId, projectId } = args0;
-  const identifier = `${args0.projectId}-${args0.databaseId}`;
-  if (fieldsList.has(identifier)) return fieldsList.get(identifier);
-  let res = await window.database.mongify.sendQuery({
-    command: `db.getCollection("${collectionName}").findOne()`,
-    databaseId,
-    projectId
-  });
-  console.log("findOne getFieldsList result", res);
-  const fields = Object.keys(res || {});
-  fieldsList.set(identifier, fields);
-  return fields;
 };
 var addSuggestionItem = (args0) => {
   const item = new $div({
@@ -2247,25 +2315,10 @@ var suggestionSelect = (args0) => {
         })();
         break;
       case type === "field":
-        (() => {
-          const text = editor.innerText;
-          console.log(
-            "innerText inside field",
-            JSON.stringify({ text }, null, 2)
-          );
-          const listFieldsRegex = /(db\.getCollection\(".+"\).find\({[\s\t\n]*)(.+)/;
-          const match = text.match(listFieldsRegex);
-          const toBeReplaced = (match == null ? void 0 : match[1]) || "";
-          if (toBeReplaced === "" || !toBeReplaced) {
-            editor.innerText = text + content + ":";
-          } else {
-            const tabCount = params.tabCount;
-            editor.innerText = text.replace(
-              listFieldsRegex,
-              (completeMatch, group1, group2) => `${group1}${"	".repeat(tabCount)}${content}:`
-            );
-          }
-        })();
+        fieldsSuggestionsModel.selectSuggestion({
+          content,
+          editor
+        });
         break;
     }
     setCursorPositionInEndOfLine(editor);
@@ -2275,7 +2328,7 @@ var suggestionSelect = (args0) => {
   }
 };
 var suggestions = async (args0) => {
-  var _a, _b, _c, _d, _e, _f, _g;
+  var _a, _b, _c, _d;
   const key = args0.e.key;
   if (key === "ArrowDown" || key === "ArrowUp") return;
   const { codeEditor, output } = args0;
@@ -2289,33 +2342,25 @@ var suggestions = async (args0) => {
   const getCollectionText = ((_b = text.match(getCollectionRegex)) == null ? void 0 : _b[1]) || "";
   let collections;
   const command = text.split("db.")[1];
-  const listFieldsPreRegex = /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/;
-  const listFieldsRegex = /db\.getCollection\(".+"\).find\({[\s\n\t]+(.*)/;
-  const collectionNameRegex = /db\.getCollection\("(.+)"\)/;
-  const collectionName = ((_c = text.match(collectionNameRegex)) == null ? void 0 : _c[1]) || "";
-  const fieldTextMatched = ((_d = text.match(listFieldsRegex)) == null ? void 0 : _d[1]) || "";
   let suggestionsAvailable = [];
   let type;
   switch (true) {
-    case ((_e = text.match(listFieldsPreRegex)) == null ? void 0 : _e.length) > 0:
+    case fieldsSuggestionsModel.trigger({ text }):
       type = "field";
-      const fieldsAvailable = await getFieldsList({
-        collectionName,
+      suggestionsAvailable = await fieldsSuggestionsModel.filterSuggestions({
         databaseId: args0.databaseId,
-        projectId: args0.projectId
+        projectId: args0.projectId,
+        text
       });
-      suggestionsAvailable = fieldsAvailable.filter(
-        (fields) => fields.startsWith(fieldTextMatched) || fieldTextMatched === ""
-      );
       break;
-    case ((_f = text.match(regExPreFunction)) == null ? void 0 : _f.length) > 0:
+    case ((_c = text.match(regExPreFunction)) == null ? void 0 : _c.length) > 0:
       type = "function";
       suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
         if (method.startsWith(functionText) || functionText === "") return true;
         return false;
       });
       break;
-    case ((_g = text.match(getCollectionPreRegex)) == null ? void 0 : _g.length) > 0:
+    case ((_d = text.match(getCollectionPreRegex)) == null ? void 0 : _d.length) > 0:
       type = "collection";
       collections = await getCollectionsList({
         databaseId: args0.databaseId,
@@ -2338,7 +2383,6 @@ var suggestions = async (args0) => {
   const cursorPosition = getCursorPosition();
   removeSuggestionBox();
   suggestionsIsVisible = true;
-  console.log("suggestion box position", cursorPosition);
   const suggestionBox = new $div(
     {
       style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,

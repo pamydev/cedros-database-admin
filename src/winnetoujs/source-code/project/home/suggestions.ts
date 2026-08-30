@@ -9,6 +9,7 @@ import {
 } from "./cursor";
 import { colorizeAndFormat } from "./colorizeAndFormat";
 import { params } from "./params";
+import { fieldsSuggestionsModel } from "./fields.suggestions";
 
 const getCursorPosition = () => {
   const selection = window.getSelection();
@@ -53,7 +54,6 @@ let selectedPosition = 0;
 let totalItems = 0;
 let suggestionsIsVisible = false;
 let collectionsList = new Map<string, string[]>();
-let fieldsList = new Map<string, string[]>();
 
 const getCollectionsList = async (args0: {
   projectId: string;
@@ -70,28 +70,6 @@ const getCollectionsList = async (args0: {
 
   collectionsList.set(identifier, res);
   return res;
-};
-
-const getFieldsList = async (args0: {
-  collectionName: string;
-  databaseId: string;
-  projectId: string;
-}): Promise<string[]> => {
-  const { collectionName, databaseId, projectId } = args0;
-  const identifier = `${args0.projectId}-${args0.databaseId}`;
-  if (fieldsList.has(identifier)) return fieldsList.get(identifier);
-
-  let res = await window.database.mongify.sendQuery({
-    command: `db.getCollection("${collectionName}").findOne()`,
-    databaseId,
-    projectId,
-  });
-
-  console.log("findOne getFieldsList result", res);
-
-  const fields = Object.keys(res || {});
-  fieldsList.set(identifier, fields);
-  return fields;
 };
 
 const addSuggestionItem = (args0: {
@@ -223,27 +201,10 @@ export const suggestionSelect = (args0: {
         break;
 
       case type === "field":
-        (() => {
-          const text = editor.innerText;
-          console.log(
-            "innerText inside field",
-            JSON.stringify({ text }, null, 2),
-          );
-          const listFieldsRegex =
-            /(db\.getCollection\(".+"\).find\({[\s\t\n]*)(.+)/;
-          const match = text.match(listFieldsRegex);
-          const toBeReplaced = match?.[1] || "";
-          if (toBeReplaced === "" || !toBeReplaced) {
-            editor.innerText = text + content + ":";
-          } else {
-            const tabCount = params.tabCount;
-            editor.innerText = text.replace(
-              listFieldsRegex,
-              (completeMatch, group1, group2) =>
-                `${group1}${"\t".repeat(tabCount)}${content}:`,
-            );
-          }
-        })();
+        fieldsSuggestionsModel.selectSuggestion({
+          content,
+          editor,
+        });
         break;
     }
 
@@ -283,34 +244,19 @@ export const suggestions = async (args0: {
   // to match db. to show available database methods like listCollections, ...
   const command = text.split("db.")[1];
 
-  // regex to match db.getCollection("...").find({
-  // to show fields available in that collection
-  const listFieldsPreRegex = /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/;
-  const listFieldsRegex = /db\.getCollection\(".+"\).find\({[\s\n\t]+(.*)/;
-  const collectionNameRegex = /db\.getCollection\("(.+)"\)/;
-  const collectionName = text.match(collectionNameRegex)?.[1] || "";
-  const fieldTextMatched = text.match(listFieldsRegex)?.[1] || "";
-
   let suggestionsAvailable: string[] = [];
   let type: "method" | "collection" | "function" | "field";
 
   // fills suggestionsAvailable List
   // defines type added to list item
   switch (true) {
-    case text.match(listFieldsPreRegex)?.length > 0:
+    case fieldsSuggestionsModel.trigger({ text }):
       type = "field";
-
-      const fieldsAvailable: string[] = await getFieldsList({
-        collectionName,
+      suggestionsAvailable = await fieldsSuggestionsModel.filterSuggestions({
         databaseId: args0.databaseId,
         projectId: args0.projectId,
+        text,
       });
-
-      suggestionsAvailable = fieldsAvailable.filter(
-        (fields) =>
-          fields.startsWith(fieldTextMatched) || fieldTextMatched === "",
-      );
-
       break;
 
     case text.match(regExPreFunction)?.length > 0:
@@ -342,13 +288,17 @@ export const suggestions = async (args0: {
       break;
   }
 
+  /**
+   * What turns suggestionBox visible is the
+   * fact of suggestionsAvailable > 0
+   */
+
   totalItems = suggestionsAvailable.length;
 
   await new Promise((resolve) => setTimeout(resolve, 100));
   const cursorPosition = getCursorPosition();
   removeSuggestionBox();
   suggestionsIsVisible = true;
-  console.log("suggestion box position", cursorPosition);
   const suggestionBox = new $div(
     {
       style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,
