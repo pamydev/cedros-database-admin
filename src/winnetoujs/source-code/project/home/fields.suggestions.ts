@@ -5,8 +5,10 @@ class FieldsSuggestions {
     trigger: /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/,
     collectionName: /db\.getCollection\("(.+)"\)/,
     filters: {
+      /** /^\t([^,:\r\n]*)$/gm */
       next: /^\t([^,:\r\n]*)$/gm,
     },
+    /** /(^\t+)([^,:\r\n]+)$/gm */
     select: /(^\t+)([^,:\r\n]+)$/gm,
   };
 
@@ -66,6 +68,8 @@ class FieldsSuggestions {
     const nextMatch = args0.text.match(this.regex.filters.next)?.[0] || "";
 
     const suggestionsAvailable = fieldsAvailable.filter((field) => {
+      if (nextMatch === "\t") return true;
+
       if (nextMatch.trim() === "") return false;
 
       if (field.startsWith(nextMatch.trim())) return true;
@@ -75,16 +79,34 @@ class FieldsSuggestions {
 
   public selectSuggestion(args0: { editor: HTMLElement; content: string }) {
     const { editor, content } = args0;
-    const text = editor.innerText;
-    const nextRegex = this.regex.select;
-    const match = text.match(nextRegex);
+    let text = editor.innerText;
+    const selectRegex = this.regex.select;
+    const match = text.match(selectRegex);
     const toBeReplaced = match?.[0] || "";
+
+    console.log(
+      JSON.stringify(
+        {
+          text,
+          match,
+          toBeReplaced,
+          content,
+        },
+        null,
+        2,
+      ),
+    );
+
     if (toBeReplaced === "" || !toBeReplaced) {
+      // if innerText finish with \n remove it
+      if (text.endsWith("\n")) {
+        text = text.slice(0, -1);
+      }
       editor.innerText = text + content + ":";
     } else {
       let tabCount = params.tabCount;
       editor.innerText = text.replace(
-        nextRegex,
+        selectRegex,
         (completeMatch: string, group1: string, group2: string) => {
           return `${group1}${content}:`;
         },

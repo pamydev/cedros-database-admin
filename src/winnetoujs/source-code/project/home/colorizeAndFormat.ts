@@ -101,7 +101,7 @@ const insertTab = async (args0: {
   codeEditor: string;
   onPressEnter?: boolean;
 }) => {
-  console.warn(new Error("tab inserted"));
+  // console.warn(new Error("tab inserted"));
 
   const { e, codeEditor, onPressEnter } = args0;
   if (onPressEnter && params.tabCount === 0) return;

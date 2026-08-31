@@ -2036,7 +2036,6 @@ var isSuggestionBoxVisible = () => {
 };
 var insertTab = async (args0) => {
   var _a;
-  console.warn(new Error("tab inserted"));
   const { e, codeEditor, onPressEnter } = args0;
   if (onPressEnter && params.tabCount === 0) return;
   if (document.getElementById("div-win-suggestion-box")) return;
@@ -2100,8 +2099,10 @@ var FieldsSuggestions = class {
     trigger: /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/,
     collectionName: /db\.getCollection\("(.+)"\)/,
     filters: {
+      /** /^\t([^,:\r\n]*)$/gm */
       next: /^\t([^,:\r\n]*)$/gm
     },
+    /** /(^\t+)([^,:\r\n]+)$/gm */
     select: /(^\t+)([^,:\r\n]+)$/gm
   };
   storage = {
@@ -2147,6 +2148,7 @@ var FieldsSuggestions = class {
     });
     const nextMatch = ((_a = args0.text.match(this.regex.filters.next)) == null ? void 0 : _a[0]) || "";
     const suggestionsAvailable = fieldsAvailable.filter((field) => {
+      if (nextMatch === "	") return true;
       if (nextMatch.trim() === "") return false;
       if (field.startsWith(nextMatch.trim())) return true;
     });
@@ -2154,16 +2156,31 @@ var FieldsSuggestions = class {
   }
   selectSuggestion(args0) {
     const { editor, content } = args0;
-    const text = editor.innerText;
-    const nextRegex = this.regex.select;
-    const match = text.match(nextRegex);
+    let text = editor.innerText;
+    const selectRegex = this.regex.select;
+    const match = text.match(selectRegex);
     const toBeReplaced = (match == null ? void 0 : match[0]) || "";
+    console.log(
+      JSON.stringify(
+        {
+          text,
+          match,
+          toBeReplaced,
+          content
+        },
+        null,
+        2
+      )
+    );
     if (toBeReplaced === "" || !toBeReplaced) {
+      if (text.endsWith("\n")) {
+        text = text.slice(0, -1);
+      }
       editor.innerText = text + content + ":";
     } else {
       let tabCount = params.tabCount;
       editor.innerText = text.replace(
-        nextRegex,
+        selectRegex,
         (completeMatch, group1, group2) => {
           return `${group1}${content}:`;
         }
