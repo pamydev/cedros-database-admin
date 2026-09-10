@@ -994,6 +994,15 @@ var FolderKanban = [
   ["path", { d: "M16 10v6" }]
 ];
 
+// ../../node_modules/lucide/dist/esm/icons/hand-grab.mjs
+var HandGrab = [
+  ["path", { d: "M18 11.5V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1.4" }],
+  ["path", { d: "M14 10V8a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" }],
+  ["path", { d: "M10 9.9V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v5" }],
+  ["path", { d: "M6 14a2 2 0 0 0-2-2a2 2 0 0 0-2 2" }],
+  ["path", { d: "M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8 2 2 0 1 1 4 0" }]
+];
+
 // ../../node_modules/lucide/dist/esm/icons/info.mjs
 var Info = [
   ["circle", { cx: "12", cy: "12", r: "10" }],
@@ -1892,7 +1901,14 @@ var mongify = {
     "getCollection",
     "deleteCollection"
   ],
-  getCollectionFunctions: ["find", "findOne", "insert", "update", "delete"]
+  getCollectionFunctions: [
+    "find",
+    "findOne",
+    "insert",
+    "insertMany",
+    "update",
+    "delete"
+  ]
 };
 
 // source-code/project/home/cursor.ts
@@ -2297,19 +2313,31 @@ var suggestionSelect = (args0) => {
     const editor = document.getElementById(args0.codeEditor);
     switch (true) {
       case type === "method":
-        editor.innerText = "db." + content + '("';
+        const text = editor.innerText;
+        const regex = /(.*db\.)/s;
+        text.replace(regex, (completeMatch, g1) => {
+          console.log(
+            JSON.stringify(
+              { text, completeMatch, g1, content, return: `${g1}${content}("` },
+              null,
+              2
+            )
+          );
+          editor.innerText = `${g1}${content}("`;
+          return `${g1}${content}("`;
+        });
         break;
       case type === "collection":
         (() => {
-          const text = editor.innerText;
-          const regex = /(db\.getCollection\(\")([^.]+)/;
-          const match = text.match(regex);
+          const text2 = editor.innerText;
+          const regex2 = /(db\.getCollection\(\")([^.]+)/;
+          const match = text2.match(regex2);
           const toBeReplaced = match == null ? void 0 : match[1];
           if (toBeReplaced === "" || !toBeReplaced) {
             editor.innerText = `db.getCollection("${content}")`;
           } else {
-            editor.innerText = text.replace(
-              regex,
+            editor.innerText = text2.replace(
+              regex2,
               (completeMatch, group1, group2) => `${group1}${content}`
             ) + '")';
           }
@@ -2317,14 +2345,14 @@ var suggestionSelect = (args0) => {
         break;
       case type === "function":
         (() => {
-          const text = editor.innerText;
+          const text2 = editor.innerText;
           const functionRegex = /(db\.[^.]+\.)(.*)/;
-          const match = text.match(functionRegex);
+          const match = text2.match(functionRegex);
           const toBeReplaced = (match == null ? void 0 : match[1]) || "";
           if (toBeReplaced === "" || !toBeReplaced) {
-            editor.innerText = text + content + "(";
+            editor.innerText = text2 + content + "(";
           } else {
-            editor.innerText = text.replace(
+            editor.innerText = text2.replace(
               functionRegex,
               (completeMatch, group1, group2) => `${group1}${content}(`
             );
@@ -2358,7 +2386,10 @@ var suggestions = async (args0) => {
   const getCollectionRegex = /db\.getCollection\(\"([^.]+)/;
   const getCollectionText = ((_b = text.match(getCollectionRegex)) == null ? void 0 : _b[1]) || "";
   let collections;
-  const command = text.split("db.")[1];
+  let command = text.split("db.")[1];
+  if (command == null ? void 0 : command.endsWith("\n")) {
+    command = command.slice(0, -1);
+  }
   let suggestionsAvailable = [];
   let type;
   switch (true) {
@@ -2420,60 +2451,6 @@ var removeSuggestionBox = () => {
   var _a;
   (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
   suggestionsIsVisible = false;
-};
-
-// source-code/project/home/digestOutput.ts
-var digestOutput = (args0) => {
-  const { output, result } = args0;
-  if (typeof result[0] === "object") {
-    renderTable(result, output);
-  } else {
-    new $div({
-      class: "code-editor-output",
-      content: JSON.stringify(result, null, 2)
-    }).create(output);
-  }
-};
-var renderTable = (data, output) => {
-  const table = new $div({
-    class: "code-editor-output"
-  }).create(output).ids.div;
-  const header = Object.keys(data[0]);
-  const headerRow = new $div({
-    class: "table-row"
-  }).create(table).ids.div;
-  header.forEach((key) => {
-    new $div({
-      class: "table-cell",
-      content: key
-    }).create(headerRow);
-  });
-  data.forEach((row) => {
-    const rowDiv = new $div({
-      class: "table-row"
-    }).create(table).ids.div;
-    header.forEach((key) => {
-      new $div({
-        class: "table-cell",
-        content: row[key]
-      }).create(rowDiv);
-    });
-  });
-};
-
-// source-code/project/home/mongify.sendQuery.ts
-var mongify_sendQuery = async (args0) => {
-  const { projectId, databaseId, command, output } = args0;
-  const res = await window.database.mongify.sendQuery({
-    projectId,
-    databaseId,
-    command: document.getElementById(command).textContent
-  });
-  console.log(res);
-  digestOutput({
-    output,
-    result: res
-  });
 };
 
 // source-code/project/home/homeScreen.ts
@@ -2553,61 +2530,222 @@ var ProjectHomeScreen = class extends Screen {
       this.renderMongify(db);
     }
   }
-  async renderMongify(db) {
-    console.log("renderMongify", db.database_name);
+  createCodeDiv() {
     const output = new $div({
-      class: "PANEL",
+      class: "PANEL codeDiv",
       style: "position:relative"
     }).create(this.panelOutput).ids.div;
+    const resizeTop = new $div({
+      class: "resizeDiv resizeTop"
+    }).create(output).ids.div;
+    const resizeRight = new $div({
+      class: "resizeDiv resizeRight"
+    }).create(output).ids.div;
+    const resizeBottom = new $div({
+      class: "resizeDiv resizeBottom"
+    }).create(output).ids.div;
+    const resizeLeft = new $div({
+      class: "resizeDiv resizeLeft"
+    }).create(output).ids.div;
+    const resizeTopLeft = new $div({
+      class: "resizeDiv resizeTopLeft"
+    }).create(output).ids.div;
+    const resizeBottomLeft = new $div({
+      class: "resizeDiv resizeBottomLeft"
+    }).create(output).ids.div;
+    const resizeBottomRight = new $div({
+      class: "resizeDiv resizeBottomRight"
+    }).create(output).ids.div;
+    const resizeTopRight = new $div({
+      class: "resizeDiv resizeTopRight"
+    }).create(output).ids.div;
+    [
+      resizeBottom,
+      resizeBottomLeft,
+      resizeBottomRight,
+      resizeLeft,
+      resizeRight,
+      resizeTop,
+      resizeTopLeft,
+      resizeTopRight
+    ].forEach((id) => {
+      this.addResizeContainerListeners({
+        id,
+        codeEditorContainer: output
+      });
+    });
+    return output;
+  }
+  async renderMongify(db) {
+    const output = this.createCodeDiv();
+    const header = new $div({
+      class: "mongify-header"
+    }).create(output).ids.div;
+    const left = new $div({
+      class: "mongify-header-left"
+    }).create(header).ids.div;
+    const right = new $div({
+      class: "mongify-header-right"
+    }).create(header).ids.div;
     new $div({
       content: db.database_name,
-      class: "TITLE"
-    }).create(output);
-    new $buttonPrimary({
-      content: "Send",
-      onclick: W.fx(
-        async () => mongify_sendQuery({
-          command: codeEditorDiv,
-          databaseId: db.databaseId,
-          output,
-          projectId: db.projectId
-        })
-      )
-    }).create(output);
-    const codeEditorDiv = new $codeEditor().create(output).ids.contentEditable;
+      class: "mongify-command"
+    }).create(left);
+    const grabIcon = new $div({
+      content: createIcon(HandGrab, {
+        simple: true
+      })
+    }).create(right).ids.div;
+    this.addGrabIconListeners({
+      id: grabIcon,
+      output
+    });
+    const codeEditor = new $codeEditor().create(output);
+    const codeEditorContentId = codeEditor.ids.contentEditable;
+    const codeEditorDivId = codeEditor.ids.codeEditor;
     let leftAltPressed = false;
-    document.getElementById(codeEditorDiv).addEventListener("keydown", async (e) => {
+    document.getElementById(codeEditorContentId).addEventListener("keydown", async (e) => {
       if (e.repeat) return;
       const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
       if (sendShortcut) {
         e.preventDefault();
-        mongify_sendQuery({
-          command: codeEditorDiv,
+        const command = document.getElementById(codeEditorContentId).textContent;
+        const res = await window.database.mongify.sendQuery({
+          projectId: db.projectId,
           databaseId: db.databaseId,
-          output,
-          projectId: db.projectId
+          command
+        });
+        this.printMongifyResult({
+          result: res,
+          command
         });
         return;
       }
       const enterWasPressed = suggestionSelect({
         e,
-        codeEditor: codeEditorDiv,
+        codeEditor: codeEditorContentId,
         output
       });
       if (enterWasPressed) return;
       colorizeAndFormat({
         e,
-        codeEditor: codeEditorDiv
+        codeEditor: codeEditorContentId
       });
     });
-    document.getElementById(codeEditorDiv).addEventListener("keyup", (e) => {
+    document.getElementById(codeEditorContentId).addEventListener("keyup", (e) => {
       suggestions({
         e,
-        codeEditor: codeEditorDiv,
+        codeEditor: codeEditorContentId,
         output,
         databaseId: db.databaseId,
         projectId: db.projectId
       });
+    });
+  }
+  addGrabIconListeners(arg0) {
+    const { id, output } = arg0;
+    const grabIconElement = document.getElementById(id);
+    if (!grabIconElement) return;
+    grabIconElement.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      const onPointerMove = (ev) => {
+        const outputElement = document.getElementById(output);
+        if (!outputElement) return;
+        outputElement.style.position = "absolute";
+        let leftOrigin = outputElement.offsetLeft;
+        let topOrigin = outputElement.offsetTop;
+        console.log({
+          leftOrigin,
+          topOrigin,
+          mouseX: ev.clientX,
+          mouseY: ev.clientY
+        });
+        if (leftOrigin === 0 && topOrigin === 0) {
+          const mouseX = ev.clientX - 270 - outputElement.offsetWidth;
+          const mouseY = ev.clientY - 120;
+          leftOrigin = mouseX;
+          topOrigin = mouseY;
+        }
+        outputElement.style.left = leftOrigin + ev.movementX + "px";
+        outputElement.style.top = topOrigin + ev.movementY + "px";
+      };
+      const onPointerUp = () => {
+        document.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerup", onPointerUp);
+      };
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
+    });
+  }
+  printMongifyResult(arg0) {
+    console.log(arg0.result);
+    const output = this.createCodeDiv();
+    const header = new $div({
+      class: "mongify-header"
+    }).create(output).ids.div;
+    const left = new $div({
+      class: "mongify-header-left"
+    }).create(header).ids.div;
+    const right = new $div({
+      class: "mongify-header-right"
+    }).create(header).ids.div;
+    new $div({
+      content: arg0.command,
+      class: "mongify-command"
+    }).create(left);
+    new $div({
+      content: JSON.stringify(arg0.result, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;"),
+      class: "mongify-output"
+    }).create(output);
+  }
+  addResizeContainerListeners(arg0) {
+    const { id, codeEditorContainer } = arg0;
+    let isDragging = /* @__PURE__ */ new Map();
+    let posX = 0;
+    let posY = 0;
+    document.getElementById(id).addEventListener("pointerdown", (ev) => {
+      isDragging.set(id, true);
+    });
+    document.addEventListener("pointermove", (ev) => {
+      if (!isDragging.get(id)) return;
+      const x = ev.movementX;
+      const y = ev.movementY;
+      const width = document.getElementById(codeEditorContainer).getBoundingClientRect().width;
+      const height = document.getElementById(codeEditorContainer).getBoundingClientRect().height;
+      const classList = document.getElementById(id).classList;
+      switch (true) {
+        case classList.contains("resizeTop"):
+          document.getElementById(codeEditorContainer).style.height = height - y + "px";
+          break;
+        case classList.contains("resizeBottom"):
+          document.getElementById(codeEditorContainer).style.height = height + y + "px";
+          break;
+        case classList.contains("resizeLeft"):
+          document.getElementById(codeEditorContainer).style.width = width - x + "px";
+          break;
+        case classList.contains("resizeRight"):
+          document.getElementById(codeEditorContainer).style.width = width + x + "px";
+          break;
+        case classList.contains("resizeTopLeft"):
+          document.getElementById(codeEditorContainer).style.height = height - y + "px";
+          document.getElementById(codeEditorContainer).style.width = width - x + "px";
+          break;
+        case classList.contains("resizeTopRight"):
+          document.getElementById(codeEditorContainer).style.height = height - y + "px";
+          document.getElementById(codeEditorContainer).style.width = width + x + "px";
+          break;
+        case classList.contains("resizeBottomLeft"):
+          document.getElementById(codeEditorContainer).style.height = height + y + "px";
+          document.getElementById(codeEditorContainer).style.width = width - x + "px";
+          break;
+        case classList.contains("resizeBottomRight"):
+          document.getElementById(codeEditorContainer).style.height = height + y + "px";
+          document.getElementById(codeEditorContainer).style.width = width + x + "px";
+          break;
+      }
+    });
+    document.addEventListener("pointerup", (ev) => {
+      isDragging.set(id, false);
     });
   }
 };
@@ -2889,6 +3027,7 @@ lucide/dist/esm/icons/clipboard-pen-line.mjs:
 lucide/dist/esm/icons/corner-down-left.mjs:
 lucide/dist/esm/icons/database.mjs:
 lucide/dist/esm/icons/folder-kanban.mjs:
+lucide/dist/esm/icons/hand-grab.mjs:
 lucide/dist/esm/icons/info.mjs:
 lucide/dist/esm/icons/logs.mjs:
 lucide/dist/esm/icons/plus.mjs:

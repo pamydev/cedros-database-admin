@@ -32,10 +32,12 @@ export const database = {
     ipcRenderer.invoke(ipcChannels.save_mongify_connection, args),
 
   mongify: {
-    getCollections: (args0: IGetMongifyCollectionsArgs): Promise<string[] | undefined> =>
+    getCollections: (
+      args0: IGetMongifyCollectionsArgs,
+    ): Promise<string[] | undefined> =>
       ipcRenderer.invoke(ipcChannels.mongify.get_collections, args0),
 
-    sendQuery: (args0: IMongifySendQueryArgs): Promise<{}> =>
+    sendQuery: (args0: IMongifySendQueryArgs): Promise<{ result: any }> =>
       ipcRenderer.invoke(ipcChannels.mongify.send_query, args0),
   },
 

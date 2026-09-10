@@ -4,6 +4,19 @@
   gap: 10px;
   background: transparent;
   flex-wrap: wrap;
+  position: relative;
+}
+.GRID-LAYOUT {
+  columns: 4 200px;
+  column-gap: 16px;
+  div {
+    break-inside: avoid;
+  }
+
+  .codeDiv {
+    margin-bottom: 16px;
+    break-inside: avoid;
+  }
 }
 .PANEL {
   width: 100%;

@@ -11,7 +11,8 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx .",
-    "sass:dev": "sass --watch ./src/sass/main.scss:./src/index.css --style expanded --source-map --load-path='./src/'"
+    "sass:dev": "sass --watch ./src/sass/main.scss:./src/index.css --style expanded --source-map --load-path='./src/'",
+    "winnetou:dev": "cd src/winnetoujs && npm run start:dev"
   },
   "keywords": [],
   "author": {

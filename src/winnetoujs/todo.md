@@ -16,6 +16,8 @@ if (text.endsWith("\n")) {
 }
 ```
 
+[] redimensionar o editor de codigos
+
 [] poder escolher a suggestion com o click do mouse
 [] fazer tudo funcionar tambem com aspas simples
 [] o esc deve fechar a suggestion box

@@ -162,7 +162,19 @@ export const suggestionSelect = (args0: {
 
     switch (true) {
       case type === "method":
-        editor.innerText = "db." + content + '("';
+        const text = editor.innerText;
+        const regex = /(.*db\.)/s;
+        text.replace(regex, (completeMatch, g1) => {
+          console.log(
+            JSON.stringify(
+              { text, completeMatch, g1, content, return: `${g1}${content}("` },
+              null,
+              2,
+            ),
+          );
+          editor.innerText = `${g1}${content}("`;
+          return `${g1}${content}("`;
+        });
         break;
 
       case type === "collection":
@@ -242,7 +254,10 @@ export const suggestions = async (args0: {
   let collections: string[];
 
   // to match db. to show available database methods like listCollections, ...
-  const command = text.split("db.")[1];
+  let command = text.split("db.")[1];
+  if (command?.endsWith("\n")) {
+    command = command.slice(0, -1);
+  }
 
   let suggestionsAvailable: string[] = [];
   let type: "method" | "collection" | "function" | "field";

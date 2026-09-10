@@ -291,6 +291,19 @@
   gap: 10px;
   background: transparent;
   flex-wrap: wrap;
+  position: relative;
+}
+
+.GRID-LAYOUT {
+  columns: 4 200px;
+  column-gap: 16px;
+}
+.GRID-LAYOUT div {
+  break-inside: avoid;
+}
+.GRID-LAYOUT .codeDiv {
+  margin-bottom: 16px;
+  break-inside: avoid;
 }
 
 .PANEL {
@@ -439,12 +452,83 @@ form textarea {
   border: 1px solid var(--mac-separator-soft);
 }
 
+.codeDiv {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-width: none !important;
+  width: 600px;
+  height: 400px;
+  padding: 10px;
+}
+.codeDiv .resizeDiv {
+  content: " ";
+  position: absolute;
+  background-color: transparent;
+  cursor: ns-resize;
+}
+.codeDiv .resizeTop {
+  height: 10px;
+  width: 100%;
+  left: -5px;
+  top: -5px;
+}
+.codeDiv .resizeRight {
+  width: 10px;
+  height: 100%;
+  right: -5px;
+  top: -5px;
+  cursor: ew-resize;
+}
+.codeDiv .resizeBottom {
+  height: 10px;
+  width: 100%;
+  bottom: -5px;
+  left: -5px;
+}
+.codeDiv .resizeLeft {
+  width: 10px;
+  height: 100%;
+  left: -5px;
+  top: -5px;
+  cursor: ew-resize;
+}
+.codeDiv .resizeTopLeft {
+  height: 10px;
+  width: 10px;
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
+}
+.codeDiv .resizeBottomLeft {
+  height: 10px;
+  width: 10px;
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+.codeDiv .resizeBottomRight {
+  height: 10px;
+  width: 10px;
+  bottom: -5px;
+  right: -5px;
+  cursor: nwse-resize;
+}
+.codeDiv .resizeTopRight {
+  height: 10px;
+  width: 10px;
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
 .code-editor-container {
   border-radius: 10px;
   background: transparent;
   border: 1px solid var(--mac-accent);
   width: 100%;
-  height: 100px;
+  height: 100%;
+  min-height: 100px;
   margin-top: 10px;
   display: flex;
   justify-content: center;
@@ -456,6 +540,7 @@ form textarea {
 .code-editor div {
   width: 100%;
   height: 100%;
+  min-height: 100px;
   background-color: transparent;
   overflow: auto;
   outline: none;
@@ -483,7 +568,9 @@ form textarea {
   background: transparent;
   border: 1px solid var(--mac-yellow);
   width: 100%;
-  height: auto;
+  height: max-content;
+  max-height: 500px;
+  min-height: 100px;
   margin-top: 10px;
   overflow: auto;
 }
@@ -569,6 +656,32 @@ form textarea {
 
 .__c0002__ {
   color: var(--code-editor-red);
+}
+
+.mongify-output {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  font-family: var(--code-font);
+  font-size: var(--font-size-small);
+}
+
+.mongify-header {
+  font-weight: 600;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--mac-separator);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mongify-header .mongify-header-left .mongify-command {
+  font-weight: 600;
+  font-size: var(--font-size-small);
+}
+.mongify-header .mongify-header-right {
+  font-weight: 600;
+  font-size: var(--font-size-small);
 }
 
 :root {

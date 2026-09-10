@@ -5,5 +5,12 @@ export const mongify = {
     "getCollection",
     "deleteCollection",
   ],
-  getCollectionFunctions: ["find", "findOne", "insert", "update", "delete"],
+  getCollectionFunctions: [
+    "find",
+    "findOne",
+    "insert",
+    "insertMany",
+    "update",
+    "delete",
+  ],
 };
