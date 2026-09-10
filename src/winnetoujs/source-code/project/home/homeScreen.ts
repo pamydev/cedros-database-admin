@@ -1,4 +1,15 @@
-import { $buttonPrimary, $codeEditor, $div, $span } from "@common";
+import {
+  $buttonPrimary,
+  $codeEditor,
+  $div,
+  $option,
+  $select,
+  $span,
+  $table,
+  $td,
+  $th,
+  $tr,
+} from "@common";
 import { Screen } from "@screens/screen";
 import { IDatabasesColl } from "../../../../../types/contracts";
 import { listItem } from "@helpers/listItem.helper";
@@ -252,9 +263,86 @@ class ProjectHomeScreen extends Screen {
       });
   }
 
-  private printMongifyResult(arg0: { result: {}; command: string }) {
+  private printMongifyResult(arg0: { result: {}[] | any; command: string }) {
     console.log(arg0.result);
     const output = this.createCodeDiv();
+    let resultDiv: string;
+
+    const printJson = () => {
+      document.getElementById(resultDiv)?.remove();
+      const formattedResult = this.formatJSON({
+        content: arg0.result,
+      });
+      resultDiv = new $div({
+        content: formattedResult,
+        class: "mongify-output",
+      }).create(output).ids.div;
+    };
+
+    const printTable = () => {
+      document.getElementById(resultDiv)?.remove();
+      resultDiv = new $div({
+        class: "mongify-output",
+      }).create(output).ids.div;
+
+      const content = arg0.result;
+
+      console.log({
+        objectKeys: Object.keys(content[0]),
+      });
+
+      if (Object.keys(content[0])[0] == "0") {
+        new $div({
+          content: "No data available",
+        }).create(resultDiv);
+        return;
+      }
+
+      const table = new $table().create(resultDiv);
+      let tr1 = table.ids.thead_tr_output;
+
+      let columns = new Set<string>();
+
+      content.forEach((obj: any) => {
+        const tr = new $tr().create(table.ids.tbody_output).ids.tr;
+        const keys = Object.keys(obj);
+        keys.forEach((key) => {
+          const value = obj[key];
+          columns.add(key);
+        });
+        columns.forEach((column) => {
+          if (keys.includes(column)) {
+            const key = column;
+            const value = obj[key];
+            console.log("typeof value", typeof value);
+            new $td({
+              content:
+                typeof value !== "string" &&
+                typeof value !== "number" &&
+                typeof value !== "boolean"
+                  ? JSON.stringify(value)
+                  : value,
+            }).create(tr);
+          }
+        });
+      });
+
+      columns.forEach((column) => {
+        new $th({ scope: "col", content: column }).create(
+          table.ids.thead_tr_output,
+        );
+      });
+
+      // const table = new $table().create(resultDiv);
+      // let tr1 = table.ids.thead_tr_output;
+      // new $td({ content: "Name" }).create(tr1);
+      // new $td({ content: "Age" }).create(tr1);
+      // new $td({ content: "Role" }).create(tr1);
+      // let tr = new $tr().create(table.ids.tbody_output).ids.tr;
+      // new $td({ content: "John" }).create(tr);
+      // new $td({ content: "38" }).create(tr);
+      // new $td({ content: "Senior" }).create(tr);
+    };
 
     const header = new $div({
       class: "mongify-header",
@@ -273,6 +361,29 @@ class ProjectHomeScreen extends Screen {
       class: "mongify-command",
     }).create(left);
 
+    const selectFormat = new $select({
+      onchange: W.fx(() => {
+        const format = (
+          document.getElementById(selectFormat) as HTMLSelectElement
+        ).value;
+        if (format === "JSON") {
+          printJson();
+        } else if (format === "Table") {
+          printTable();
+        }
+      }),
+    }).create(right).ids.select;
+
+    new $option({
+      content: "JSON",
+      value: "JSON",
+    }).create(selectFormat);
+
+    new $option({
+      content: "Table",
+      value: "Table",
+    }).create(selectFormat);
+
     const grabIcon = new $div({
       content: createIcon(Grab, {
         simple: true,
@@ -284,14 +395,9 @@ class ProjectHomeScreen extends Screen {
       output,
     });
 
-    const formattedResult = this.formatJSON({
-      content: arg0.result,
-    });
+    // ^^^^^^^^^^^^^^^^^^^
 
-    new $div({
-      content: formattedResult,
-      class: "mongify-output",
-    }).create(output);
+    printJson();
   }
 
   private formatJSON(arg0: { content: {} }) {

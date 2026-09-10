@@ -452,6 +452,36 @@ form textarea {
   border: 1px solid var(--mac-separator-soft);
 }
 
+select {
+  padding: 1px 20px;
+  border-radius: 4px;
+  border: 1px solid var(--mac-separator-soft);
+  background: transparent;
+  color: var(--mac-text);
+  font-family: var(--mac-font);
+  font-size: var(--font-size-small);
+}
+select option {
+  font-family: var(--mac-font);
+  font-size: var(--font-size-small);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table thead {
+  background: var(--mac-separator-soft);
+}
+table th,
+table td {
+  border: 1px solid var(--mac-separator-soft);
+  padding: 8px;
+  text-align: left;
+  font-family: var(--code-font);
+  font-size: var(--font-size-smaller);
+}
+
 .codeDiv {
   position: relative;
   display: flex;
@@ -675,6 +705,11 @@ form textarea {
   justify-content: space-between;
   align-items: center;
 }
+.mongify-header .mongify-header-left {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
 .mongify-header .mongify-header-left .mongify-command {
   font-weight: 600;
   font-size: var(--font-size-small);
@@ -682,6 +717,9 @@ form textarea {
 .mongify-header .mongify-header-right {
   font-weight: 600;
   font-size: var(--font-size-small);
+  display: flex;
+  gap: 5px;
+  align-items: center;
 }
 
 .json-key {

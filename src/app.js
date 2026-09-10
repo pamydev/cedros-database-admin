@@ -896,6 +896,390 @@ var $codeEditor = class _$codeEditor extends Constructos {
     return this.component;
   }
 };
+var $select = class _$select extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.class]  
+   * @param {any} [elements.onchange]  
+   * @param {any} [elements.style]  
+   * @param {any} [elements.options]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `select-win-${this.identifier}`,
+      elements,
+      options,
+      _$select
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <select     id="select-win-${this.identifier}"
+    class="${(props == null ? void 0 : props.class) || ""}"
+    onchange="${(props == null ? void 0 : props.onchange) || ""}"
+    style="${(props == null ? void 0 : props.style) || ""}">
+    ${(props == null ? void 0 : props.options) || ""}
+  </select>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        select: `select-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $option = class _$option extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} elements
+   * @param {any} [elements.value]  
+   * @param {any} [elements.class]  
+   * @param {any} elements.content  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `option-win-${this.identifier}`,
+      elements,
+      options,
+      _$option
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <option id="option-win-${this.identifier}" value="${(props == null ? void 0 : props.value) || ""}" class="${(props == null ? void 0 : props.class) || ""}">
+    ${(props == null ? void 0 : props.content) || ""}
+  </option>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        option: `option-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $table = class _$table extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `table-win-${this.identifier}`,
+      elements,
+      options,
+      _$table
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <table id="table-win-${this.identifier}">
+    <thead>
+      <tr id="thead_tr_output-win-${this.identifier}"></tr>
+    </thead>
+    <tbody id="tbody_output-win-${this.identifier}"></tbody>
+  </table>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        table: `table-win-${this.identifier}`,
+        thead_tr_output: `thead_tr_output-win-${this.identifier}`,
+        tbody_output: `tbody_output-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $tr = class _$tr extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `tr-win-${this.identifier}`,
+      elements,
+      options,
+      _$tr
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <tr id="tr-win-${this.identifier}"></tr>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        tr: `tr-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $th = class _$th extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} elements
+   * @param {'col'|'row'} [elements.scope]  
+   * @param {any} elements.content  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `th-win-${this.identifier}`,
+      elements,
+      options,
+      _$th
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <th id="th-win-${this.identifier}" scope="${(props == null ? void 0 : props.scope) || ""}">${(props == null ? void 0 : props.content) || ""}</th>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        th: `th-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
+var $td = class _$td extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} elements
+   * @param {any} elements.content  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `td-win-${this.identifier}`,
+      elements,
+      options,
+      _$td
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <td id="td-win-${this.identifier}">${(props == null ? void 0 : props.content) || ""}</td>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        td: `td-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
 
 // ../../node_modules/lucide/dist/esm/defaultAttributes.mjs
 var defaultAttributes = {
@@ -2645,6 +3029,61 @@ var ProjectHomeScreen = class extends Screen {
   printMongifyResult(arg0) {
     console.log(arg0.result);
     const output = this.createCodeDiv();
+    let resultDiv;
+    const printJson = () => {
+      var _a;
+      (_a = document.getElementById(resultDiv)) == null ? void 0 : _a.remove();
+      const formattedResult = this.formatJSON({
+        content: arg0.result
+      });
+      resultDiv = new $div({
+        content: formattedResult,
+        class: "mongify-output"
+      }).create(output).ids.div;
+    };
+    const printTable = () => {
+      var _a;
+      (_a = document.getElementById(resultDiv)) == null ? void 0 : _a.remove();
+      resultDiv = new $div({
+        class: "mongify-output"
+      }).create(output).ids.div;
+      const content = arg0.result;
+      console.log({
+        objectKeys: Object.keys(content[0])
+      });
+      if (Object.keys(content[0])[0] == "0") {
+        new $div({
+          content: "No data available"
+        }).create(resultDiv);
+        return;
+      }
+      const table = new $table().create(resultDiv);
+      let tr1 = table.ids.thead_tr_output;
+      let columns = /* @__PURE__ */ new Set();
+      content.forEach((obj) => {
+        const tr = new $tr().create(table.ids.tbody_output).ids.tr;
+        const keys = Object.keys(obj);
+        keys.forEach((key) => {
+          const value = obj[key];
+          columns.add(key);
+        });
+        columns.forEach((column) => {
+          if (keys.includes(column)) {
+            const key = column;
+            const value = obj[key];
+            console.log("typeof value", typeof value);
+            new $td({
+              content: typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean" ? JSON.stringify(value) : value
+            }).create(tr);
+          }
+        });
+      });
+      columns.forEach((column) => {
+        new $th({ scope: "col", content: column }).create(
+          table.ids.thead_tr_output
+        );
+      });
+    };
     const header = new $div({
       class: "mongify-header"
     }).create(output).ids.div;
@@ -2658,6 +3097,24 @@ var ProjectHomeScreen = class extends Screen {
       content: arg0.command,
       class: "mongify-command"
     }).create(left);
+    const selectFormat = new $select({
+      onchange: W.fx(() => {
+        const format = document.getElementById(selectFormat).value;
+        if (format === "JSON") {
+          printJson();
+        } else if (format === "Table") {
+          printTable();
+        }
+      })
+    }).create(right).ids.select;
+    new $option({
+      content: "JSON",
+      value: "JSON"
+    }).create(selectFormat);
+    new $option({
+      content: "Table",
+      value: "Table"
+    }).create(selectFormat);
     const grabIcon = new $div({
       content: createIcon(HandGrab, {
         simple: true
@@ -2667,13 +3124,7 @@ var ProjectHomeScreen = class extends Screen {
       id: grabIcon,
       output
     });
-    const formattedResult = this.formatJSON({
-      content: arg0.result
-    });
-    new $div({
-      content: formattedResult,
-      class: "mongify-output"
-    }).create(output);
+    printJson();
   }
   formatJSON(arg0) {
     let content = arg0.content;

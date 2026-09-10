@@ -47,3 +47,23 @@ export const database = {
 
 contextBridge.exposeInMainWorld("systemAPI", systemAPI);
 contextBridge.exposeInMainWorld("database", database);
+
+[
+  {
+    name: "John",
+    age: 55,
+  },
+  {
+    name: "Sam",
+    age: 35,
+  },
+  {
+    name: "Rute",
+    age: 55,
+    role: "Senior",
+  },
+  {
+    name: "Carmen",
+    card: false,
+  },
+];

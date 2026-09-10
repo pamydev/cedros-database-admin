@@ -240,6 +240,9 @@
   align-items: center;
 
   .mongify-header-left {
+    display: flex;
+    gap: 5px;
+    align-items: center;
     .mongify-command {
       font-weight: 600;
       font-size: var(--font-size-small);
@@ -249,6 +252,9 @@
   .mongify-header-right {
     font-weight: 600;
     font-size: var(--font-size-small);
+    display: flex;
+    gap: 5px;
+    align-items: center;
   }
 }
 

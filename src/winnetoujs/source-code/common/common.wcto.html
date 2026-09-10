@@ -119,3 +119,40 @@
       style="{{style?}}"></pre>
   </div>
 </winnetou>
+
+<winnetou d="select">
+  <select
+    id="[[select]]"
+    class="{{class?}}"
+    onchange="{{onchange?}}"
+    style="{{style?}}">
+    {{options?}}
+  </select>
+</winnetou>
+
+<winnetou d="option">
+  <option id="[[option]]" value="{{value?}}" class="{{class?}}">
+    {{content}}
+  </option>
+</winnetou>
+
+<winnetou d="table">
+  <table id="[[table]]">
+    <thead>
+      <tr id="[[thead_tr_output]]"></tr>
+    </thead>
+    <tbody id="[[tbody_output]]"></tbody>
+  </table>
+</winnetou>
+
+<winnetou d="tr">
+  <tr id="[[tr]]"></tr>
+</winnetou>
+
+<winnetou d="th">
+  <th id="[[th]]" scope="{{scope?:'col'|'row'}}">{{content}}</th>
+</winnetou>
+
+<winnetou d="td">
+  <td id="[[td]]">{{content}}</td>
+</winnetou>

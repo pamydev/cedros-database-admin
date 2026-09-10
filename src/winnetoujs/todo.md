@@ -16,9 +16,12 @@ if (text.endsWith("\n")) {
 }
 ```
 
-[] redimensionar o editor de codigos
+[ok] redimensionar o codeEditor
 
-[] poder escolher a suggestion com o click do mouse
+parei aqui:
+[] quando clica em um container com position:absolute tem que aumentar o z-index dele
+[] a tabela ainda nao esta funcionando totalmente, tem erro na montagem, testar com "users"
+
 [] fazer tudo funcionar tambem com aspas simples
 [] o esc deve fechar a suggestion box
 [] implementar fields tambem em outras operacoes
