@@ -2642,41 +2642,6 @@ var ProjectHomeScreen = class extends Screen {
       });
     });
   }
-  addGrabIconListeners(arg0) {
-    const { id, output } = arg0;
-    const grabIconElement = document.getElementById(id);
-    if (!grabIconElement) return;
-    grabIconElement.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      const onPointerMove = (ev) => {
-        const outputElement = document.getElementById(output);
-        if (!outputElement) return;
-        outputElement.style.position = "absolute";
-        let leftOrigin = outputElement.offsetLeft;
-        let topOrigin = outputElement.offsetTop;
-        console.log({
-          leftOrigin,
-          topOrigin,
-          mouseX: ev.clientX,
-          mouseY: ev.clientY
-        });
-        if (leftOrigin === 0 && topOrigin === 0) {
-          const mouseX = ev.clientX - 270 - outputElement.offsetWidth;
-          const mouseY = ev.clientY - 120;
-          leftOrigin = mouseX;
-          topOrigin = mouseY;
-        }
-        outputElement.style.left = leftOrigin + ev.movementX + "px";
-        outputElement.style.top = topOrigin + ev.movementY + "px";
-      };
-      const onPointerUp = () => {
-        document.removeEventListener("pointermove", onPointerMove);
-        document.removeEventListener("pointerup", onPointerUp);
-      };
-      document.addEventListener("pointermove", onPointerMove);
-      document.addEventListener("pointerup", onPointerUp);
-    });
-  }
   printMongifyResult(arg0) {
     console.log(arg0.result);
     const output = this.createCodeDiv();
@@ -2693,10 +2658,26 @@ var ProjectHomeScreen = class extends Screen {
       content: arg0.command,
       class: "mongify-command"
     }).create(left);
+    const grabIcon = new $div({
+      content: createIcon(HandGrab, {
+        simple: true
+      })
+    }).create(right).ids.div;
+    this.addGrabIconListeners({
+      id: grabIcon,
+      output
+    });
+    const formattedResult = this.formatJSON({
+      content: arg0.result
+    });
     new $div({
-      content: JSON.stringify(arg0.result, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;"),
+      content: formattedResult,
       class: "mongify-output"
     }).create(output);
+  }
+  formatJSON(arg0) {
+    let content = arg0.content;
+    return JSON.stringify(content, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/(".*?")/g, '<span class="json-key">$1</span>');
   }
   addResizeContainerListeners(arg0) {
     const { id, codeEditorContainer } = arg0;
@@ -2746,6 +2727,41 @@ var ProjectHomeScreen = class extends Screen {
     });
     document.addEventListener("pointerup", (ev) => {
       isDragging.set(id, false);
+    });
+  }
+  addGrabIconListeners(arg0) {
+    const { id, output } = arg0;
+    const grabIconElement = document.getElementById(id);
+    if (!grabIconElement) return;
+    grabIconElement.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      const onPointerMove = (ev) => {
+        const outputElement = document.getElementById(output);
+        if (!outputElement) return;
+        outputElement.style.position = "absolute";
+        let leftOrigin = outputElement.offsetLeft;
+        let topOrigin = outputElement.offsetTop;
+        console.log({
+          leftOrigin,
+          topOrigin,
+          mouseX: ev.clientX,
+          mouseY: ev.clientY
+        });
+        if (leftOrigin === 0 && topOrigin === 0) {
+          const mouseX = ev.clientX - 270 - outputElement.offsetWidth;
+          const mouseY = ev.clientY - 120;
+          leftOrigin = mouseX;
+          topOrigin = mouseY;
+        }
+        outputElement.style.left = leftOrigin + ev.movementX + "px";
+        outputElement.style.top = topOrigin + ev.movementY + "px";
+      };
+      const onPointerUp = () => {
+        document.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerup", onPointerUp);
+      };
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
     });
   }
 };

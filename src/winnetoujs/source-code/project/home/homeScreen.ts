@@ -49,7 +49,7 @@ class ProjectHomeScreen extends Screen {
     // this.listWorkspaces();
   }
 
-  async listDatabasesAndWorkspaces() {
+  private async listDatabasesAndWorkspaces() {
     const output = new $div({
       class: "PANEL CONTENT-WIDTH",
     }).create(this.panelOutput).ids.div;
@@ -101,7 +101,7 @@ class ProjectHomeScreen extends Screen {
     });
   }
 
-  async openDatabase(db: IDatabasesColl) {
+  private async openDatabase(db: IDatabasesColl) {
     if (db.type === "mongify") {
       this.renderMongify(db);
     }
@@ -163,7 +163,7 @@ class ProjectHomeScreen extends Screen {
     return output;
   }
 
-  async renderMongify(db: IDatabasesColl) {
+  private async renderMongify(db: IDatabasesColl) {
     const output = this.createCodeDiv();
 
     const header = new $div({
@@ -251,42 +251,6 @@ class ProjectHomeScreen extends Screen {
         });
       });
   }
-  addGrabIconListeners(arg0: { id: string; output: string }) {
-    const { id, output } = arg0;
-    const grabIconElement = document.getElementById(id);
-    if (!grabIconElement) return;
-
-    grabIconElement.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      const onPointerMove = (ev: PointerEvent) => {
-        const outputElement = document.getElementById(output);
-        if (!outputElement) return;
-        outputElement.style.position = "absolute";
-        let leftOrigin = outputElement.offsetLeft;
-        let topOrigin = outputElement.offsetTop;
-        console.log({
-          leftOrigin,
-          topOrigin,
-          mouseX: ev.clientX,
-          mouseY: ev.clientY,
-        });
-        if (leftOrigin === 0 && topOrigin === 0) {
-          const mouseX = ev.clientX - 270 - outputElement.offsetWidth;
-          const mouseY = ev.clientY - 120;
-          leftOrigin = mouseX;
-          topOrigin = mouseY;
-        }
-        outputElement.style.left = leftOrigin + ev.movementX + "px";
-        outputElement.style.top = topOrigin + ev.movementY + "px";
-      };
-      const onPointerUp = () => {
-        document.removeEventListener("pointermove", onPointerMove);
-        document.removeEventListener("pointerup", onPointerUp);
-      };
-      document.addEventListener("pointermove", onPointerMove);
-      document.addEventListener("pointerup", onPointerUp);
-    });
-  }
 
   private printMongifyResult(arg0: { result: {}; command: string }) {
     console.log(arg0.result);
@@ -309,13 +273,35 @@ class ProjectHomeScreen extends Screen {
       class: "mongify-command",
     }).create(left);
 
+    const grabIcon = new $div({
+      content: createIcon(Grab, {
+        simple: true,
+      }),
+    }).create(right).ids.div;
+
+    this.addGrabIconListeners({
+      id: grabIcon,
+      output,
+    });
+
+    const formattedResult = this.formatJSON({
+      content: arg0.result,
+    });
+
     new $div({
-      content: JSON.stringify(arg0.result, null, 2)
-        .replace(/\n/g, "<br>")
-        .replace(/ /g, "&nbsp;")
-        .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;"),
+      content: formattedResult,
       class: "mongify-output",
     }).create(output);
+  }
+
+  private formatJSON(arg0: { content: {} }) {
+    let content = arg0.content;
+
+    return JSON.stringify(content, null, 2)
+      .replace(/\n/g, "<br>")
+      .replace(/ /g, "&nbsp;")
+      .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
+      .replace(/(".*?")/g, '<span class="json-key">$1</span>');
   }
 
   private addResizeContainerListeners(arg0: {
@@ -386,6 +372,43 @@ class ProjectHomeScreen extends Screen {
     });
     document.addEventListener("pointerup", (ev) => {
       isDragging.set(id, false);
+    });
+  }
+
+  private addGrabIconListeners(arg0: { id: string; output: string }) {
+    const { id, output } = arg0;
+    const grabIconElement = document.getElementById(id);
+    if (!grabIconElement) return;
+
+    grabIconElement.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      const onPointerMove = (ev: PointerEvent) => {
+        const outputElement = document.getElementById(output);
+        if (!outputElement) return;
+        outputElement.style.position = "absolute";
+        let leftOrigin = outputElement.offsetLeft;
+        let topOrigin = outputElement.offsetTop;
+        console.log({
+          leftOrigin,
+          topOrigin,
+          mouseX: ev.clientX,
+          mouseY: ev.clientY,
+        });
+        if (leftOrigin === 0 && topOrigin === 0) {
+          const mouseX = ev.clientX - 270 - outputElement.offsetWidth;
+          const mouseY = ev.clientY - 120;
+          leftOrigin = mouseX;
+          topOrigin = mouseY;
+        }
+        outputElement.style.left = leftOrigin + ev.movementX + "px";
+        outputElement.style.top = topOrigin + ev.movementY + "px";
+      };
+      const onPointerUp = () => {
+        document.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerup", onPointerUp);
+      };
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
     });
   }
 }
