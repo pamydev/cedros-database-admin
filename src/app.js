@@ -1378,15 +1378,6 @@ var FolderKanban = [
   ["path", { d: "M16 10v6" }]
 ];
 
-// ../../node_modules/lucide/dist/esm/icons/hand-grab.mjs
-var HandGrab = [
-  ["path", { d: "M18 11.5V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1.4" }],
-  ["path", { d: "M14 10V8a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" }],
-  ["path", { d: "M10 9.9V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v5" }],
-  ["path", { d: "M6 14a2 2 0 0 0-2-2a2 2 0 0 0-2 2" }],
-  ["path", { d: "M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8 2 2 0 1 1 4 0" }]
-];
-
 // ../../node_modules/lucide/dist/esm/icons/info.mjs
 var Info = [
   ["circle", { cx: "12", cy: "12", r: "10" }],
@@ -1405,6 +1396,16 @@ var Logs = [
   ["path", { d: "M13 5h8" }],
   ["path", { d: "M13 12h8" }],
   ["path", { d: "M13 19h8" }]
+];
+
+// ../../node_modules/lucide/dist/esm/icons/move.mjs
+var Move = [
+  ["path", { d: "M12 2v20" }],
+  ["path", { d: "m15 19-3 3-3-3" }],
+  ["path", { d: "m19 9 3 3-3 3" }],
+  ["path", { d: "M2 12h20" }],
+  ["path", { d: "m5 9-3 3 3 3" }],
+  ["path", { d: "m9 5 3-3 3 3" }]
 ];
 
 // ../../node_modules/lucide/dist/esm/icons/plus.mjs
@@ -1821,11 +1822,11 @@ var Screen = class {
 // source-code/helpers/listItem.helper.ts
 var listItem = (args0) => {
   const output = new $div({
-    class: "LIST-ITEM",
+    class: `LIST-ITEM`,
     onclick: args0.onclick
   }).create(args0.output).ids.div;
   const leftDiv = new $div({
-    class: "LEFT"
+    class: `LEFT ${args0.subLabel && "atTop"}`
   }).create(output).ids.div;
   if (args0.icon) {
     new $div({
@@ -2900,8 +2901,12 @@ var ProjectHomeScreen = class extends Screen {
       content: db.type,
       class: `__span-${db.type}__`
     }).constructoString();
+    const dbName = new $span({
+      content: db.database_name
+    }).constructoString();
     listItem({
-      label: label + db.database_name,
+      label,
+      subLabel: db.database_name,
       onclick: W.fx(() => {
         this.openDatabase(db);
       }),
@@ -2976,7 +2981,7 @@ var ProjectHomeScreen = class extends Screen {
       class: "mongify-command"
     }).create(left);
     const grabIcon = new $div({
-      content: createIcon(HandGrab, {
+      content: createIcon(Move, {
         simple: true
       })
     }).create(right).ids.div;
@@ -3116,7 +3121,7 @@ var ProjectHomeScreen = class extends Screen {
       value: "Table"
     }).create(selectFormat);
     const grabIcon = new $div({
-      content: createIcon(HandGrab, {
+      content: createIcon(Move, {
         simple: true
       })
     }).create(right).ids.div;
@@ -3494,9 +3499,9 @@ lucide/dist/esm/icons/clipboard-pen-line.mjs:
 lucide/dist/esm/icons/corner-down-left.mjs:
 lucide/dist/esm/icons/database.mjs:
 lucide/dist/esm/icons/folder-kanban.mjs:
-lucide/dist/esm/icons/hand-grab.mjs:
 lucide/dist/esm/icons/info.mjs:
 lucide/dist/esm/icons/logs.mjs:
+lucide/dist/esm/icons/move.mjs:
 lucide/dist/esm/icons/plus.mjs:
 lucide/dist/esm/icons/power.mjs:
 lucide/dist/esm/icons/settings.mjs:

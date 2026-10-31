@@ -10,6 +10,10 @@
 
   border-bottom: 1px solid var(--mac-divider);
 
+  &.atTop {
+    align-items: flex-start;
+  }
+
   &:first-child {
     padding-top: 0;
   }
@@ -27,6 +31,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
+
+    &.atTop {
+      align-items: flex-start;
+    }
 
     .ICON {
       div {

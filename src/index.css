@@ -215,6 +215,9 @@
   transition: background-color 0.1s ease-in-out;
   border-bottom: 1px solid var(--mac-divider);
 }
+.LIST-ITEM.atTop {
+  align-items: flex-start;
+}
 .LIST-ITEM:first-child {
   padding-top: 0;
 }
@@ -229,6 +232,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+.LIST-ITEM .LEFT.atTop {
+  align-items: flex-start;
 }
 .LIST-ITEM .LEFT .ICON div {
   border-radius: 5px;

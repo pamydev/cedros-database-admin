@@ -13,7 +13,7 @@ import {
 import { Screen } from "@screens/screen";
 import { IDatabasesColl } from "../../../../../types/contracts";
 import { listItem } from "@helpers/listItem.helper";
-import { Database, Grab } from "lucide";
+import { Database, Move } from "lucide";
 import { W } from "winnetoujs";
 import { suggestions, suggestionSelect } from "./suggestions";
 import { colorizeAndFormat } from "./colorizeAndFormat";
@@ -102,8 +102,12 @@ class ProjectHomeScreen extends Screen {
       content: db.type,
       class: `__span-${db.type}__`,
     }).constructoString();
+    const dbName = new $span({
+      content: db.database_name,
+    }).constructoString();
     listItem({
-      label: label + db.database_name,
+      label: label,
+      subLabel: db.database_name,
       onclick: W.fx(() => {
         this.openDatabase(db);
       }),
@@ -195,7 +199,7 @@ class ProjectHomeScreen extends Screen {
     }).create(left);
 
     const grabIcon = new $div({
-      content: createIcon(Grab, {
+      content: createIcon(Move, {
         simple: true,
       }),
     }).create(right).ids.div;
@@ -385,7 +389,7 @@ class ProjectHomeScreen extends Screen {
     }).create(selectFormat);
 
     const grabIcon = new $div({
-      content: createIcon(Grab, {
+      content: createIcon(Move, {
         simple: true,
       }),
     }).create(right).ids.div;

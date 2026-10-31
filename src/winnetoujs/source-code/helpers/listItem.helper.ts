@@ -14,12 +14,12 @@ interface IListItem {
 
 export const listItem = (args0: IListItem) => {
   const output = new $div({
-    class: "LIST-ITEM",
+    class: `LIST-ITEM`,
     onclick: args0.onclick,
   }).create(args0.output).ids.div;
 
   const leftDiv = new $div({
-    class: "LEFT",
+    class: `LEFT ${args0.subLabel && "atTop"}`,
   }).create(output).ids.div;
 
   if (args0.icon) {

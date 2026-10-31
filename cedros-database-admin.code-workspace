@@ -22,9 +22,16 @@
       "**/*.css": true,
       "**/*.js": true,
     },
+    "workbench.experimental.modernUI": true,
+    "workbench.editor.tabSizing": "fixed",
+    "workbench.experimental.modernUIEditorTabStyle": "connected",
+    "window.density.layout": "default",
 
     "winnetoujs.fullPath": "/Users/pamydev/CedrosDev/cedros-database-admin/src/winnetoujs",
-    "workbench.colorTheme": "Visual Studio Dark - C++",
+    "workbench.colorTheme": "Turbo Pascal Modern",
+    "editor.fontFamily": "JetBrains Mono",
+    "editor.fontSize": 12,
+    "editor.lineHeight": 28,
     "editor.tokenColorCustomizations": {
       "textMateRules": [
         {
