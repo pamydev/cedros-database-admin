@@ -1,4 +1,4 @@
-import { $div } from "../common/common.wcto";
+import { $div, $span } from "../common/common.wcto";
 import { W } from "winnetoujs";
 import {
   createElement,
@@ -15,11 +15,42 @@ import { createIcon } from "../helpers/icons.helper";
 import { appRouter } from "../router/router";
 
 class LeftMenu {
+  private leftSpaceContainer: string;
+  private leftMenuSpace: string;
+  private messageBoxSpace: string;
+  private messageBox: string;
+
+  constructor() {
+    this.renderLeftSpace();
+    this.renderMessageBox();
+  }
   private output: string;
+
+  private renderLeftSpace() {
+    this.leftSpaceContainer = new $div({ class: "leftSpaceContainer" }).create(
+      "#app",
+    ).ids.div;
+    this.leftMenuSpace = new $div({ style: "height:100%" }).create(
+      this.leftSpaceContainer,
+    ).ids.div;
+    this.messageBoxSpace = new $div().create(this.leftSpaceContainer).ids.div;
+  }
+
+  private renderMessageBox() {
+    this.messageBox = new $div({
+      class: "messageBox",
+    }).create(this.messageBoxSpace).ids.div;
+  }
+
+  public addMessageToMessageBox = (arg0: { message: string }) => {
+    const { message } = arg0;
+    new $span({ content: message }).create(this.messageBox, { clear: true });
+  };
+
   render() {
     const output = new $div({
       class: "left-menu",
-    }).create("#app", { clear: true }).ids.div;
+    }).create(this.leftMenuSpace, { clear: true }).ids.div;
 
     this.output = output;
 
@@ -159,7 +190,7 @@ class LeftMenu {
 }
 
 export const leftMenu = new LeftMenu();
-
+export const addMessageToMessageBox = leftMenu.addMessageToMessageBox;
 export const manualMenuEffect = (identifier: string) => {
   document
     .querySelectorAll<HTMLElement>(".left-menu button")

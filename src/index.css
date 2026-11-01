@@ -1,4 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+.leftSpaceContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.messageBox {
+  height: 100px;
+  padding: 6px 8px 14px;
+  border: 1px solid var(--mac-separator-soft);
+  border-right: 1px solid var(--mac-separator);
+  border-top: 1px solid var(--mac-separator);
+  border-radius: 12px;
+  width: 350px;
+}
+
 .left-menu {
   height: 100%;
   padding: 6px 8px 14px;
@@ -496,6 +513,8 @@ table td {
   width: 600px;
   height: 400px;
   padding: 10px;
+  min-height: 200px;
+  min-width: 150px;
 }
 .codeDiv .resizeDiv {
   content: " ";
@@ -732,6 +751,29 @@ table td {
   color: var(--mac-green);
   font-family: var(--code-font);
   font-size: var(--font-size-small);
+}
+
+.managementDotContainer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 15px;
+}
+
+.managementDot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  content: "";
+}
+.managementDot.red {
+  background-color: var(--mac-red);
+}
+.managementDot.green {
+  background-color: var(--mac-green);
+}
+.managementDot.yellow {
+  background-color: var(--mac-yellow);
 }
 
 :root {

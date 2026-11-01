@@ -1,3 +1,164 @@
+// node_modules/winnetoujs/dist/modules/router.js
+var WinnetouRouter_ = class {
+  constructor() {
+    this.routes = {};
+    this.paramRoutes = [];
+    this.routesOptions = {};
+    this.addListeners();
+  }
+  addListeners() {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" || event.which === 27) {
+        history.go(-1);
+      }
+    });
+    if (window.history) {
+      window.onpopstate = (event) => {
+        var _a;
+        event.preventDefault();
+        if (event.state == null) {
+          if (this.routes["/"]) {
+            this.routes["/"]();
+          } else {
+            console.error(
+              `WinnetouJs Error, id: CR00a67
+Default route "/" is not defined. Please define a default route.`
+            );
+          }
+        } else {
+          try {
+            this.callRoute(event.state);
+          } catch (e) {
+            console.error(
+              `WinnetouJs Error, id: CR002
+Given route is not available "${event.state}". Please verify given route. Original Error: ${e}`
+            );
+          }
+        }
+        if ((_a = this.routesOptions) == null ? void 0 : _a.onBack) {
+          try {
+            this.routesOptions.onBack(event.state || "/");
+          } catch (e) {
+            console.error(
+              `Winnetou Error, id: CR001
+The onBack option in createRoutes() is not valid. Please use a function. 
+
+Original Error: `,
+              e
+            );
+          }
+        }
+      };
+    }
+  }
+  createRoutes(obj, options) {
+    this.routes = obj;
+    this.routesOptions = options || {};
+    Object.keys(this.routes).forEach((route) => {
+      const segment = route.split("/");
+      const size = segment.length;
+      this.paramRoutes.push({
+        root: route,
+        size
+      });
+    });
+  }
+  navigate(url, pushState = true) {
+    var _a;
+    if (window.history) {
+      this.callRoute(url);
+      pushState && this.pushState(url);
+      if ((_a = this.routesOptions) == null ? void 0 : _a.onGo) {
+        try {
+          this.routesOptions.onGo(url || "/");
+        } catch (e) {
+          console.error(
+            `Winnetou Error, id: CR001
+The onGo option in createRoutes() is not valid. Please use a function. 
+
+Original Error: `,
+            e
+          );
+        }
+      }
+    }
+  }
+  pass(route) {
+    var _a;
+    if (window.history) {
+      this.callRoute(route);
+      this.pushStateInteraction(route);
+      if ((_a = this.routesOptions) == null ? void 0 : _a.onGo) {
+        try {
+          this.routesOptions.onGo(route || "/");
+        } catch (e) {
+          console.error(
+            `Winnetou Error, id: CR001
+The onGo option in createRoutes() is not valid. Please use a function. 
+
+Original Error: `,
+            e
+          );
+        }
+      }
+    }
+  }
+  pushStateInteraction(func) {
+    history.pushState(func, "");
+  }
+  callRoute(url) {
+    try {
+      const splittedUrl = url.split("/");
+      const size = splittedUrl.length;
+      const filter = this.paramRoutes.filter((data) => data.size === size);
+      if (filter.length === 0) {
+        this.notFound();
+      }
+      for (let i = 0; i < filter.length; i++) {
+        const root = filter[i].root.split("/");
+        let correctMatch = true;
+        const paramStore = [];
+        for (let j = 0; j < root.length; j++) {
+          if (root[j] !== splittedUrl[j]) {
+            correctMatch = false;
+            if (root[j].includes(":")) {
+              correctMatch = true;
+              paramStore.push(splittedUrl[j]);
+            } else {
+              correctMatch = false;
+              break;
+            }
+          }
+        }
+        if (correctMatch) {
+          this.routes[filter[i].root](...paramStore);
+          return;
+        } else if (i === filter.length - 1) {
+          this.notFound();
+        }
+      }
+    } catch (e) {
+      console.log(e);
+      this.notFound();
+    }
+  }
+  notFound() {
+    try {
+      this.routes["/404"]();
+    } catch (e) {
+      document.body.innerHTML = `<p onclick="Winnetou.select('.winnetouNotFoundDefault').hide()" style="width:100%;padding:15px;color:white;background-color:red;cursor:pointer;" class='winnetouNotFoundDefault'>Page not found. Click to close.</p>` + document.body.innerHTML;
+    }
+  }
+  pushState(url) {
+    try {
+      history.pushState(url, "", url);
+    } catch (e) {
+      history.pushState(url, "");
+    }
+  }
+};
+var Router = new WinnetouRouter_();
+
 // node_modules/winnetoujs/dist/core/winnetou.js
 var Winnetou_ = class {
   constructor() {
@@ -1579,166 +1740,165 @@ var createIcon = (icon, args0) => {
   }).constructoString();
 };
 
-// node_modules/winnetoujs/dist/modules/router.js
-var WinnetouRouter_ = class {
+// source-code/left-menu/left-menu.ts
+var LeftMenu = class {
+  leftSpaceContainer;
+  leftMenuSpace;
+  messageBoxSpace;
+  messageBox;
   constructor() {
-    this.routes = {};
-    this.paramRoutes = [];
-    this.routesOptions = {};
-    this.addListeners();
+    this.renderLeftSpace();
+    this.renderMessageBox();
   }
-  addListeners() {
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" || event.which === 27) {
-        history.go(-1);
-      }
-    });
-    if (window.history) {
-      window.onpopstate = (event) => {
-        var _a;
-        event.preventDefault();
-        if (event.state == null) {
-          if (this.routes["/"]) {
-            this.routes["/"]();
-          } else {
-            console.error(
-              `WinnetouJs Error, id: CR00a67
-Default route "/" is not defined. Please define a default route.`
-            );
-          }
-        } else {
-          try {
-            this.callRoute(event.state);
-          } catch (e) {
-            console.error(
-              `WinnetouJs Error, id: CR002
-Given route is not available "${event.state}". Please verify given route. Original Error: ${e}`
-            );
-          }
-        }
-        if ((_a = this.routesOptions) == null ? void 0 : _a.onBack) {
-          try {
-            this.routesOptions.onBack(event.state || "/");
-          } catch (e) {
-            console.error(
-              `Winnetou Error, id: CR001
-The onBack option in createRoutes() is not valid. Please use a function. 
-
-Original Error: `,
-              e
-            );
-          }
-        }
-      };
-    }
+  output;
+  renderLeftSpace() {
+    this.leftSpaceContainer = new $div({ class: "leftSpaceContainer" }).create(
+      "#app"
+    ).ids.div;
+    this.leftMenuSpace = new $div({ style: "height:100%" }).create(
+      this.leftSpaceContainer
+    ).ids.div;
+    this.messageBoxSpace = new $div().create(this.leftSpaceContainer).ids.div;
   }
-  createRoutes(obj, options) {
-    this.routes = obj;
-    this.routesOptions = options || {};
-    Object.keys(this.routes).forEach((route) => {
-      const segment = route.split("/");
-      const size = segment.length;
-      this.paramRoutes.push({
-        root: route,
-        size
+  renderMessageBox() {
+    this.messageBox = new $div({
+      class: "messageBox"
+    }).create(this.messageBoxSpace).ids.div;
+  }
+  addMessageToMessageBox = (arg0) => {
+    const { message } = arg0;
+    new $span({ content: message }).create(this.messageBox, { clear: true });
+  };
+  render() {
+    const output = new $div({
+      class: "left-menu"
+    }).create(this.leftMenuSpace, { clear: true }).ids.div;
+    this.output = output;
+    new $div({
+      class: "__header"
+    }).create(output);
+    new $menuItem(
+      {
+        ariaLabel: "Add Project",
+        icon: createIcon(Plus),
+        label: "Add Project",
+        onclick: W.fx((self) => {
+          appRouter.methods.addProject.go();
+        }, "this")
+      },
+      { identifier: "add-project" }
+    ).create(output);
+    new $menuSeparator().create(output);
+    new $menuItem(
+      {
+        ariaLabel: "Select Project",
+        icon: createIcon(FolderKanban, {
+          color: "red"
+        }),
+        label: "Select Project",
+        onclick: W.fx((self) => {
+          appRouter.methods.selectProject.go();
+        }, "this")
+      },
+      { identifier: "select-project" }
+    ).create(output);
+    new $menuItem(
+      {
+        ariaLabel: "About",
+        icon: createIcon(Info, {
+          color: "blue"
+        }),
+        label: "About",
+        onclick: W.fx((self) => {
+          appRouter.methods.about.go();
+        }, "this")
+      },
+      { identifier: "about" }
+    ).create(output);
+    this.buttonEffect();
+  }
+  renderProjectMenu(_id) {
+    const output = this.output;
+    new $div({
+      class: "__header"
+    }).create(output, { clear: true });
+    new $menuItem(
+      {
+        ariaLabel: "Home",
+        icon: createIcon(FolderKanban, { color: "grey" }),
+        label: "Home",
+        onclick: W.fx((self) => {
+          appRouter.methods.project_home.go(_id);
+        }, "this")
+      },
+      { identifier: "home" }
+    ).create(output);
+    new $menuItem(
+      {
+        ariaLabel: "Add connection",
+        icon: createIcon(ClipboardPenLine, { color: "grey" }),
+        label: "Add connection",
+        onclick: W.fx((self) => {
+          appRouter.methods.add_connection.go(_id);
+        }, "this")
+      },
+      { identifier: "add-connection" }
+    ).create(output);
+    new $menuItem(
+      {
+        ariaLabel: "Show database log entries",
+        icon: createIcon(Logs, { color: "black" }),
+        label: "Show database log entries",
+        onclick: W.fx((self) => {
+        }, "this")
+      },
+      { identifier: "show-database-log-entries" }
+    ).create(output);
+    new $menuSeparator().create(output);
+    new $menuItem(
+      {
+        ariaLabel: "Project settings",
+        icon: createIcon(Settings, { color: "yellow" }),
+        label: "Project settings",
+        onclick: W.fx((self) => {
+        }, "this")
+      },
+      { identifier: "project-settings" }
+    ).create(output);
+    new $menuItem(
+      {
+        ariaLabel: "Close project",
+        icon: createIcon(Power, { color: "grey" }),
+        label: "Close project",
+        onclick: W.fx((self) => {
+        }, "this")
+      },
+      { identifier: "close-project" }
+    ).create(output);
+    this.buttonEffect();
+  }
+  buttonEffect() {
+    document.querySelectorAll(".left-menu button").forEach((item) => {
+      item.addEventListener("pointerdown", () => {
+        document.querySelectorAll(".left-menu button").forEach((btn) => {
+          btn.classList.remove("is-active");
+        });
+        item.classList.add("is-active");
       });
     });
   }
-  navigate(url, pushState = true) {
-    var _a;
-    if (window.history) {
-      this.callRoute(url);
-      pushState && this.pushState(url);
-      if ((_a = this.routesOptions) == null ? void 0 : _a.onGo) {
-        try {
-          this.routesOptions.onGo(url || "/");
-        } catch (e) {
-          console.error(
-            `Winnetou Error, id: CR001
-The onGo option in createRoutes() is not valid. Please use a function. 
-
-Original Error: `,
-            e
-          );
-        }
-      }
-    }
-  }
-  pass(route) {
-    var _a;
-    if (window.history) {
-      this.callRoute(route);
-      this.pushStateInteraction(route);
-      if ((_a = this.routesOptions) == null ? void 0 : _a.onGo) {
-        try {
-          this.routesOptions.onGo(route || "/");
-        } catch (e) {
-          console.error(
-            `Winnetou Error, id: CR001
-The onGo option in createRoutes() is not valid. Please use a function. 
-
-Original Error: `,
-            e
-          );
-        }
-      }
-    }
-  }
-  pushStateInteraction(func) {
-    history.pushState(func, "");
-  }
-  callRoute(url) {
-    try {
-      const splittedUrl = url.split("/");
-      const size = splittedUrl.length;
-      const filter = this.paramRoutes.filter((data) => data.size === size);
-      if (filter.length === 0) {
-        this.notFound();
-      }
-      for (let i = 0; i < filter.length; i++) {
-        const root = filter[i].root.split("/");
-        let correctMatch = true;
-        const paramStore = [];
-        for (let j = 0; j < root.length; j++) {
-          if (root[j] !== splittedUrl[j]) {
-            correctMatch = false;
-            if (root[j].includes(":")) {
-              correctMatch = true;
-              paramStore.push(splittedUrl[j]);
-            } else {
-              correctMatch = false;
-              break;
-            }
-          }
-        }
-        if (correctMatch) {
-          this.routes[filter[i].root](...paramStore);
-          return;
-        } else if (i === filter.length - 1) {
-          this.notFound();
-        }
-      }
-    } catch (e) {
-      console.log(e);
-      this.notFound();
-    }
-  }
-  notFound() {
-    try {
-      this.routes["/404"]();
-    } catch (e) {
-      document.body.innerHTML = `<p onclick="Winnetou.select('.winnetouNotFoundDefault').hide()" style="width:100%;padding:15px;color:white;background-color:red;cursor:pointer;" class='winnetouNotFoundDefault'>Page not found. Click to close.</p>` + document.body.innerHTML;
-    }
-  }
-  pushState(url) {
-    try {
-      history.pushState(url, "", url);
-    } catch (e) {
-      history.pushState(url, "");
-    }
+};
+var leftMenu = new LeftMenu();
+var addMessageToMessageBox = leftMenu.addMessageToMessageBox;
+var manualMenuEffect = (identifier) => {
+  document.querySelectorAll(".left-menu button").forEach((item) => {
+    item.classList.remove("is-active");
+  });
+  const el = document.getElementById(`menuItem-win-${identifier}`);
+  if (el) {
+    el.classList.add("is-active");
   }
 };
-var Router = new WinnetouRouter_();
 
 // source-code/screens/screen.ts
 var Screen = class {
@@ -2838,6 +2998,18 @@ var removeSuggestionBox = () => {
   suggestionsIsVisible = false;
 };
 
+// source-code/helpers/messageBox.helper.ts
+var updateMessageBoxWhenCursorEnterElement = (arg0) => {
+  const { elementId, messageText } = arg0;
+  const el = document.getElementById(elementId);
+  el.addEventListener("mouseenter", () => {
+    addMessageToMessageBox({ message: messageText });
+  });
+  el.addEventListener("mouseleave", () => {
+    addMessageToMessageBox({ message: "" });
+  });
+};
+
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
   output;
@@ -2916,79 +3088,41 @@ var ProjectHomeScreen = class extends Screen {
   }
   async openDatabase(db) {
     if (db.type === "mongify") {
-      this.renderMongify(db);
+      this.renderMongifyCodeDiv(db);
     }
   }
-  createCodeDiv() {
-    const output = new $div({
-      class: "PANEL codeDiv",
-      style: "position:relative"
-    }).create(this.panelOutput).ids.div;
-    const resizeTop = new $div({
-      class: "resizeDiv resizeTop"
-    }).create(output).ids.div;
-    const resizeRight = new $div({
-      class: "resizeDiv resizeRight"
-    }).create(output).ids.div;
-    const resizeBottom = new $div({
-      class: "resizeDiv resizeBottom"
-    }).create(output).ids.div;
-    const resizeLeft = new $div({
-      class: "resizeDiv resizeLeft"
-    }).create(output).ids.div;
-    const resizeTopLeft = new $div({
-      class: "resizeDiv resizeTopLeft"
-    }).create(output).ids.div;
-    const resizeBottomLeft = new $div({
-      class: "resizeDiv resizeBottomLeft"
-    }).create(output).ids.div;
-    const resizeBottomRight = new $div({
-      class: "resizeDiv resizeBottomRight"
-    }).create(output).ids.div;
-    const resizeTopRight = new $div({
-      class: "resizeDiv resizeTopRight"
-    }).create(output).ids.div;
-    [
-      resizeBottom,
-      resizeBottomLeft,
-      resizeBottomRight,
-      resizeLeft,
-      resizeRight,
-      resizeTop,
-      resizeTopLeft,
-      resizeTopRight
-    ].forEach((id) => {
-      this.addResizeContainerListeners({
-        id,
-        codeEditorContainer: output
-      });
-    });
-    return output;
-  }
-  async renderMongify(db) {
+  async renderMongifyCodeDiv(db) {
     const output = this.createCodeDiv();
     const header = new $div({
       class: "mongify-header"
     }).create(output).ids.div;
     const left = new $div({
-      class: "mongify-header-left"
+      class: "mongify-header-left",
+      style: "width:100%"
     }).create(header).ids.div;
     const right = new $div({
       class: "mongify-header-right"
     }).create(header).ids.div;
+    const resizeManagementButtonsDiv = new $div().create(left).ids.div;
+    this.createResizeManagementButton({
+      idToInsert: resizeManagementButtonsDiv,
+      codeDivToResizeOrClose: output
+    });
+    const nameOfWindowDiv = new $div({
+      style: "display:flex;align-items:center;width:100%;"
+    }).create(left).ids.div;
+    this.addMovementOfGrabTitleListener({
+      id: nameOfWindowDiv,
+      output
+    });
+    const label = new $span({
+      content: db.type,
+      class: `__span-${db.type}__`
+    }).create(nameOfWindowDiv);
     new $div({
       content: db.database_name,
       class: "mongify-command"
-    }).create(left);
-    const grabIcon = new $div({
-      content: createIcon(Move, {
-        simple: true
-      })
-    }).create(right).ids.div;
-    this.addGrabIconListeners({
-      id: grabIcon,
-      output
-    });
+    }).create(nameOfWindowDiv);
     const codeEditor = new $codeEditor().create(output);
     const codeEditorContentId = codeEditor.ids.contentEditable;
     const codeEditorDivId = codeEditor.ids.codeEditor;
@@ -3030,6 +3164,83 @@ var ProjectHomeScreen = class extends Screen {
         projectId: db.projectId
       });
     });
+  }
+  createResizeManagementButton(arg0) {
+    const { idToInsert, codeDivToResizeOrClose } = arg0;
+    const container = new $div({ class: "managementDotContainer" }).create(
+      idToInsert
+    ).ids.div;
+    const redDot = new $div({ class: "managementDot red" }).create(container).ids.div;
+    updateMessageBoxWhenCursorEnterElement({
+      elementId: redDot,
+      messageText: "Close window"
+    });
+    const yellowDot = new $div({ class: "managementDot yellow" }).create(
+      container
+    ).ids.div;
+    updateMessageBoxWhenCursorEnterElement({
+      elementId: yellowDot,
+      messageText: "Minimize window"
+    });
+    const greenDot = new $div({ class: "managementDot green" }).create(
+      container
+    ).ids.div;
+    updateMessageBoxWhenCursorEnterElement({
+      elementId: greenDot,
+      messageText: "Maximize window"
+    });
+  }
+  createCodeDiv() {
+    const output = new $div({
+      class: "PANEL codeDiv",
+      style: "position:relative"
+    }).create(this.panelOutput).ids.div;
+    document.getElementById(output).addEventListener(
+      "click",
+      () => this.incrementZIndexToCodeDivBecomeToFrontOnClick({
+        codeDivId: output
+      })
+    );
+    const resizeTop = new $div({
+      class: "resizeDiv resizeTop"
+    }).create(output).ids.div;
+    const resizeRight = new $div({
+      class: "resizeDiv resizeRight"
+    }).create(output).ids.div;
+    const resizeBottom = new $div({
+      class: "resizeDiv resizeBottom"
+    }).create(output).ids.div;
+    const resizeLeft = new $div({
+      class: "resizeDiv resizeLeft"
+    }).create(output).ids.div;
+    const resizeTopLeft = new $div({
+      class: "resizeDiv resizeTopLeft"
+    }).create(output).ids.div;
+    const resizeBottomLeft = new $div({
+      class: "resizeDiv resizeBottomLeft"
+    }).create(output).ids.div;
+    const resizeBottomRight = new $div({
+      class: "resizeDiv resizeBottomRight"
+    }).create(output).ids.div;
+    const resizeTopRight = new $div({
+      class: "resizeDiv resizeTopRight"
+    }).create(output).ids.div;
+    [
+      resizeBottom,
+      resizeBottomLeft,
+      resizeBottomRight,
+      resizeLeft,
+      resizeRight,
+      resizeTop,
+      resizeTopLeft,
+      resizeTopRight
+    ].forEach((id) => {
+      this.addResizeContainerListeners({
+        id,
+        codeEditorContainer: output
+      });
+    });
+    return output;
   }
   printMongifyResult(arg0) {
     console.log(arg0.result);
@@ -3125,7 +3336,7 @@ var ProjectHomeScreen = class extends Screen {
         simple: true
       })
     }).create(right).ids.div;
-    this.addGrabIconListeners({
+    this.addMovementOfGrabTitleListener({
       id: grabIcon,
       output
     });
@@ -3185,30 +3396,25 @@ var ProjectHomeScreen = class extends Screen {
       isDragging.set(id, false);
     });
   }
-  addGrabIconListeners(arg0) {
+  globalZIndex = 1;
+  incrementZIndexToCodeDivBecomeToFrontOnClick(arg0) {
+    const { codeDivId } = arg0;
+    const codeDiv = document.getElementById(codeDivId);
+    this.globalZIndex++;
+    codeDiv.style.zIndex = String(this.globalZIndex);
+  }
+  addMovementOfGrabTitleListener(arg0) {
     const { id, output } = arg0;
     const grabIconElement = document.getElementById(id);
     if (!grabIconElement) return;
     grabIconElement.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       const onPointerMove = (ev) => {
-        const outputElement = document.getElementById(output);
+        let outputElement = document.getElementById(output);
         if (!outputElement) return;
-        outputElement.style.position = "absolute";
         let leftOrigin = outputElement.offsetLeft;
         let topOrigin = outputElement.offsetTop;
-        console.log({
-          leftOrigin,
-          topOrigin,
-          mouseX: ev.clientX,
-          mouseY: ev.clientY
-        });
-        if (leftOrigin === 0 && topOrigin === 0) {
-          const mouseX = ev.clientX - 270 - outputElement.offsetWidth;
-          const mouseY = ev.clientY - 120;
-          leftOrigin = mouseX;
-          topOrigin = mouseY;
-        }
+        outputElement.style.position = "absolute";
         outputElement.style.left = leftOrigin + ev.movementX + "px";
         outputElement.style.top = topOrigin + ev.movementY + "px";
       };
@@ -3232,7 +3438,7 @@ var projectRouter = (routes = {}) => {
       },
       set() {
         routes["/screen/home/:projectId"] = (projectId) => {
-          leftMenu2.renderProjectMenu(projectId);
+          leftMenu.renderProjectMenu(projectId);
           hideScreens();
           manualMenuEffect("home");
           projectHomeScreen.render(projectId);
@@ -3245,7 +3451,7 @@ var projectRouter = (routes = {}) => {
       },
       set() {
         routes["/screen/add-connection/:projectId"] = (projectId) => {
-          leftMenu2.renderProjectMenu(projectId);
+          leftMenu.renderProjectMenu(projectId);
           hideScreens();
           manualMenuEffect("add-connection");
           addConnectionScreen.render(projectId);
@@ -3302,7 +3508,7 @@ var MyRouter = class {
       go: () => Router.navigate("/add-project"),
       set: () => {
         this.routes["/add-project"] = () => {
-          leftMenu2.render();
+          leftMenu.render();
           this.hideScreens();
           manualMenuEffect("add-project");
           newProjectScreen.render();
@@ -3313,7 +3519,7 @@ var MyRouter = class {
       go: (reload) => Router.navigate(`/select-project/${reload || "null"}`),
       set: () => {
         this.routes["/select-project/:reload"] = (reload) => {
-          leftMenu2.render();
+          leftMenu.render();
           this.hideScreens();
           manualMenuEffect("select-project");
           selectProjectScreen.render(reload);
@@ -3324,7 +3530,7 @@ var MyRouter = class {
       go: () => Router.navigate("/about"),
       set: () => {
         this.routes["/about"] = () => {
-          leftMenu2.render();
+          leftMenu.render();
           this.hideScreens();
           manualMenuEffect("about");
           aboutScreen.render();
@@ -3347,144 +3553,8 @@ var MyRouter = class {
 };
 var appRouter = new MyRouter();
 
-// source-code/left-menu/left-menu.ts
-var LeftMenu = class {
-  output;
-  render() {
-    const output = new $div({
-      class: "left-menu"
-    }).create("#app", { clear: true }).ids.div;
-    this.output = output;
-    new $div({
-      class: "__header"
-    }).create(output);
-    new $menuItem(
-      {
-        ariaLabel: "Add Project",
-        icon: createIcon(Plus),
-        label: "Add Project",
-        onclick: W.fx((self) => {
-          appRouter.methods.addProject.go();
-        }, "this")
-      },
-      { identifier: "add-project" }
-    ).create(output);
-    new $menuSeparator().create(output);
-    new $menuItem(
-      {
-        ariaLabel: "Select Project",
-        icon: createIcon(FolderKanban, {
-          color: "red"
-        }),
-        label: "Select Project",
-        onclick: W.fx((self) => {
-          appRouter.methods.selectProject.go();
-        }, "this")
-      },
-      { identifier: "select-project" }
-    ).create(output);
-    new $menuItem(
-      {
-        ariaLabel: "About",
-        icon: createIcon(Info, {
-          color: "blue"
-        }),
-        label: "About",
-        onclick: W.fx((self) => {
-          appRouter.methods.about.go();
-        }, "this")
-      },
-      { identifier: "about" }
-    ).create(output);
-    this.buttonEffect();
-  }
-  renderProjectMenu(_id) {
-    const output = this.output;
-    new $div({
-      class: "__header"
-    }).create(output, { clear: true });
-    new $menuItem(
-      {
-        ariaLabel: "Home",
-        icon: createIcon(FolderKanban, { color: "grey" }),
-        label: "Home",
-        onclick: W.fx((self) => {
-          appRouter.methods.project_home.go(_id);
-        }, "this")
-      },
-      { identifier: "home" }
-    ).create(output);
-    new $menuItem(
-      {
-        ariaLabel: "Add connection",
-        icon: createIcon(ClipboardPenLine, { color: "grey" }),
-        label: "Add connection",
-        onclick: W.fx((self) => {
-          appRouter.methods.add_connection.go(_id);
-        }, "this")
-      },
-      { identifier: "add-connection" }
-    ).create(output);
-    new $menuItem(
-      {
-        ariaLabel: "Show database log entries",
-        icon: createIcon(Logs, { color: "black" }),
-        label: "Show database log entries",
-        onclick: W.fx((self) => {
-        }, "this")
-      },
-      { identifier: "show-database-log-entries" }
-    ).create(output);
-    new $menuSeparator().create(output);
-    new $menuItem(
-      {
-        ariaLabel: "Project settings",
-        icon: createIcon(Settings, { color: "yellow" }),
-        label: "Project settings",
-        onclick: W.fx((self) => {
-        }, "this")
-      },
-      { identifier: "project-settings" }
-    ).create(output);
-    new $menuItem(
-      {
-        ariaLabel: "Close project",
-        icon: createIcon(Power, { color: "grey" }),
-        label: "Close project",
-        onclick: W.fx((self) => {
-        }, "this")
-      },
-      { identifier: "close-project" }
-    ).create(output);
-    this.buttonEffect();
-  }
-  buttonEffect() {
-    document.querySelectorAll(".left-menu button").forEach((item) => {
-      item.addEventListener("pointerdown", () => {
-        document.querySelectorAll(".left-menu button").forEach((btn) => {
-          btn.classList.remove("is-active");
-        });
-        item.classList.add("is-active");
-      });
-    });
-  }
-};
-var leftMenu2 = new LeftMenu();
-var manualMenuEffect = (identifier) => {
-  document.querySelectorAll(".left-menu button").forEach((item) => {
-    item.classList.remove("is-active");
-  });
-  const el = document.getElementById(`menuItem-win-${identifier}`);
-  if (el) {
-    el.classList.add("is-active");
-  }
-};
-
 // source-code/app.ts
 window.addEventListener("DOMContentLoaded", () => {
-  var _a;
-  leftMenu2.render();
-  (_a = document.getElementById("menuItem-win-new-project")) == null ? void 0 : _a.classList.add("is-active");
   appRouter.methods.selectProject.go();
 });
 /*! Bundled license information:

@@ -18,6 +18,7 @@ import { W } from "winnetoujs";
 import { suggestions, suggestionSelect } from "./suggestions";
 import { colorizeAndFormat } from "./colorizeAndFormat";
 import { createIcon } from "@icons";
+import { updateMessageBoxWhenCursorEnterElement } from "@helpers/messageBox.helper";
 
 class ProjectHomeScreen extends Screen {
   private output: string;
@@ -118,67 +119,11 @@ class ProjectHomeScreen extends Screen {
 
   private async openDatabase(db: IDatabasesColl) {
     if (db.type === "mongify") {
-      this.renderMongify(db);
+      this.renderMongifyCodeDiv(db);
     }
   }
 
-  private createCodeDiv() {
-    const output = new $div({
-      class: "PANEL codeDiv",
-      style: "position:relative",
-    }).create(this.panelOutput).ids.div;
-
-    const resizeTop = new $div({
-      class: "resizeDiv resizeTop",
-    }).create(output).ids.div;
-
-    const resizeRight = new $div({
-      class: "resizeDiv resizeRight",
-    }).create(output).ids.div;
-
-    const resizeBottom = new $div({
-      class: "resizeDiv resizeBottom",
-    }).create(output).ids.div;
-
-    const resizeLeft = new $div({
-      class: "resizeDiv resizeLeft",
-    }).create(output).ids.div;
-
-    const resizeTopLeft = new $div({
-      class: "resizeDiv resizeTopLeft",
-    }).create(output).ids.div;
-
-    const resizeBottomLeft = new $div({
-      class: "resizeDiv resizeBottomLeft",
-    }).create(output).ids.div;
-
-    const resizeBottomRight = new $div({
-      class: "resizeDiv resizeBottomRight",
-    }).create(output).ids.div;
-
-    const resizeTopRight = new $div({
-      class: "resizeDiv resizeTopRight",
-    }).create(output).ids.div;
-
-    [
-      resizeBottom,
-      resizeBottomLeft,
-      resizeBottomRight,
-      resizeLeft,
-      resizeRight,
-      resizeTop,
-      resizeTopLeft,
-      resizeTopRight,
-    ].forEach((id) => {
-      this.addResizeContainerListeners({
-        id,
-        codeEditorContainer: output,
-      });
-    });
-    return output;
-  }
-
-  private async renderMongify(db: IDatabasesColl) {
+  private async renderMongifyCodeDiv(db: IDatabasesColl) {
     const output = this.createCodeDiv();
 
     const header = new $div({
@@ -187,27 +132,38 @@ class ProjectHomeScreen extends Screen {
 
     const left = new $div({
       class: "mongify-header-left",
+      style: "width:100%",
     }).create(header).ids.div;
 
     const right = new $div({
       class: "mongify-header-right",
     }).create(header).ids.div;
 
+    // ----------
+
+    const resizeManagementButtonsDiv = new $div().create(left).ids.div;
+    this.createResizeManagementButton({
+      idToInsert: resizeManagementButtonsDiv,
+      codeDivToResizeOrClose: output,
+    });
+    const nameOfWindowDiv = new $div({
+      style: "display:flex;align-items:center;width:100%;",
+    }).create(left).ids.div;
+
+    this.addMovementOfGrabTitleListener({
+      id: nameOfWindowDiv,
+      output,
+    });
+
+    const label = new $span({
+      content: db.type,
+      class: `__span-${db.type}__`,
+    }).create(nameOfWindowDiv);
+
     new $div({
       content: db.database_name,
       class: "mongify-command",
-    }).create(left);
-
-    const grabIcon = new $div({
-      content: createIcon(Move, {
-        simple: true,
-      }),
-    }).create(right).ids.div;
-
-    this.addGrabIconListeners({
-      id: grabIcon,
-      output,
-    });
+    }).create(nameOfWindowDiv);
 
     const codeEditor = new $codeEditor().create(output);
     const codeEditorContentId = codeEditor.ids.contentEditable;
@@ -265,6 +221,98 @@ class ProjectHomeScreen extends Screen {
           projectId: db.projectId,
         });
       });
+  }
+
+  private createResizeManagementButton(arg0: {
+    idToInsert: string;
+    codeDivToResizeOrClose: string;
+  }) {
+    const { idToInsert, codeDivToResizeOrClose } = arg0;
+    const container = new $div({ class: "managementDotContainer" }).create(
+      idToInsert,
+    ).ids.div;
+    const redDot = new $div({ class: "managementDot red" }).create(container)
+      .ids.div;
+    updateMessageBoxWhenCursorEnterElement({
+      elementId: redDot,
+      messageText: "Close window",
+    });
+    const yellowDot = new $div({ class: "managementDot yellow" }).create(
+      container,
+    ).ids.div;
+    updateMessageBoxWhenCursorEnterElement({
+      elementId: yellowDot,
+      messageText: "Minimize window",
+    });
+    const greenDot = new $div({ class: "managementDot green" }).create(
+      container,
+    ).ids.div;
+    updateMessageBoxWhenCursorEnterElement({
+      elementId: greenDot,
+      messageText: "Maximize window",
+    });
+  }
+
+  private createCodeDiv() {
+    const output = new $div({
+      class: "PANEL codeDiv",
+      style: "position:relative",
+    }).create(this.panelOutput).ids.div;
+
+    document.getElementById(output).addEventListener("click", () =>
+      this.incrementZIndexToCodeDivBecomeToFrontOnClick({
+        codeDivId: output,
+      }),
+    );
+
+    const resizeTop = new $div({
+      class: "resizeDiv resizeTop",
+    }).create(output).ids.div;
+
+    const resizeRight = new $div({
+      class: "resizeDiv resizeRight",
+    }).create(output).ids.div;
+
+    const resizeBottom = new $div({
+      class: "resizeDiv resizeBottom",
+    }).create(output).ids.div;
+
+    const resizeLeft = new $div({
+      class: "resizeDiv resizeLeft",
+    }).create(output).ids.div;
+
+    const resizeTopLeft = new $div({
+      class: "resizeDiv resizeTopLeft",
+    }).create(output).ids.div;
+
+    const resizeBottomLeft = new $div({
+      class: "resizeDiv resizeBottomLeft",
+    }).create(output).ids.div;
+
+    const resizeBottomRight = new $div({
+      class: "resizeDiv resizeBottomRight",
+    }).create(output).ids.div;
+
+    const resizeTopRight = new $div({
+      class: "resizeDiv resizeTopRight",
+    }).create(output).ids.div;
+
+    [
+      resizeBottom,
+      resizeBottomLeft,
+      resizeBottomRight,
+      resizeLeft,
+      resizeRight,
+      resizeTop,
+      resizeTopLeft,
+      resizeTopRight,
+    ].forEach((id) => {
+      this.addResizeContainerListeners({
+        id,
+        codeEditorContainer: output,
+      });
+    });
+    return output;
   }
 
   private printMongifyResult(arg0: { result: {}[] | any; command: string }) {
@@ -394,7 +442,7 @@ class ProjectHomeScreen extends Screen {
       }),
     }).create(right).ids.div;
 
-    this.addGrabIconListeners({
+    this.addMovementOfGrabTitleListener({
       id: grabIcon,
       output,
     });
@@ -485,7 +533,17 @@ class ProjectHomeScreen extends Screen {
     });
   }
 
-  private addGrabIconListeners(arg0: { id: string; output: string }) {
+  private globalZIndex = 1;
+  private incrementZIndexToCodeDivBecomeToFrontOnClick(arg0: {
+    codeDivId: string;
+  }) {
+    const { codeDivId } = arg0;
+    const codeDiv = document.getElementById(codeDivId);
+    this.globalZIndex++;
+    codeDiv.style.zIndex = String(this.globalZIndex);
+  }
+
+  private addMovementOfGrabTitleListener(arg0: { id: string; output: string }) {
     const { id, output } = arg0;
     const grabIconElement = document.getElementById(id);
     if (!grabIconElement) return;
@@ -493,23 +551,15 @@ class ProjectHomeScreen extends Screen {
     grabIconElement.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       const onPointerMove = (ev: PointerEvent) => {
-        const outputElement = document.getElementById(output);
+        let outputElement = document.getElementById(output);
         if (!outputElement) return;
-        outputElement.style.position = "absolute";
+
+        // get position before turns it absolute
+        // because absolute turn it to 0,0
         let leftOrigin = outputElement.offsetLeft;
         let topOrigin = outputElement.offsetTop;
-        console.log({
-          leftOrigin,
-          topOrigin,
-          mouseX: ev.clientX,
-          mouseY: ev.clientY,
-        });
-        if (leftOrigin === 0 && topOrigin === 0) {
-          const mouseX = ev.clientX - 270 - outputElement.offsetWidth;
-          const mouseY = ev.clientY - 120;
-          leftOrigin = mouseX;
-          topOrigin = mouseY;
-        }
+        outputElement.style.position = "absolute";
+
         outputElement.style.left = leftOrigin + ev.movementX + "px";
         outputElement.style.top = topOrigin + ev.movementY + "px";
       };

@@ -26,3 +26,9 @@ parei aqui:
 [] o esc deve fechar a suggestion box
 [] implementar fields tambem em outras operacoes
 [] testar com varias fields o comportamento
+
+31-10-2026
+[] adicionar codeDiv resize dots: fechar, minimizar e maximizar
+[] adicionar qual banco esta sendo usado e qual nome do banco
+
+onde parei: dots adicionados, falta a funcionalidade.

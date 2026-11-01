@@ -1,3 +1,18 @@
+.leftSpaceContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.messageBox {
+  height: 100px;
+  padding: 6px 8px 14px;
+  border: 1px solid var(--mac-separator-soft);
+  border-right: 1px solid var(--mac-separator);
+  border-top: 1px solid var(--mac-separator);
+  border-radius: 12px;
+  width: 350px;
+}
 .left-menu {
   height: 100%;
   padding: 6px 8px 14px;

@@ -6,6 +6,8 @@
   width: 600px;
   height: 400px;
   padding: 10px;
+  min-height: 200px;
+  min-width: 150px;
   .resizeDiv {
     content: " ";
     position: absolute;
@@ -262,4 +264,27 @@
   color: var(--mac-green);
   font-family: var(--code-font);
   font-size: var(--font-size-small);
+}
+
+.managementDotContainer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 15px;
+}
+.managementDot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  content: "";
+
+  &.red {
+    background-color: var(--mac-red);
+  }
+  &.green {
+    background-color: var(--mac-green);
+  }
+  &.yellow {
+    background-color: var(--mac-yellow);
+  }
 }
