@@ -2428,566 +2428,6 @@ var RedisConnectionScreen = class extends Screen {
 };
 var redisConnectionScreen = new RedisConnectionScreen();
 
-// source-code/project/home/mongify.suggestions.ts
-var mongify = {
-  methods: [
-    "listCollections",
-    "createCollection",
-    "getCollection",
-    "deleteCollection"
-  ],
-  getCollectionFunctions: [
-    "find",
-    "findOne",
-    "insert",
-    "insertMany",
-    "update",
-    "delete"
-  ]
-};
-
-// source-code/project/home/cursor.ts
-var saveCursorPosition = (textEl) => {
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) {
-    return null;
-  }
-  const currentRange = selection.getRangeAt(0);
-  if (!textEl.contains(currentRange.startContainer) || !textEl.contains(currentRange.endContainer)) {
-    return null;
-  }
-  const startRange = document.createRange();
-  startRange.selectNodeContents(textEl);
-  startRange.setEnd(currentRange.startContainer, currentRange.startOffset);
-  const endRange = document.createRange();
-  endRange.selectNodeContents(textEl);
-  endRange.setEnd(currentRange.endContainer, currentRange.endOffset);
-  return {
-    start: startRange.toString().length,
-    end: endRange.toString().length
-  };
-};
-var restoreCursorPosition = (textEl, position2) => {
-  if (!position2) return;
-  const findPosition = (targetOffset) => {
-    var _a;
-    const walker = document.createTreeWalker(textEl, NodeFilter.SHOW_TEXT);
-    let currentOffset = 0;
-    let node = walker.nextNode();
-    while (node) {
-      const nodeLength = ((_a = node.textContent) == null ? void 0 : _a.length) ?? 0;
-      if (targetOffset <= currentOffset + nodeLength) {
-        return {
-          node,
-          offset: targetOffset - currentOffset
-        };
-      }
-      currentOffset += nodeLength;
-      node = walker.nextNode();
-    }
-    return {
-      node: textEl,
-      offset: textEl.childNodes.length
-    };
-  };
-  const start = findPosition(position2.start);
-  const end = findPosition(position2.end);
-  const range = document.createRange();
-  range.setStart(start.node, start.offset);
-  range.setEnd(end.node, end.offset);
-  const selection = window.getSelection();
-  textEl.focus();
-  selection == null ? void 0 : selection.removeAllRanges();
-  selection == null ? void 0 : selection.addRange(range);
-};
-var setCursorPositionInEndOfLine = (textEl) => {
-  const range = document.createRange();
-  range.selectNodeContents(textEl);
-  range.collapse(false);
-  const selection = window.getSelection();
-  selection == null ? void 0 : selection.removeAllRanges();
-  selection == null ? void 0 : selection.addRange(range);
-  textEl.focus();
-};
-
-// source-code/project/home/params.ts
-var Params = class {
-  tabCount = 0;
-};
-var params = new Params();
-
-// source-code/project/home/colorizeAndFormat.ts
-var isAwaiting = false;
-var tabDecrement = () => {
-  console.log("tabDecrement called --");
-  if (params.tabCount > 0) params.tabCount--;
-};
-var tabIncrement = () => {
-  console.log("tabIncrement called ++");
-  params.tabCount++;
-};
-var colorizeAndFormat = async (args0) => {
-  const { e, codeEditor } = args0;
-  if ((e == null ? void 0 : e.key) === "{") {
-    tabIncrement();
-  }
-  if ((e == null ? void 0 : e.key) === "}") {
-    tabDecrement();
-    removeTab({ e, codeEditor, str: "}" });
-  }
-  if ((e == null ? void 0 : e.key) === "Tab") {
-    insertTab({ e, codeEditor });
-    return;
-  }
-  if ((e == null ? void 0 : e.key) === "Backspace") {
-    backspacePressed({ e, codeEditor });
-  }
-  if ((e == null ? void 0 : e.key) === "Enter") {
-    insertTab({ e, codeEditor, onPressEnter: true });
-  }
-  if (e) {
-    if (isDeniedKeyPressed(e)) {
-      return;
-    }
-  }
-  if (isAwaiting) return;
-  isAwaiting = true;
-  await new Promise((resolve) => setTimeout(() => resolve(true), 10));
-  isAwaiting = false;
-  if (isSuggestionBoxVisible()) return;
-  const textEl = document.getElementById(codeEditor);
-  const innerText = textEl.innerText;
-  const innerHTML = textEl.innerHTML;
-  let res = stylish.quotes(innerText);
-  res = stylish.db(res);
-  res = res.replace(/\n/g, "<br>");
-  if (res === innerText || res === innerHTML) return;
-  const cursorPosition = saveCursorPosition(textEl);
-  textEl.innerHTML = res;
-  restoreCursorPosition(textEl, cursorPosition);
-};
-var stylish = {
-  quotes(text) {
-    const regex = /("[^"]+")/g;
-    return text.replace(
-      regex,
-      (match) => `<span class="__c0001__">${match}</span>`
-    );
-  },
-  db(text) {
-    const regex = /(db)/g;
-    return text.replace(
-      regex,
-      (match) => `<span class="__c0002__">${match}</span>`
-    );
-  }
-};
-var isSuggestionBoxVisible = () => {
-  return document.getElementById("div-win-suggestion-box") !== null;
-};
-var insertTab = async (args0) => {
-  var _a;
-  const { e, codeEditor, onPressEnter } = args0;
-  if (onPressEnter && params.tabCount === 0) return;
-  if (document.getElementById("div-win-suggestion-box")) return;
-  if (!onPressEnter) e.preventDefault();
-  await new Promise(
-    (resolve) => setTimeout(() => {
-      resolve(true);
-    }, 10)
-  );
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) return;
-  const range = selection.getRangeAt(0);
-  if (!((_a = document.getElementById(codeEditor)) == null ? void 0 : _a.contains(range.commonAncestorContainer)))
-    return;
-  range.deleteContents();
-  let spaces;
-  if (!onPressEnter) {
-    tabIncrement();
-    spaces = document.createTextNode("	");
-  } else {
-    console.log({ tabCount: params.tabCount });
-    spaces = document.createTextNode("	".repeat(params.tabCount));
-  }
-  range.insertNode(spaces);
-  range.setStartAfter(spaces);
-  range.collapse(true);
-  selection.removeAllRanges();
-  selection.addRange(range);
-};
-var removeTab = (args0) => {
-  const { e, codeEditor, str } = args0;
-  e.preventDefault();
-  const el = document.getElementById(codeEditor);
-  const text = el.innerText;
-  console.log(JSON.stringify({ text }, null, 2));
-  let newText = text;
-  if (newText.endsWith("\n")) {
-    newText = newText.slice(0, -1);
-  }
-  if (newText.endsWith("	")) {
-    newText = newText.slice(0, -1);
-  }
-  el.innerText = newText + str;
-  setCursorPositionInEndOfLine(el);
-};
-var backspacePressed = (args0) => {
-  const { e, codeEditor } = args0;
-  const el = document.getElementById(codeEditor);
-  const text = el.innerText;
-  console.log("backspace", JSON.stringify({ text }, null, 2));
-  if (text.endsWith("	") || text.endsWith("	\n") || text.endsWith("{") || text.endsWith("{\n")) {
-    console.log("tab decrement triggered by backspace");
-    tabDecrement();
-  }
-};
-var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Tab" || e.key === "Meta" || e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" || e.key === "Insert" || e.key === "Home" || e.key === "End" || e.key === "PageUp" || e.key === "PageDown" || e.key === "Backspace";
-
-// source-code/project/home/fields.suggestions.ts
-var FieldsSuggestions = class {
-  regex = {
-    trigger: /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/,
-    collectionName: /db\.getCollection\("(.+)"\)/,
-    filters: {
-      /** /^\t([^,:\r\n]*)$/gm */
-      next: /^\t([^,:\r\n]*)$/gm
-    },
-    /** /(^\t+)([^,:\r\n]+)$/gm */
-    select: /(^\t+)([^,:\r\n]+)$/gm
-  };
-  storage = {
-    fieldsList: /* @__PURE__ */ new Map()
-  };
-  collectionName;
-  getCollectionName(text) {
-    var _a;
-    return ((_a = text.match(this.regex.collectionName)) == null ? void 0 : _a[1]) || "";
-  }
-  async getFieldsList(args0) {
-    const { collectionName, databaseId, projectId } = args0;
-    const identifier = `${args0.projectId}-${args0.databaseId}-${collectionName}`;
-    if (this.storage.fieldsList.has(identifier)) {
-      return this.storage.fieldsList.get(identifier);
-    }
-    let res = await window.database.mongify.sendQuery({
-      command: `db.getCollection("${collectionName}").findOne()`,
-      databaseId,
-      projectId
-    });
-    const fields = Object.keys(res || {});
-    this.storage.fieldsList.set(identifier, fields);
-    return fields;
-  }
-  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  trigger(args0) {
-    var _a;
-    const { text } = args0;
-    this.collectionName = this.getCollectionName(text);
-    if (((_a = text.match(this.regex.trigger)) == null ? void 0 : _a.length) > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  async filterSuggestions(args0) {
-    var _a;
-    const fieldsAvailable = await this.getFieldsList({
-      collectionName: this.collectionName,
-      databaseId: args0.databaseId,
-      projectId: args0.projectId
-    });
-    const nextMatch = ((_a = args0.text.match(this.regex.filters.next)) == null ? void 0 : _a[0]) || "";
-    const suggestionsAvailable = fieldsAvailable.filter((field) => {
-      if (nextMatch === "	") return true;
-      if (nextMatch.trim() === "") return false;
-      if (field.startsWith(nextMatch.trim())) return true;
-    });
-    return suggestionsAvailable;
-  }
-  selectSuggestion(args0) {
-    const { editor, content } = args0;
-    let text = editor.innerText;
-    const selectRegex = this.regex.select;
-    const match = text.match(selectRegex);
-    const toBeReplaced = (match == null ? void 0 : match[0]) || "";
-    console.log(
-      JSON.stringify(
-        {
-          text,
-          match,
-          toBeReplaced,
-          content
-        },
-        null,
-        2
-      )
-    );
-    if (toBeReplaced === "" || !toBeReplaced) {
-      if (text.endsWith("\n")) {
-        text = text.slice(0, -1);
-      }
-      editor.innerText = text + content + ":";
-    } else {
-      let tabCount = params.tabCount;
-      editor.innerText = text.replace(
-        selectRegex,
-        (completeMatch, group1, group2) => {
-          return `${group1}${content}:`;
-        }
-      );
-    }
-  }
-};
-var fieldsSuggestionsModel = new FieldsSuggestions();
-
-// source-code/project/home/suggestions.ts
-var getCursorPosition = () => {
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) {
-    return { left: 0, bottom: 0 };
-  }
-  const originalRange = selection.getRangeAt(0).cloneRange();
-  const measurementRange = originalRange.cloneRange();
-  measurementRange.collapse(true);
-  const marker = document.createElement("span");
-  marker.textContent = "\u200B";
-  marker.style.cssText = `
-    visibility: hidden;
-    pointer-events: none;
-  `;
-  measurementRange.insertNode(marker);
-  const markerParent = marker.parentNode;
-  const markerRect = marker.getBoundingClientRect();
-  marker.remove();
-  markerParent == null ? void 0 : markerParent.normalize();
-  selection.removeAllRanges();
-  selection.addRange(originalRange);
-  return {
-    left: markerRect.left,
-    bottom: markerRect.bottom + 4
-  };
-};
-var position = 0;
-var selectedPosition = 0;
-var totalItems = 0;
-var suggestionsIsVisible = false;
-var collectionsList = /* @__PURE__ */ new Map();
-var getCollectionsList = async (args0) => {
-  const identifier = `${args0.projectId}-${args0.databaseId}`;
-  if (collectionsList.has(identifier)) return collectionsList.get(identifier);
-  let res = await window.database.mongify.sendQuery({
-    command: "db.listCollections()",
-    databaseId: args0.databaseId,
-    projectId: args0.projectId
-  });
-  collectionsList.set(identifier, res);
-  return res;
-};
-var addSuggestionItem = (args0) => {
-  const item = new $div({
-    class: `__suggestion-item ${selectedPosition === position ? "__selected__" : ""}`,
-    data: `data-position="${position}" data-content="${args0.method}" data-type="${args0.type}"`
-  }).create(args0.output).ids.div;
-  position++;
-  const left = new $div({
-    class: "__left"
-  }).create(item).ids.div;
-  const right = new $div({
-    class: "__right"
-  }).create(item).ids.div;
-  new $div({
-    content: createIcon(Box, { simple: true }),
-    class: "__icon"
-  }).create(left);
-  new $div({
-    content: args0.method,
-    class: "__text"
-  }).create(left);
-  new $div({
-    content: `(${args0.type})`,
-    class: "__description"
-  }).create(right);
-  new $div({
-    class: "__enterIcon",
-    content: createIcon(CornerDownLeft, { simple: true })
-  }).create(right);
-};
-var removeSelectedFromAllItems = () => {
-  document.querySelectorAll(".__suggestion-item").forEach((el) => {
-    document.getElementById(el.id).classList.remove("__selected__");
-  });
-};
-var suggestionSelect = (args0) => {
-  let enterPressed = false;
-  if (!suggestionsIsVisible) return enterPressed;
-  const key = args0.e.key;
-  if (key === "ArrowDown") {
-    args0.e.preventDefault();
-    if (selectedPosition + 1 === totalItems) return;
-    selectedPosition++;
-    removeSelectedFromAllItems();
-    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
-  }
-  if (key === "ArrowUp") {
-    args0.e.preventDefault();
-    if (selectedPosition === 0) return;
-    selectedPosition--;
-    removeSelectedFromAllItems();
-    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
-  }
-  if (key === "Enter") {
-    enterPressed = true;
-    args0.e.preventDefault();
-    args0.e.stopPropagation();
-    const selectedEl = document.querySelector(
-      `[data-position="${selectedPosition}"]`
-    );
-    const content = selectedEl.dataset.content;
-    const type = selectedEl.dataset.type;
-    const editor = document.getElementById(args0.codeEditor);
-    switch (true) {
-      case type === "method":
-        const text = editor.innerText;
-        const regex = /(.*db\.)/s;
-        text.replace(regex, (completeMatch, g1) => {
-          console.log(
-            JSON.stringify(
-              { text, completeMatch, g1, content, return: `${g1}${content}("` },
-              null,
-              2
-            )
-          );
-          editor.innerText = `${g1}${content}("`;
-          return `${g1}${content}("`;
-        });
-        break;
-      case type === "collection":
-        (() => {
-          const text2 = editor.innerText;
-          const regex2 = /(db\.getCollection\(\")([^.]+)/;
-          const match = text2.match(regex2);
-          const toBeReplaced = match == null ? void 0 : match[1];
-          if (toBeReplaced === "" || !toBeReplaced) {
-            editor.innerText = `db.getCollection("${content}")`;
-          } else {
-            editor.innerText = text2.replace(
-              regex2,
-              (completeMatch, group1, group2) => `${group1}${content}`
-            ) + '")';
-          }
-        })();
-        break;
-      case type === "function":
-        (() => {
-          const text2 = editor.innerText;
-          const functionRegex = /(db\.[^.]+\.)(.*)/;
-          const match = text2.match(functionRegex);
-          const toBeReplaced = (match == null ? void 0 : match[1]) || "";
-          if (toBeReplaced === "" || !toBeReplaced) {
-            editor.innerText = text2 + content + "(";
-          } else {
-            editor.innerText = text2.replace(
-              functionRegex,
-              (completeMatch, group1, group2) => `${group1}${content}(`
-            );
-          }
-        })();
-        break;
-      case type === "field":
-        fieldsSuggestionsModel.selectSuggestion({
-          content,
-          editor
-        });
-        break;
-    }
-    setCursorPositionInEndOfLine(editor);
-    removeSuggestionBox();
-    colorizeAndFormat({ codeEditor: args0.codeEditor });
-    return enterPressed;
-  }
-};
-var suggestions = async (args0) => {
-  var _a, _b, _c, _d;
-  const key = args0.e.key;
-  if (key === "ArrowDown" || key === "ArrowUp") return;
-  const { codeEditor, output } = args0;
-  const codeEditorElement = document.getElementById(codeEditor);
-  const text = codeEditorElement.innerText;
-  const regExPreFunction = /db\.[^.]+\./;
-  const regExFunction = /db\.[^.]+\.(.+)/;
-  const functionText = ((_a = text.match(regExFunction)) == null ? void 0 : _a[1]) || "";
-  const getCollectionPreRegex = /db\.getCollection\(\"/;
-  const getCollectionRegex = /db\.getCollection\(\"([^.]+)/;
-  const getCollectionText = ((_b = text.match(getCollectionRegex)) == null ? void 0 : _b[1]) || "";
-  let collections;
-  let command = text.split("db.")[1];
-  if (command == null ? void 0 : command.endsWith("\n")) {
-    command = command.slice(0, -1);
-  }
-  let suggestionsAvailable = [];
-  let type;
-  switch (true) {
-    case fieldsSuggestionsModel.trigger({ text }):
-      type = "field";
-      suggestionsAvailable = await fieldsSuggestionsModel.filterSuggestions({
-        databaseId: args0.databaseId,
-        projectId: args0.projectId,
-        text
-      });
-      break;
-    case ((_c = text.match(regExPreFunction)) == null ? void 0 : _c.length) > 0:
-      type = "function";
-      suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
-        if (method.startsWith(functionText) || functionText === "") return true;
-        return false;
-      });
-      break;
-    case ((_d = text.match(getCollectionPreRegex)) == null ? void 0 : _d.length) > 0:
-      type = "collection";
-      collections = await getCollectionsList({
-        databaseId: args0.databaseId,
-        projectId: args0.projectId
-      });
-      suggestionsAvailable = collections.filter(
-        (coll) => coll.startsWith(getCollectionText) || getCollectionText === ""
-      );
-      break;
-    default:
-      type = "method";
-      suggestionsAvailable = mongify.methods.filter((method) => {
-        if (method.startsWith(command) || command === "") return true;
-        return false;
-      });
-      break;
-  }
-  totalItems = suggestionsAvailable.length;
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  const cursorPosition = getCursorPosition();
-  removeSuggestionBox();
-  suggestionsIsVisible = true;
-  const suggestionBox = new $div(
-    {
-      style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,
-      class: "suggestion-box"
-    },
-    { identifier: "suggestion-box" }
-  ).create(output).ids.div;
-  position = 0;
-  selectedPosition = 0;
-  suggestionsAvailable.forEach(
-    (method) => addSuggestionItem({ method, output: suggestionBox, type })
-  );
-  if (suggestionsAvailable.length === 0) {
-    removeSuggestionBox();
-  }
-};
-var removeSuggestionBox = () => {
-  var _a;
-  (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
-  suggestionsIsVisible = false;
-};
-
 // source-code/helpers/messageBox.helper.ts
 var updateMessageBoxWhenCursorEnterElement = (arg0) => {
   const { elementId, messageText } = arg0;
@@ -3234,6 +2674,710 @@ var createCodeDiv = (arg0) => {
   return { output, right: res.right };
 };
 
+// source-code/helpers/json.helper.ts
+var formatJSON = (arg0) => {
+  let content = arg0.content;
+  return JSON.stringify(content, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/(".*?")/g, '<span class="json-key">$1</span>');
+};
+
+// source-code/project/home/mongifyRenderer/mongify.result.ts
+var printMongifyResult = (arg0) => {
+  const { panelOutput, result, command } = arg0;
+  const codeDivResponse = createCodeDiv({
+    panelOutput,
+    title: arg0.command,
+    type: "mongify"
+  });
+  const { output, right } = codeDivResponse;
+  let resultDiv;
+  const printJson = () => {
+    var _a;
+    (_a = document.getElementById(resultDiv)) == null ? void 0 : _a.remove();
+    const formattedResult = formatJSON({
+      content: arg0.result
+    });
+    resultDiv = new $div({
+      content: formattedResult,
+      class: "mongify-output"
+    }).create(output).ids.div;
+  };
+  const printTable = () => {
+    var _a;
+    (_a = document.getElementById(resultDiv)) == null ? void 0 : _a.remove();
+    resultDiv = new $div({
+      class: "mongify-output"
+    }).create(output).ids.div;
+    const content = arg0.result;
+    console.log({
+      objectKeys: Object.keys(content[0])
+    });
+    if (Object.keys(content[0])[0] == "0") {
+      new $div({
+        content: "No data available"
+      }).create(resultDiv);
+      return;
+    }
+    const table = new $table().create(resultDiv);
+    let tr1 = table.ids.thead_tr_output;
+    let columns = /* @__PURE__ */ new Set();
+    content.forEach((obj) => {
+      const tr = new $tr().create(table.ids.tbody_output).ids.tr;
+      const keys = Object.keys(obj);
+      keys.forEach((key) => {
+        const value = obj[key];
+        columns.add(key);
+      });
+      columns.forEach((column) => {
+        if (keys.includes(column)) {
+          const key = column;
+          const value = obj[key];
+          console.log("typeof value", typeof value);
+          new $td({
+            content: typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean" ? JSON.stringify(value) : value
+          }).create(tr);
+        }
+      });
+    });
+    columns.forEach((column) => {
+      new $th({ scope: "col", content: column }).create(
+        table.ids.thead_tr_output
+      );
+    });
+  };
+  const selectFormat = new $select({
+    onchange: W.fx(() => {
+      const format = document.getElementById(selectFormat).value;
+      if (format === "JSON") {
+        printJson();
+      } else if (format === "Table") {
+        printTable();
+      }
+    })
+  }).create(right).ids.select;
+  new $option({
+    content: "JSON",
+    value: "JSON"
+  }).create(selectFormat);
+  new $option({
+    content: "Table",
+    value: "Table"
+  }).create(selectFormat);
+  printJson();
+};
+
+// source-code/project/home/mongifyRenderer/mongify.suggestions.ts
+var mongify = {
+  methods: [
+    "listCollections",
+    "createCollection",
+    "getCollection",
+    "deleteCollection"
+  ],
+  getCollectionFunctions: [
+    "find",
+    "findOne",
+    "insert",
+    "insertMany",
+    "update",
+    "delete"
+  ]
+};
+
+// source-code/project/home/mongifyRenderer/cursor.ts
+var saveCursorPosition = (textEl) => {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    return null;
+  }
+  const currentRange = selection.getRangeAt(0);
+  if (!textEl.contains(currentRange.startContainer) || !textEl.contains(currentRange.endContainer)) {
+    return null;
+  }
+  const startRange = document.createRange();
+  startRange.selectNodeContents(textEl);
+  startRange.setEnd(currentRange.startContainer, currentRange.startOffset);
+  const endRange = document.createRange();
+  endRange.selectNodeContents(textEl);
+  endRange.setEnd(currentRange.endContainer, currentRange.endOffset);
+  return {
+    start: startRange.toString().length,
+    end: endRange.toString().length
+  };
+};
+var restoreCursorPosition = (textEl, position2) => {
+  if (!position2) return;
+  const findPosition = (targetOffset) => {
+    var _a;
+    const walker = document.createTreeWalker(textEl, NodeFilter.SHOW_TEXT);
+    let currentOffset = 0;
+    let node = walker.nextNode();
+    while (node) {
+      const nodeLength = ((_a = node.textContent) == null ? void 0 : _a.length) ?? 0;
+      if (targetOffset <= currentOffset + nodeLength) {
+        return {
+          node,
+          offset: targetOffset - currentOffset
+        };
+      }
+      currentOffset += nodeLength;
+      node = walker.nextNode();
+    }
+    return {
+      node: textEl,
+      offset: textEl.childNodes.length
+    };
+  };
+  const start = findPosition(position2.start);
+  const end = findPosition(position2.end);
+  const range = document.createRange();
+  range.setStart(start.node, start.offset);
+  range.setEnd(end.node, end.offset);
+  const selection = window.getSelection();
+  textEl.focus();
+  selection == null ? void 0 : selection.removeAllRanges();
+  selection == null ? void 0 : selection.addRange(range);
+};
+var setCursorPositionInEndOfLine = (textEl) => {
+  const range = document.createRange();
+  range.selectNodeContents(textEl);
+  range.collapse(false);
+  const selection = window.getSelection();
+  selection == null ? void 0 : selection.removeAllRanges();
+  selection == null ? void 0 : selection.addRange(range);
+  textEl.focus();
+};
+
+// source-code/project/home/mongifyRenderer/params.ts
+var Params = class {
+  tabCount = 0;
+};
+var params = new Params();
+
+// source-code/project/home/mongifyRenderer/colorizeAndFormat.ts
+var isAwaiting = false;
+var tabDecrement = () => {
+  console.log("tabDecrement called --");
+  if (params.tabCount > 0) params.tabCount--;
+};
+var tabIncrement = () => {
+  console.log("tabIncrement called ++");
+  params.tabCount++;
+};
+var colorizeAndFormat = async (args0) => {
+  const { e, codeEditor } = args0;
+  if ((e == null ? void 0 : e.key) === "{") {
+    tabIncrement();
+  }
+  if ((e == null ? void 0 : e.key) === "}") {
+    tabDecrement();
+    removeTab({ e, codeEditor, str: "}" });
+  }
+  if ((e == null ? void 0 : e.key) === "Tab") {
+    insertTab({ e, codeEditor });
+    return;
+  }
+  if ((e == null ? void 0 : e.key) === "Backspace") {
+    backspacePressed({ e, codeEditor });
+  }
+  if ((e == null ? void 0 : e.key) === "Enter") {
+    insertTab({ e, codeEditor, onPressEnter: true });
+  }
+  if (e) {
+    if (isDeniedKeyPressed(e)) {
+      return;
+    }
+  }
+  if (isAwaiting) return;
+  isAwaiting = true;
+  await new Promise((resolve) => setTimeout(() => resolve(true), 10));
+  isAwaiting = false;
+  if (isSuggestionBoxVisible()) return;
+  const textEl = document.getElementById(codeEditor);
+  const innerText = textEl.innerText;
+  const innerHTML = textEl.innerHTML;
+  let res = stylish.quotes(innerText);
+  res = stylish.db(res);
+  res = res.replace(/\n/g, "<br>");
+  if (res === innerText || res === innerHTML) return;
+  const cursorPosition = saveCursorPosition(textEl);
+  textEl.innerHTML = res;
+  restoreCursorPosition(textEl, cursorPosition);
+};
+var stylish = {
+  quotes(text) {
+    const regex = /("[^"]+")/g;
+    return text.replace(
+      regex,
+      (match) => `<span class="__c0001__">${match}</span>`
+    );
+  },
+  db(text) {
+    const regex = /(db)/g;
+    return text.replace(
+      regex,
+      (match) => `<span class="__c0002__">${match}</span>`
+    );
+  }
+};
+var isSuggestionBoxVisible = () => {
+  return document.getElementById("div-win-suggestion-box") !== null;
+};
+var insertTab = async (args0) => {
+  var _a;
+  const { e, codeEditor, onPressEnter } = args0;
+  if (onPressEnter && params.tabCount === 0) return;
+  if (document.getElementById("div-win-suggestion-box")) return;
+  if (!onPressEnter) e.preventDefault();
+  await new Promise(
+    (resolve) => setTimeout(() => {
+      resolve(true);
+    }, 10)
+  );
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return;
+  const range = selection.getRangeAt(0);
+  if (!((_a = document.getElementById(codeEditor)) == null ? void 0 : _a.contains(range.commonAncestorContainer)))
+    return;
+  range.deleteContents();
+  let spaces;
+  if (!onPressEnter) {
+    tabIncrement();
+    spaces = document.createTextNode("	");
+  } else {
+    console.log({ tabCount: params.tabCount });
+    spaces = document.createTextNode("	".repeat(params.tabCount));
+  }
+  range.insertNode(spaces);
+  range.setStartAfter(spaces);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
+var removeTab = (args0) => {
+  const { e, codeEditor, str } = args0;
+  e.preventDefault();
+  const el = document.getElementById(codeEditor);
+  const text = el.innerText;
+  console.log(JSON.stringify({ text }, null, 2));
+  let newText = text;
+  if (newText.endsWith("\n")) {
+    newText = newText.slice(0, -1);
+  }
+  if (newText.endsWith("	")) {
+    newText = newText.slice(0, -1);
+  }
+  el.innerText = newText + str;
+  setCursorPositionInEndOfLine(el);
+};
+var backspacePressed = (args0) => {
+  const { e, codeEditor } = args0;
+  const el = document.getElementById(codeEditor);
+  const text = el.innerText;
+  console.log("backspace", JSON.stringify({ text }, null, 2));
+  if (text.endsWith("	") || text.endsWith("	\n") || text.endsWith("{") || text.endsWith("{\n")) {
+    console.log("tab decrement triggered by backspace");
+    tabDecrement();
+  }
+};
+var isDeniedKeyPressed = (e) => e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Enter" || e.key === "Escape" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Tab" || e.key === "Meta" || e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" || e.key === "Insert" || e.key === "Home" || e.key === "End" || e.key === "PageUp" || e.key === "PageDown" || e.key === "Backspace";
+
+// source-code/project/home/mongifyRenderer/fields.suggestions.ts
+var FieldsSuggestions = class {
+  regex = {
+    trigger: /db\.getCollection\(".+"\)\.find\({[\s\n\t]+/,
+    collectionName: /db\.getCollection\("(.+)"\)/,
+    filters: {
+      /** /^\t([^,:\r\n]*)$/gm */
+      next: /^\t([^,:\r\n]*)$/gm
+    },
+    /** /(^\t+)([^,:\r\n]+)$/gm */
+    select: /(^\t+)([^,:\r\n]+)$/gm
+  };
+  storage = {
+    fieldsList: /* @__PURE__ */ new Map()
+  };
+  collectionName;
+  getCollectionName(text) {
+    var _a;
+    return ((_a = text.match(this.regex.collectionName)) == null ? void 0 : _a[1]) || "";
+  }
+  async getFieldsList(args0) {
+    const { collectionName, databaseId, projectId } = args0;
+    const identifier = `${args0.projectId}-${args0.databaseId}-${collectionName}`;
+    if (this.storage.fieldsList.has(identifier)) {
+      return this.storage.fieldsList.get(identifier);
+    }
+    let res = await window.database.mongify.sendQuery({
+      command: `db.getCollection("${collectionName}").findOne()`,
+      databaseId,
+      projectId
+    });
+    const fields = Object.keys(res || {});
+    this.storage.fieldsList.set(identifier, fields);
+    return fields;
+  }
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  trigger(args0) {
+    var _a;
+    const { text } = args0;
+    this.collectionName = this.getCollectionName(text);
+    if (((_a = text.match(this.regex.trigger)) == null ? void 0 : _a.length) > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  async filterSuggestions(args0) {
+    var _a;
+    const fieldsAvailable = await this.getFieldsList({
+      collectionName: this.collectionName,
+      databaseId: args0.databaseId,
+      projectId: args0.projectId
+    });
+    const nextMatch = ((_a = args0.text.match(this.regex.filters.next)) == null ? void 0 : _a[0]) || "";
+    const suggestionsAvailable = fieldsAvailable.filter((field) => {
+      if (nextMatch === "	") return true;
+      if (nextMatch.trim() === "") return false;
+      if (field.startsWith(nextMatch.trim())) return true;
+    });
+    return suggestionsAvailable;
+  }
+  selectSuggestion(args0) {
+    const { editor, content } = args0;
+    let text = editor.innerText;
+    const selectRegex = this.regex.select;
+    const match = text.match(selectRegex);
+    const toBeReplaced = (match == null ? void 0 : match[0]) || "";
+    console.log(
+      JSON.stringify(
+        {
+          text,
+          match,
+          toBeReplaced,
+          content
+        },
+        null,
+        2
+      )
+    );
+    if (toBeReplaced === "" || !toBeReplaced) {
+      if (text.endsWith("\n")) {
+        text = text.slice(0, -1);
+      }
+      editor.innerText = text + content + ":";
+    } else {
+      let tabCount = params.tabCount;
+      editor.innerText = text.replace(
+        selectRegex,
+        (completeMatch, group1, group2) => {
+          return `${group1}${content}:`;
+        }
+      );
+    }
+  }
+};
+var fieldsSuggestionsModel = new FieldsSuggestions();
+
+// source-code/project/home/mongifyRenderer/suggestions.ts
+var getCursorPosition = () => {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    return { left: 0, bottom: 0 };
+  }
+  const originalRange = selection.getRangeAt(0).cloneRange();
+  const measurementRange = originalRange.cloneRange();
+  measurementRange.collapse(true);
+  const marker = document.createElement("span");
+  marker.textContent = "\u200B";
+  marker.style.cssText = `
+    visibility: hidden;
+    pointer-events: none;
+  `;
+  measurementRange.insertNode(marker);
+  const markerParent = marker.parentNode;
+  const markerRect = marker.getBoundingClientRect();
+  marker.remove();
+  markerParent == null ? void 0 : markerParent.normalize();
+  selection.removeAllRanges();
+  selection.addRange(originalRange);
+  return {
+    left: markerRect.left,
+    bottom: markerRect.bottom + 4
+  };
+};
+var position = 0;
+var selectedPosition = 0;
+var totalItems = 0;
+var suggestionsIsVisible = false;
+var collectionsList = /* @__PURE__ */ new Map();
+var getCollectionsList = async (args0) => {
+  const identifier = `${args0.projectId}-${args0.databaseId}`;
+  if (collectionsList.has(identifier)) return collectionsList.get(identifier);
+  let res = (await window.database.mongify.sendQuery({
+    command: "db.listCollections()",
+    databaseId: args0.databaseId,
+    projectId: args0.projectId
+  })).result;
+  collectionsList.set(identifier, res);
+  return res;
+};
+var addSuggestionItem = (args0) => {
+  const item = new $div({
+    class: `__suggestion-item ${selectedPosition === position ? "__selected__" : ""}`,
+    data: `data-position="${position}" data-content="${args0.method}" data-type="${args0.type}"`
+  }).create(args0.output).ids.div;
+  position++;
+  const left = new $div({
+    class: "__left"
+  }).create(item).ids.div;
+  const right = new $div({
+    class: "__right"
+  }).create(item).ids.div;
+  new $div({
+    content: createIcon(Box, { simple: true }),
+    class: "__icon"
+  }).create(left);
+  new $div({
+    content: args0.method,
+    class: "__text"
+  }).create(left);
+  new $div({
+    content: `(${args0.type})`,
+    class: "__description"
+  }).create(right);
+  new $div({
+    class: "__enterIcon",
+    content: createIcon(CornerDownLeft, { simple: true })
+  }).create(right);
+};
+var removeSelectedFromAllItems = () => {
+  document.querySelectorAll(".__suggestion-item").forEach((el) => {
+    document.getElementById(el.id).classList.remove("__selected__");
+  });
+};
+var suggestionSelect = (args0) => {
+  let enterPressed = false;
+  if (!suggestionsIsVisible) return enterPressed;
+  const key = args0.e.key;
+  if (key === "ArrowDown") {
+    args0.e.preventDefault();
+    if (selectedPosition + 1 === totalItems) return;
+    selectedPosition++;
+    removeSelectedFromAllItems();
+    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
+  }
+  if (key === "ArrowUp") {
+    args0.e.preventDefault();
+    if (selectedPosition === 0) return;
+    selectedPosition--;
+    removeSelectedFromAllItems();
+    const selectedEl = document.querySelector(`[data-position="${selectedPosition}"]`).classList.add("__selected__");
+  }
+  if (key === "Enter") {
+    enterPressed = true;
+    args0.e.preventDefault();
+    args0.e.stopPropagation();
+    const selectedEl = document.querySelector(
+      `[data-position="${selectedPosition}"]`
+    );
+    const content = selectedEl.dataset.content;
+    const type = selectedEl.dataset.type;
+    const editor = document.getElementById(args0.codeEditor);
+    switch (true) {
+      case type === "method":
+        const text = editor.innerText;
+        const regex = /(.*db\.)/s;
+        text.replace(regex, (completeMatch, g1) => {
+          console.log(
+            JSON.stringify(
+              { text, completeMatch, g1, content, return: `${g1}${content}("` },
+              null,
+              2
+            )
+          );
+          editor.innerText = `${g1}${content}("`;
+          return `${g1}${content}("`;
+        });
+        break;
+      case type === "collection":
+        (() => {
+          const text2 = editor.innerText;
+          const regex2 = /(db\.getCollection\(\")([^.]+)/;
+          const match = text2.match(regex2);
+          const toBeReplaced = match == null ? void 0 : match[1];
+          if (toBeReplaced === "" || !toBeReplaced) {
+            editor.innerText = `db.getCollection("${content}")`;
+          } else {
+            editor.innerText = text2.replace(
+              regex2,
+              (completeMatch, group1, group2) => `${group1}${content}`
+            ) + '")';
+          }
+        })();
+        break;
+      case type === "function":
+        (() => {
+          const text2 = editor.innerText;
+          const functionRegex = /(db\.[^.]+\.)(.*)/;
+          const match = text2.match(functionRegex);
+          const toBeReplaced = (match == null ? void 0 : match[1]) || "";
+          if (toBeReplaced === "" || !toBeReplaced) {
+            editor.innerText = text2 + content + "(";
+          } else {
+            editor.innerText = text2.replace(
+              functionRegex,
+              (completeMatch, group1, group2) => `${group1}${content}(`
+            );
+          }
+        })();
+        break;
+      case type === "field":
+        fieldsSuggestionsModel.selectSuggestion({
+          content,
+          editor
+        });
+        break;
+    }
+    setCursorPositionInEndOfLine(editor);
+    removeSuggestionBox();
+    colorizeAndFormat({ codeEditor: args0.codeEditor });
+    return enterPressed;
+  }
+};
+var suggestions = async (args0) => {
+  var _a, _b, _c, _d;
+  const key = args0.e.key;
+  if (key === "ArrowDown" || key === "ArrowUp") return;
+  const { codeEditor, output } = args0;
+  const codeEditorElement = document.getElementById(codeEditor);
+  const text = codeEditorElement.innerText;
+  const regExPreFunction = /db\.[^.]+\./;
+  const regExFunction = /db\.[^.]+\.(.+)/;
+  const functionText = ((_a = text.match(regExFunction)) == null ? void 0 : _a[1]) || "";
+  const getCollectionPreRegex = /db\.getCollection\(\"/;
+  const getCollectionRegex = /db\.getCollection\(\"([^.]+)/;
+  const getCollectionText = ((_b = text.match(getCollectionRegex)) == null ? void 0 : _b[1]) || "";
+  let collections;
+  let command = text.split("db.")[1];
+  if (command == null ? void 0 : command.endsWith("\n")) {
+    command = command.slice(0, -1);
+  }
+  let suggestionsAvailable = [];
+  let type;
+  switch (true) {
+    case fieldsSuggestionsModel.trigger({ text }):
+      type = "field";
+      suggestionsAvailable = await fieldsSuggestionsModel.filterSuggestions({
+        databaseId: args0.databaseId,
+        projectId: args0.projectId,
+        text
+      });
+      break;
+    case ((_c = text.match(regExPreFunction)) == null ? void 0 : _c.length) > 0:
+      type = "function";
+      suggestionsAvailable = mongify.getCollectionFunctions.filter((method) => {
+        if (method.startsWith(functionText) || functionText === "") return true;
+        return false;
+      });
+      break;
+    case ((_d = text.match(getCollectionPreRegex)) == null ? void 0 : _d.length) > 0:
+      type = "collection";
+      collections = await getCollectionsList({
+        databaseId: args0.databaseId,
+        projectId: args0.projectId
+      });
+      suggestionsAvailable = collections.filter(
+        (coll) => coll.startsWith(getCollectionText) || getCollectionText === ""
+      );
+      break;
+    default:
+      type = "method";
+      suggestionsAvailable = mongify.methods.filter((method) => {
+        if (method.startsWith(command) || command === "") return true;
+        return false;
+      });
+      break;
+  }
+  totalItems = suggestionsAvailable.length;
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const cursorPosition = getCursorPosition();
+  removeSuggestionBox();
+  suggestionsIsVisible = true;
+  const suggestionBox = new $div(
+    {
+      style: `top:${cursorPosition.bottom}px;left:${cursorPosition.left}px;`,
+      class: "suggestion-box"
+    },
+    { identifier: "suggestion-box" }
+  ).create(output).ids.div;
+  position = 0;
+  selectedPosition = 0;
+  suggestionsAvailable.forEach(
+    (method) => addSuggestionItem({ method, output: suggestionBox, type })
+  );
+  if (suggestionsAvailable.length === 0) {
+    removeSuggestionBox();
+  }
+};
+var removeSuggestionBox = () => {
+  var _a;
+  (_a = document.getElementById("div-win-suggestion-box")) == null ? void 0 : _a.remove();
+  suggestionsIsVisible = false;
+};
+
+// source-code/project/home/mongifyRenderer/mongify.coder.ts
+var renderMongifyCodeDiv = (arg0) => {
+  const { db, panelOutput } = arg0;
+  const codeDivResponse = createCodeDiv({
+    panelOutput,
+    title: db.database_name,
+    type: db.type
+  });
+  const { output } = codeDivResponse;
+  const codeEditor = new $codeEditor().create(output);
+  const codeEditorContentId = codeEditor.ids.contentEditable;
+  const codeEditorDivId = codeEditor.ids.codeEditor;
+  let leftAltPressed = false;
+  document.getElementById(codeEditorContentId).addEventListener("keydown", async (e) => {
+    if (e.repeat) return;
+    const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
+    if (sendShortcut) {
+      e.preventDefault();
+      const command = document.getElementById(codeEditorContentId).textContent;
+      const res = await window.database.mongify.sendQuery({
+        projectId: db.projectId,
+        databaseId: db.databaseId,
+        command
+      });
+      printMongifyResult({
+        panelOutput,
+        result: res,
+        command
+      });
+      return;
+    }
+    const enterWasPressed = suggestionSelect({
+      e,
+      codeEditor: codeEditorContentId,
+      output
+    });
+    if (enterWasPressed) return;
+    colorizeAndFormat({
+      e,
+      codeEditor: codeEditorContentId
+    });
+  });
+  document.getElementById(codeEditorContentId).addEventListener("keyup", (e) => {
+    suggestions({
+      e,
+      codeEditor: codeEditorContentId,
+      output,
+      databaseId: db.databaseId,
+      projectId: db.projectId
+    });
+  });
+};
+
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
   output;
@@ -3313,143 +3457,11 @@ var ProjectHomeScreen = class extends Screen {
   }
   async openDatabase(db) {
     if (db.type === "mongify") {
-      this.renderMongifyCodeDiv(db);
+      renderMongifyCodeDiv({
+        db,
+        panelOutput: this.panelOutput
+      });
     }
-  }
-  async renderMongifyCodeDiv(db) {
-    const codeDivResponse = createCodeDiv({
-      panelOutput: this.panelOutput,
-      title: db.database_name,
-      type: db.type
-    });
-    const { output, right } = codeDivResponse;
-    const codeEditor = new $codeEditor().create(output);
-    const codeEditorContentId = codeEditor.ids.contentEditable;
-    const codeEditorDivId = codeEditor.ids.codeEditor;
-    let leftAltPressed = false;
-    document.getElementById(codeEditorContentId).addEventListener("keydown", async (e) => {
-      if (e.repeat) return;
-      const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
-      if (sendShortcut) {
-        e.preventDefault();
-        const command = document.getElementById(codeEditorContentId).textContent;
-        const res = await window.database.mongify.sendQuery({
-          projectId: db.projectId,
-          databaseId: db.databaseId,
-          command
-        });
-        this.printMongifyResult({
-          result: res,
-          command
-        });
-        return;
-      }
-      const enterWasPressed = suggestionSelect({
-        e,
-        codeEditor: codeEditorContentId,
-        output
-      });
-      if (enterWasPressed) return;
-      colorizeAndFormat({
-        e,
-        codeEditor: codeEditorContentId
-      });
-    });
-    document.getElementById(codeEditorContentId).addEventListener("keyup", (e) => {
-      suggestions({
-        e,
-        codeEditor: codeEditorContentId,
-        output,
-        databaseId: db.databaseId,
-        projectId: db.projectId
-      });
-    });
-  }
-  printMongifyResult(arg0) {
-    const codeDivResponse = createCodeDiv({
-      panelOutput: this.panelOutput,
-      title: arg0.command,
-      type: "mongify"
-    });
-    const { output, right } = codeDivResponse;
-    let resultDiv;
-    const printJson = () => {
-      var _a;
-      (_a = document.getElementById(resultDiv)) == null ? void 0 : _a.remove();
-      const formattedResult = this.formatJSON({
-        content: arg0.result
-      });
-      resultDiv = new $div({
-        content: formattedResult,
-        class: "mongify-output"
-      }).create(output).ids.div;
-    };
-    const printTable = () => {
-      var _a;
-      (_a = document.getElementById(resultDiv)) == null ? void 0 : _a.remove();
-      resultDiv = new $div({
-        class: "mongify-output"
-      }).create(output).ids.div;
-      const content = arg0.result;
-      console.log({
-        objectKeys: Object.keys(content[0])
-      });
-      if (Object.keys(content[0])[0] == "0") {
-        new $div({
-          content: "No data available"
-        }).create(resultDiv);
-        return;
-      }
-      const table = new $table().create(resultDiv);
-      let tr1 = table.ids.thead_tr_output;
-      let columns = /* @__PURE__ */ new Set();
-      content.forEach((obj) => {
-        const tr = new $tr().create(table.ids.tbody_output).ids.tr;
-        const keys = Object.keys(obj);
-        keys.forEach((key) => {
-          const value = obj[key];
-          columns.add(key);
-        });
-        columns.forEach((column) => {
-          if (keys.includes(column)) {
-            const key = column;
-            const value = obj[key];
-            console.log("typeof value", typeof value);
-            new $td({
-              content: typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean" ? JSON.stringify(value) : value
-            }).create(tr);
-          }
-        });
-      });
-      columns.forEach((column) => {
-        new $th({ scope: "col", content: column }).create(
-          table.ids.thead_tr_output
-        );
-      });
-    };
-    const selectFormat = new $select({
-      onchange: W.fx(() => {
-        const format = document.getElementById(selectFormat).value;
-        if (format === "JSON") {
-          printJson();
-        } else if (format === "Table") {
-          printTable();
-        }
-      })
-    }).create(right).ids.select;
-    new $option({
-      content: "JSON",
-      value: "JSON"
-    }).create(selectFormat);
-    new $option({
-      content: "Table",
-      value: "Table"
-    }).create(selectFormat);
-    printJson();
-  }
-  formatJSON(arg0) {
-    let content = arg0.content;
-    return JSON.stringify(content, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/(".*?")/g, '<span class="json-key">$1</span>');
   }
 };
 var projectHomeScreen = new ProjectHomeScreen();

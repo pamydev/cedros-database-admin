@@ -62,11 +62,13 @@ const getCollectionsList = async (args0: {
   const identifier = `${args0.projectId}-${args0.databaseId}`;
   if (collectionsList.has(identifier)) return collectionsList.get(identifier);
 
-  let res = (await window.database.mongify.sendQuery({
-    command: "db.listCollections()",
-    databaseId: args0.databaseId,
-    projectId: args0.projectId,
-  })) as string[];
+  let res = (
+    await window.database.mongify.sendQuery({
+      command: "db.listCollections()",
+      databaseId: args0.databaseId,
+      projectId: args0.projectId,
+    })
+  ).result as string[];
 
   collectionsList.set(identifier, res);
   return res;

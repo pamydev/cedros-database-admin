@@ -1,25 +1,10 @@
-import {
-  $buttonPrimary,
-  $codeEditor,
-  $div,
-  $option,
-  $select,
-  $span,
-  $table,
-  $td,
-  $th,
-  $tr,
-} from "@common";
+import { $div, $span } from "@common";
 import { Screen } from "@screens/screen";
 import { IDatabasesColl } from "../../../../../types/contracts";
 import { listItem } from "@helpers/listItem.helper";
-import { Database, Move } from "lucide";
+import { Database } from "lucide";
 import { W } from "winnetoujs";
-import { suggestions, suggestionSelect } from "./suggestions";
-import { colorizeAndFormat } from "./colorizeAndFormat";
-import { createIcon } from "@icons";
-import { updateMessageBoxWhenCursorEnterElement } from "@helpers/messageBox.helper";
-import { createCodeDiv } from "./codeDiv/codeDiv";
+import { renderMongifyCodeDiv } from "./mongifyRenderer/mongify.coder";
 
 class ProjectHomeScreen extends Screen {
   private output: string;
@@ -121,196 +106,11 @@ class ProjectHomeScreen extends Screen {
 
   private async openDatabase(db: IDatabasesColl) {
     if (db.type === "mongify") {
-      this.renderMongifyCodeDiv(db);
+      renderMongifyCodeDiv({
+        db,
+        panelOutput: this.panelOutput,
+      });
     }
-  }
-
-  private async renderMongifyCodeDiv(db: IDatabasesColl) {
-    const codeDivResponse = createCodeDiv({
-      panelOutput: this.panelOutput,
-      title: db.database_name,
-      type: db.type,
-    });
-
-    const { output, right } = codeDivResponse;
-
-    const codeEditor = new $codeEditor().create(output);
-    const codeEditorContentId = codeEditor.ids.contentEditable;
-    const codeEditorDivId = codeEditor.ids.codeEditor;
-
-    let leftAltPressed = false;
-    document
-      .getElementById(codeEditorContentId)
-      .addEventListener("keydown", async (e) => {
-        if (e.repeat) return;
-        const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
-
-        if (sendShortcut) {
-          e.preventDefault();
-          const command =
-            document.getElementById(codeEditorContentId).textContent;
-          const res = await window.database.mongify.sendQuery({
-            projectId: db.projectId,
-            databaseId: db.databaseId,
-            command,
-          });
-
-          this.printMongifyResult({
-            result: res,
-            command,
-          });
-
-          return;
-        }
-
-        const enterWasPressed = suggestionSelect({
-          e,
-          codeEditor: codeEditorContentId,
-          output,
-        });
-
-        // to not add tab when user clicks
-        // enter to select a suggestion
-        if (enterWasPressed) return;
-
-        colorizeAndFormat({
-          e,
-          codeEditor: codeEditorContentId,
-        });
-      });
-
-    document
-      .getElementById(codeEditorContentId)
-      .addEventListener("keyup", (e) => {
-        suggestions({
-          e,
-          codeEditor: codeEditorContentId,
-          output,
-          databaseId: db.databaseId,
-          projectId: db.projectId,
-        });
-      });
-  }
-
-  private printMongifyResult(arg0: { result: {}[] | any; command: string }) {
-    const codeDivResponse = createCodeDiv({
-      panelOutput: this.panelOutput,
-      title: arg0.command,
-      type: "mongify",
-    });
-    const { output, right } = codeDivResponse;
-    let resultDiv: string;
-
-    const printJson = () => {
-      document.getElementById(resultDiv)?.remove();
-      const formattedResult = this.formatJSON({
-        content: arg0.result,
-      });
-      resultDiv = new $div({
-        content: formattedResult,
-        class: "mongify-output",
-      }).create(output).ids.div;
-    };
-
-    const printTable = () => {
-      document.getElementById(resultDiv)?.remove();
-      resultDiv = new $div({
-        class: "mongify-output",
-      }).create(output).ids.div;
-
-      const content = arg0.result;
-
-      console.log({
-        objectKeys: Object.keys(content[0]),
-      });
-
-      if (Object.keys(content[0])[0] == "0") {
-        new $div({
-          content: "No data available",
-        }).create(resultDiv);
-        return;
-      }
-
-      const table = new $table().create(resultDiv);
-      let tr1 = table.ids.thead_tr_output;
-
-      let columns = new Set<string>();
-
-      content.forEach((obj: any) => {
-        const tr = new $tr().create(table.ids.tbody_output).ids.tr;
-        const keys = Object.keys(obj);
-        keys.forEach((key) => {
-          const value = obj[key];
-          columns.add(key);
-        });
-        columns.forEach((column) => {
-          if (keys.includes(column)) {
-            const key = column;
-            const value = obj[key];
-            console.log("typeof value", typeof value);
-            new $td({
-              content:
-                typeof value !== "string" &&
-                typeof value !== "number" &&
-                typeof value !== "boolean"
-                  ? JSON.stringify(value)
-                  : value,
-            }).create(tr);
-          }
-        });
-      });
-
-      columns.forEach((column) => {
-        new $th({ scope: "col", content: column }).create(
-          table.ids.thead_tr_output,
-        );
-      });
-
-      // const table = new $table().create(resultDiv);
-      // let tr1 = table.ids.thead_tr_output;
-      // new $td({ content: "Name" }).create(tr1);
-      // new $td({ content: "Age" }).create(tr1);
-      // new $td({ content: "Role" }).create(tr1);
-      // let tr = new $tr().create(table.ids.tbody_output).ids.tr;
-      // new $td({ content: "John" }).create(tr);
-      // new $td({ content: "38" }).create(tr);
-      // new $td({ content: "Senior" }).create(tr);
-    };
-
-    const selectFormat = new $select({
-      onchange: W.fx(() => {
-        const format = (
-          document.getElementById(selectFormat) as HTMLSelectElement
-        ).value;
-        if (format === "JSON") {
-          printJson();
-        } else if (format === "Table") {
-          printTable();
-        }
-      }),
-    }).create(right).ids.select;
-
-    new $option({
-      content: "JSON",
-      value: "JSON",
-    }).create(selectFormat);
-
-    new $option({
-      content: "Table",
-      value: "Table",
-    }).create(selectFormat);
-
-    printJson();
-  }
-
-  private formatJSON(arg0: { content: {} }) {
-    let content = arg0.content;
-
-    return JSON.stringify(content, null, 2)
-      .replace(/\n/g, "<br>")
-      .replace(/ /g, "&nbsp;")
-      .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
-      .replace(/(".*?")/g, '<span class="json-key">$1</span>');
   }
 }
 

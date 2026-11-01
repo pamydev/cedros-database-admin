@@ -9,6 +9,7 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",
+    "strict": false,
     "resolveJsonModule": true,
     "paths": {
       "@projectTypes/*": ["./types/*"]

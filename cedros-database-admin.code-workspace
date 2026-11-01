@@ -23,7 +23,7 @@
       "**/*.js": true,
     },
     "workbench.experimental.modernUI": true,
-    "workbench.editor.tabSizing": "fixed",
+    "workbench.editor.tabSizing": "fit",
     "workbench.experimental.modernUIEditorTabStyle": "connected",
     "window.density.layout": "default",
 
