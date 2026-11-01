@@ -550,9 +550,11 @@ class ProjectHomeScreen extends Screen {
 
     grabIconElement.addEventListener("pointerdown", (e) => {
       e.preventDefault();
+
       const onPointerMove = (ev: PointerEvent) => {
-        let outputElement = document.getElementById(output);
+        const outputElement = document.getElementById(output);
         if (!outputElement) return;
+        const father = outputElement.parentElement;
 
         // get position before turns it absolute
         // because absolute turn it to 0,0
@@ -560,8 +562,12 @@ class ProjectHomeScreen extends Screen {
         let topOrigin = outputElement.offsetTop;
         outputElement.style.position = "absolute";
 
-        outputElement.style.left = leftOrigin + ev.movementX + "px";
-        outputElement.style.top = topOrigin + ev.movementY + "px";
+        let newLeftPosition = leftOrigin + ev.movementX;
+        let newTopPosition = topOrigin + ev.movementY;
+        if (newLeftPosition < 0) newLeftPosition = 0;
+        if (newTopPosition < 0) newTopPosition = 0;
+        outputElement.style.left = newLeftPosition + "px";
+        outputElement.style.top = newTopPosition + "px";
       };
       const onPointerUp = () => {
         document.removeEventListener("pointermove", onPointerMove);
