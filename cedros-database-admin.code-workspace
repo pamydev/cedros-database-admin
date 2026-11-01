@@ -29,18 +29,176 @@
 
     "winnetoujs.fullPath": "/Users/pamydev/CedrosDev/cedros-database-admin/src/winnetoujs",
     "workbench.colorTheme": "Turbo Pascal Modern",
-    "editor.fontFamily": "JetBrains Mono",
-    "editor.fontSize": 12,
+    // "editor.fontFamily": "JetBrains Mono",
+    "editor.fontFamily": "Victor Mono",
+    "editor.fontSize": 13,
+    "editor.fontWeight": "600",
     "editor.lineHeight": 28,
+    "editor.semanticHighlighting.enabled": true,
     "editor.tokenColorCustomizations": {
-      "textMateRules": [
-        {
-          "scope": ["meta.definition.method.ts"],
-          "settings": {
-            "fontStyle": "bold underline",
+      "[Turbo Pascal Modern]": {
+        "comments": "#8A94A6",
+        "strings": "#A6D6A0",
+        "numbers": "#F1B8D0",
+        "keywords": "#F38BB9",
+        "types": "#77C9C5",
+        "functions": "#82AAFF",
+        "variables": "#B4BDCC",
+
+        "textMateRules": [
+          {
+            "scope": [
+              "keyword.control",
+              "keyword.operator.new",
+              "keyword.operator.expression",
+              "storage.type",
+              "storage.modifier",
+            ],
+            "settings": {
+              "foreground": "#F38BB9",
+            },
           },
+          {
+            "scope": [
+              "entity.name.function",
+              "support.function",
+              "meta.function-call",
+              "variable.function",
+            ],
+            "settings": {
+              "foreground": "#82AAFF",
+            },
+          },
+          {
+            "scope": [
+              "entity.name.type",
+              "entity.name.class",
+              "support.class",
+              "support.type",
+              "storage.type.interface",
+            ],
+            "settings": {
+              "foreground": "#77C9C5",
+            },
+          },
+          {
+            "scope": [
+              "variable",
+              "variable.other.readwrite",
+              "variable.parameter",
+            ],
+            "settings": {
+              "foreground": "#B4BDCC",
+            },
+          },
+          {
+            "scope": [
+              "variable.other.property",
+              "support.variable.property",
+              "meta.object-literal.key",
+              "entity.other.attribute-name",
+            ],
+            "settings": {
+              "foreground": "#9CB9E4",
+            },
+          },
+          {
+            "scope": ["string", "string.quoted", "string.template"],
+            "settings": {
+              "foreground": "#A6D6A0",
+            },
+          },
+          {
+            "scope": [
+              "constant.numeric",
+              "constant.language.boolean",
+              "constant.language.null",
+              "constant.language.undefined",
+            ],
+            "settings": {
+              "foreground": "#F1B8D0",
+            },
+          },
+          {
+            "scope": [
+              "keyword.operator",
+              "punctuation",
+              "meta.brace",
+              "meta.delimiter",
+            ],
+            "settings": {
+              "foreground": "#8793A7",
+            },
+          },
+          {
+            "scope": ["entity.name.tag", "support.type.property-name.css"],
+            "settings": {
+              "foreground": "#82AAFF",
+            },
+          },
+          {
+            "scope": [
+              "entity.other.attribute-name.html",
+              "entity.other.attribute-name.id",
+              "entity.other.attribute-name.class",
+            ],
+            "settings": {
+              "foreground": "#F38BB9",
+            },
+          },
+          {
+            "scope": [
+              "support.constant.property-value.css",
+              "constant.other.color",
+              "constant.numeric.css",
+            ],
+            "settings": {
+              "foreground": "#A6D6A0",
+            },
+          },
+          {
+            "scope": ["comment", "punctuation.definition.comment"],
+            "settings": {
+              "foreground": "#8A94A6",
+              "fontStyle": "italic",
+            },
+          },
+        ],
+      },
+    },
+
+    "editor.semanticTokenColorCustomizations": {
+      "[Turbo Pascal Modern]": {
+        "enabled": true,
+        "rules": {
+          "namespace": "#77C9C5",
+          "class": "#77C9C5",
+          "interface": "#77C9C5",
+          "type": "#77C9C5",
+          "typeParameter": "#77C9C5",
+          "enum": "#77C9C5",
+          "enumMember": "#F1B8D0",
+
+          "function": "#82AAFF",
+          "method": "#82AAFF",
+          "method.declaration": "#82AAFF",
+
+          "parameter": "#B4BDCC",
+          "variable": "#B4BDCC",
+          "variable.readonly": "#B4BDCC",
+          "property": "#9CB9E4",
+          "property.readonly": "#9CB9E4",
+
+          "string": "#A6D6A0",
+          "number": "#F1B8D0",
+          "regexp": "#A6D6A0",
+
+          "keyword": "#F38BB9",
+          "operator": "#8793A7",
+
+          "decorator": "#F38BB9",
         },
-      ],
+      },
     },
   },
 }

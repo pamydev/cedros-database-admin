@@ -1559,16 +1559,6 @@ var Logs = [
   ["path", { d: "M13 19h8" }]
 ];
 
-// ../../node_modules/lucide/dist/esm/icons/move.mjs
-var Move = [
-  ["path", { d: "M12 2v20" }],
-  ["path", { d: "m15 19-3 3-3-3" }],
-  ["path", { d: "m19 9 3 3-3 3" }],
-  ["path", { d: "M2 12h20" }],
-  ["path", { d: "m5 9-3 3 3 3" }],
-  ["path", { d: "m9 5 3-3 3 3" }]
-];
-
 // ../../node_modules/lucide/dist/esm/icons/plus.mjs
 var Plus = [
   ["path", { d: "M5 12h14" }],
@@ -3010,6 +3000,240 @@ var updateMessageBoxWhenCursorEnterElement = (arg0) => {
   });
 };
 
+// source-code/project/home/codeDiv/codeDiv.ts
+var globalZIndex = 1;
+var incrementZIndexToCodeDivBecomeToFrontOnClick = (arg0) => {
+  const { codeDivId } = arg0;
+  const codeDiv = document.getElementById(codeDivId);
+  globalZIndex++;
+  codeDiv.style.zIndex = String(globalZIndex);
+};
+var addResizeContainerListeners = (arg0) => {
+  const { id, codeEditorContainer } = arg0;
+  let isDragging = /* @__PURE__ */ new Map();
+  let posX = 0;
+  let posY = 0;
+  document.getElementById(id).addEventListener("pointerdown", (ev) => {
+    isDragging.set(id, true);
+  });
+  document.addEventListener("pointermove", (ev) => {
+    if (!isDragging.get(id)) return;
+    const x = ev.movementX;
+    const y = ev.movementY;
+    const width = document.getElementById(codeEditorContainer).getBoundingClientRect().width;
+    const height = document.getElementById(codeEditorContainer).getBoundingClientRect().height;
+    const classList = document.getElementById(id).classList;
+    switch (true) {
+      case classList.contains("resizeTop"):
+        document.getElementById(codeEditorContainer).style.height = height - y + "px";
+        break;
+      case classList.contains("resizeBottom"):
+        document.getElementById(codeEditorContainer).style.height = height + y + "px";
+        break;
+      case classList.contains("resizeLeft"):
+        document.getElementById(codeEditorContainer).style.width = width - x + "px";
+        break;
+      case classList.contains("resizeRight"):
+        document.getElementById(codeEditorContainer).style.width = width + x + "px";
+        break;
+      case classList.contains("resizeTopLeft"):
+        document.getElementById(codeEditorContainer).style.height = height - y + "px";
+        document.getElementById(codeEditorContainer).style.width = width - x + "px";
+        break;
+      case classList.contains("resizeTopRight"):
+        document.getElementById(codeEditorContainer).style.height = height - y + "px";
+        document.getElementById(codeEditorContainer).style.width = width + x + "px";
+        break;
+      case classList.contains("resizeBottomLeft"):
+        document.getElementById(codeEditorContainer).style.height = height + y + "px";
+        document.getElementById(codeEditorContainer).style.width = width - x + "px";
+        break;
+      case classList.contains("resizeBottomRight"):
+        document.getElementById(codeEditorContainer).style.height = height + y + "px";
+        document.getElementById(codeEditorContainer).style.width = width + x + "px";
+        break;
+    }
+  });
+  document.addEventListener("pointerup", (ev) => {
+    isDragging.set(id, false);
+  });
+};
+var positionStore = /* @__PURE__ */ new Map();
+var createResizeManagementButton = (arg0) => {
+  const { idToInsert, codeDivToResizeOrClose } = arg0;
+  const container = new $div({ class: "managementDotContainer" }).create(
+    idToInsert
+  ).ids.div;
+  const redDot = new $div({
+    class: "managementDot red",
+    onclick: W.fx(() => {
+      document.getElementById(codeDivToResizeOrClose).remove();
+    })
+  }).create(container).ids.div;
+  updateMessageBoxWhenCursorEnterElement({
+    elementId: redDot,
+    messageText: "Close window"
+  });
+  const yellowDot = new $div({
+    class: "managementDot yellow",
+    onclick: W.fx(() => {
+      if (!positionStore.has(`${codeDivToResizeOrClose}:top`)) return;
+      const el = document.getElementById(codeDivToResizeOrClose);
+      el.style.position = "absolute";
+      el.style.top = positionStore.get(`${codeDivToResizeOrClose}:top`) + "px";
+      el.style.left = positionStore.get(`${codeDivToResizeOrClose}:left`) + "px";
+      el.style.width = positionStore.get(`${codeDivToResizeOrClose}:width`) + "px";
+      el.style.height = positionStore.get(`${codeDivToResizeOrClose}:height`) + "px";
+      positionStore.delete(`${codeDivToResizeOrClose}:top`);
+      positionStore.delete(`${codeDivToResizeOrClose}:left`);
+      positionStore.delete(`${codeDivToResizeOrClose}:width`);
+      positionStore.delete(`${codeDivToResizeOrClose}:height`);
+    })
+  }).create(container).ids.div;
+  updateMessageBoxWhenCursorEnterElement({
+    elementId: yellowDot,
+    messageText: "Minimize window"
+  });
+  const greenDot = new $div({
+    class: "managementDot green",
+    onclick: W.fx(() => {
+      const el = document.getElementById(codeDivToResizeOrClose);
+      const previousTop = el.offsetTop;
+      const previousLeft = el.offsetLeft;
+      const previousWidth = el.getBoundingClientRect().width;
+      const previousHeight = el.getBoundingClientRect().height;
+      positionStore.set(`${codeDivToResizeOrClose}:top`, previousTop);
+      positionStore.set(`${codeDivToResizeOrClose}:left`, previousLeft);
+      positionStore.set(`${codeDivToResizeOrClose}:width`, previousWidth);
+      positionStore.set(`${codeDivToResizeOrClose}:height`, previousHeight);
+      el.style.position = "absolute";
+      el.style.top = "0px";
+      el.style.left = "0px";
+      el.style.width = "100%";
+      el.style.height = "100%";
+    })
+  }).create(container).ids.div;
+  updateMessageBoxWhenCursorEnterElement({
+    elementId: greenDot,
+    messageText: "Maximize window"
+  });
+};
+var addMovementOfGrabTitleListener = (arg0) => {
+  const { id, output } = arg0;
+  const grabIconElement = document.getElementById(id);
+  if (!grabIconElement) return;
+  grabIconElement.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    const onPointerMove = (ev) => {
+      const outputElement = document.getElementById(output);
+      if (!outputElement) return;
+      let leftOrigin = outputElement.offsetLeft;
+      let topOrigin = outputElement.offsetTop;
+      outputElement.style.position = "absolute";
+      let newLeftPosition = leftOrigin + ev.movementX;
+      let newTopPosition = topOrigin + ev.movementY;
+      if (newLeftPosition < 0) newLeftPosition = 0;
+      if (newTopPosition < 0) newTopPosition = 0;
+      outputElement.style.left = newLeftPosition + "px";
+      outputElement.style.top = newTopPosition + "px";
+    };
+    const onPointerUp = () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+    };
+    document.addEventListener("pointermove", onPointerMove);
+    document.addEventListener("pointerup", onPointerUp);
+  });
+};
+var createCodeDivHeader = (arg0) => {
+  const { output, type, title } = arg0;
+  const header = new $div({
+    class: "mongify-header"
+  }).create(output).ids.div;
+  const left = new $div({
+    class: "mongify-header-left",
+    style: "width:100%"
+  }).create(header).ids.div;
+  const right = new $div({
+    class: "mongify-header-right"
+  }).create(header).ids.div;
+  const resizeManagementButtonsDiv = new $div().create(left).ids.div;
+  createResizeManagementButton({
+    idToInsert: resizeManagementButtonsDiv,
+    codeDivToResizeOrClose: output
+  });
+  const nameOfWindowDiv = new $div({
+    style: "display:flex;align-items:center;width:100%;"
+  }).create(left).ids.div;
+  addMovementOfGrabTitleListener({
+    id: nameOfWindowDiv,
+    output
+  });
+  const label = new $span({
+    content: type,
+    class: `__span-${type}__`
+  }).create(nameOfWindowDiv);
+  new $div({
+    content: title,
+    class: "mongify-command"
+  }).create(nameOfWindowDiv);
+  return { right };
+};
+var createCodeDiv = (arg0) => {
+  const { panelOutput, type, title } = arg0;
+  const output = new $div({
+    class: "PANEL codeDiv",
+    style: "position:relative"
+  }).create(panelOutput).ids.div;
+  let res = createCodeDivHeader({ output, type, title });
+  document.getElementById(output).addEventListener(
+    "click",
+    () => incrementZIndexToCodeDivBecomeToFrontOnClick({
+      codeDivId: output
+    })
+  );
+  const resizeTop = new $div({
+    class: "resizeDiv resizeTop"
+  }).create(output).ids.div;
+  const resizeRight = new $div({
+    class: "resizeDiv resizeRight"
+  }).create(output).ids.div;
+  const resizeBottom = new $div({
+    class: "resizeDiv resizeBottom"
+  }).create(output).ids.div;
+  const resizeLeft = new $div({
+    class: "resizeDiv resizeLeft"
+  }).create(output).ids.div;
+  const resizeTopLeft = new $div({
+    class: "resizeDiv resizeTopLeft"
+  }).create(output).ids.div;
+  const resizeBottomLeft = new $div({
+    class: "resizeDiv resizeBottomLeft"
+  }).create(output).ids.div;
+  const resizeBottomRight = new $div({
+    class: "resizeDiv resizeBottomRight"
+  }).create(output).ids.div;
+  const resizeTopRight = new $div({
+    class: "resizeDiv resizeTopRight"
+  }).create(output).ids.div;
+  [
+    resizeBottom,
+    resizeBottomLeft,
+    resizeBottomRight,
+    resizeLeft,
+    resizeRight,
+    resizeTop,
+    resizeTopLeft,
+    resizeTopRight
+  ].forEach((id) => {
+    addResizeContainerListeners({
+      id,
+      codeEditorContainer: output
+    });
+  });
+  return { output, right: res.right };
+};
+
 // source-code/project/home/homeScreen.ts
 var ProjectHomeScreen = class extends Screen {
   output;
@@ -3036,7 +3260,8 @@ var ProjectHomeScreen = class extends Screen {
       style: "margin-bottom: 20px;"
     }).create(content);
     this.panelOutput = new $div({
-      class: "FLEX-TRANSPARENT"
+      class: "FLEX-TRANSPARENT",
+      style: "flex:1"
     }).create(content).ids.div;
     this.listDatabasesAndWorkspaces();
   }
@@ -3092,37 +3317,12 @@ var ProjectHomeScreen = class extends Screen {
     }
   }
   async renderMongifyCodeDiv(db) {
-    const output = this.createCodeDiv();
-    const header = new $div({
-      class: "mongify-header"
-    }).create(output).ids.div;
-    const left = new $div({
-      class: "mongify-header-left",
-      style: "width:100%"
-    }).create(header).ids.div;
-    const right = new $div({
-      class: "mongify-header-right"
-    }).create(header).ids.div;
-    const resizeManagementButtonsDiv = new $div().create(left).ids.div;
-    this.createResizeManagementButton({
-      idToInsert: resizeManagementButtonsDiv,
-      codeDivToResizeOrClose: output
+    const codeDivResponse = createCodeDiv({
+      panelOutput: this.panelOutput,
+      title: db.database_name,
+      type: db.type
     });
-    const nameOfWindowDiv = new $div({
-      style: "display:flex;align-items:center;width:100%;"
-    }).create(left).ids.div;
-    this.addMovementOfGrabTitleListener({
-      id: nameOfWindowDiv,
-      output
-    });
-    const label = new $span({
-      content: db.type,
-      class: `__span-${db.type}__`
-    }).create(nameOfWindowDiv);
-    new $div({
-      content: db.database_name,
-      class: "mongify-command"
-    }).create(nameOfWindowDiv);
+    const { output, right } = codeDivResponse;
     const codeEditor = new $codeEditor().create(output);
     const codeEditorContentId = codeEditor.ids.contentEditable;
     const codeEditorDivId = codeEditor.ids.codeEditor;
@@ -3165,86 +3365,13 @@ var ProjectHomeScreen = class extends Screen {
       });
     });
   }
-  createResizeManagementButton(arg0) {
-    const { idToInsert, codeDivToResizeOrClose } = arg0;
-    const container = new $div({ class: "managementDotContainer" }).create(
-      idToInsert
-    ).ids.div;
-    const redDot = new $div({ class: "managementDot red" }).create(container).ids.div;
-    updateMessageBoxWhenCursorEnterElement({
-      elementId: redDot,
-      messageText: "Close window"
-    });
-    const yellowDot = new $div({ class: "managementDot yellow" }).create(
-      container
-    ).ids.div;
-    updateMessageBoxWhenCursorEnterElement({
-      elementId: yellowDot,
-      messageText: "Minimize window"
-    });
-    const greenDot = new $div({ class: "managementDot green" }).create(
-      container
-    ).ids.div;
-    updateMessageBoxWhenCursorEnterElement({
-      elementId: greenDot,
-      messageText: "Maximize window"
-    });
-  }
-  createCodeDiv() {
-    const output = new $div({
-      class: "PANEL codeDiv",
-      style: "position:relative"
-    }).create(this.panelOutput).ids.div;
-    document.getElementById(output).addEventListener(
-      "click",
-      () => this.incrementZIndexToCodeDivBecomeToFrontOnClick({
-        codeDivId: output
-      })
-    );
-    const resizeTop = new $div({
-      class: "resizeDiv resizeTop"
-    }).create(output).ids.div;
-    const resizeRight = new $div({
-      class: "resizeDiv resizeRight"
-    }).create(output).ids.div;
-    const resizeBottom = new $div({
-      class: "resizeDiv resizeBottom"
-    }).create(output).ids.div;
-    const resizeLeft = new $div({
-      class: "resizeDiv resizeLeft"
-    }).create(output).ids.div;
-    const resizeTopLeft = new $div({
-      class: "resizeDiv resizeTopLeft"
-    }).create(output).ids.div;
-    const resizeBottomLeft = new $div({
-      class: "resizeDiv resizeBottomLeft"
-    }).create(output).ids.div;
-    const resizeBottomRight = new $div({
-      class: "resizeDiv resizeBottomRight"
-    }).create(output).ids.div;
-    const resizeTopRight = new $div({
-      class: "resizeDiv resizeTopRight"
-    }).create(output).ids.div;
-    [
-      resizeBottom,
-      resizeBottomLeft,
-      resizeBottomRight,
-      resizeLeft,
-      resizeRight,
-      resizeTop,
-      resizeTopLeft,
-      resizeTopRight
-    ].forEach((id) => {
-      this.addResizeContainerListeners({
-        id,
-        codeEditorContainer: output
-      });
-    });
-    return output;
-  }
   printMongifyResult(arg0) {
-    console.log(arg0.result);
-    const output = this.createCodeDiv();
+    const codeDivResponse = createCodeDiv({
+      panelOutput: this.panelOutput,
+      title: arg0.command,
+      type: "mongify"
+    });
+    const { output, right } = codeDivResponse;
     let resultDiv;
     const printJson = () => {
       var _a;
@@ -3300,19 +3427,6 @@ var ProjectHomeScreen = class extends Screen {
         );
       });
     };
-    const header = new $div({
-      class: "mongify-header"
-    }).create(output).ids.div;
-    const left = new $div({
-      class: "mongify-header-left"
-    }).create(header).ids.div;
-    const right = new $div({
-      class: "mongify-header-right"
-    }).create(header).ids.div;
-    new $div({
-      content: arg0.command,
-      class: "mongify-command"
-    }).create(left);
     const selectFormat = new $select({
       onchange: W.fx(() => {
         const format = document.getElementById(selectFormat).value;
@@ -3331,105 +3445,11 @@ var ProjectHomeScreen = class extends Screen {
       content: "Table",
       value: "Table"
     }).create(selectFormat);
-    const grabIcon = new $div({
-      content: createIcon(Move, {
-        simple: true
-      })
-    }).create(right).ids.div;
-    this.addMovementOfGrabTitleListener({
-      id: grabIcon,
-      output
-    });
     printJson();
   }
   formatJSON(arg0) {
     let content = arg0.content;
     return JSON.stringify(content, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/(".*?")/g, '<span class="json-key">$1</span>');
-  }
-  addResizeContainerListeners(arg0) {
-    const { id, codeEditorContainer } = arg0;
-    let isDragging = /* @__PURE__ */ new Map();
-    let posX = 0;
-    let posY = 0;
-    document.getElementById(id).addEventListener("pointerdown", (ev) => {
-      isDragging.set(id, true);
-    });
-    document.addEventListener("pointermove", (ev) => {
-      if (!isDragging.get(id)) return;
-      const x = ev.movementX;
-      const y = ev.movementY;
-      const width = document.getElementById(codeEditorContainer).getBoundingClientRect().width;
-      const height = document.getElementById(codeEditorContainer).getBoundingClientRect().height;
-      const classList = document.getElementById(id).classList;
-      switch (true) {
-        case classList.contains("resizeTop"):
-          document.getElementById(codeEditorContainer).style.height = height - y + "px";
-          break;
-        case classList.contains("resizeBottom"):
-          document.getElementById(codeEditorContainer).style.height = height + y + "px";
-          break;
-        case classList.contains("resizeLeft"):
-          document.getElementById(codeEditorContainer).style.width = width - x + "px";
-          break;
-        case classList.contains("resizeRight"):
-          document.getElementById(codeEditorContainer).style.width = width + x + "px";
-          break;
-        case classList.contains("resizeTopLeft"):
-          document.getElementById(codeEditorContainer).style.height = height - y + "px";
-          document.getElementById(codeEditorContainer).style.width = width - x + "px";
-          break;
-        case classList.contains("resizeTopRight"):
-          document.getElementById(codeEditorContainer).style.height = height - y + "px";
-          document.getElementById(codeEditorContainer).style.width = width + x + "px";
-          break;
-        case classList.contains("resizeBottomLeft"):
-          document.getElementById(codeEditorContainer).style.height = height + y + "px";
-          document.getElementById(codeEditorContainer).style.width = width - x + "px";
-          break;
-        case classList.contains("resizeBottomRight"):
-          document.getElementById(codeEditorContainer).style.height = height + y + "px";
-          document.getElementById(codeEditorContainer).style.width = width + x + "px";
-          break;
-      }
-    });
-    document.addEventListener("pointerup", (ev) => {
-      isDragging.set(id, false);
-    });
-  }
-  globalZIndex = 1;
-  incrementZIndexToCodeDivBecomeToFrontOnClick(arg0) {
-    const { codeDivId } = arg0;
-    const codeDiv = document.getElementById(codeDivId);
-    this.globalZIndex++;
-    codeDiv.style.zIndex = String(this.globalZIndex);
-  }
-  addMovementOfGrabTitleListener(arg0) {
-    const { id, output } = arg0;
-    const grabIconElement = document.getElementById(id);
-    if (!grabIconElement) return;
-    grabIconElement.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      const onPointerMove = (ev) => {
-        const outputElement = document.getElementById(output);
-        if (!outputElement) return;
-        const father = outputElement.parentElement;
-        let leftOrigin = outputElement.offsetLeft;
-        let topOrigin = outputElement.offsetTop;
-        outputElement.style.position = "absolute";
-        let newLeftPosition = leftOrigin + ev.movementX;
-        let newTopPosition = topOrigin + ev.movementY;
-        if (newLeftPosition < 0) newLeftPosition = 0;
-        if (newTopPosition < 0) newTopPosition = 0;
-        outputElement.style.left = newLeftPosition + "px";
-        outputElement.style.top = newTopPosition + "px";
-      };
-      const onPointerUp = () => {
-        document.removeEventListener("pointermove", onPointerMove);
-        document.removeEventListener("pointerup", onPointerUp);
-      };
-      document.addEventListener("pointermove", onPointerMove);
-      document.addEventListener("pointerup", onPointerUp);
-    });
   }
 };
 var projectHomeScreen = new ProjectHomeScreen();
@@ -3576,7 +3596,6 @@ lucide/dist/esm/icons/database.mjs:
 lucide/dist/esm/icons/folder-kanban.mjs:
 lucide/dist/esm/icons/info.mjs:
 lucide/dist/esm/icons/logs.mjs:
-lucide/dist/esm/icons/move.mjs:
 lucide/dist/esm/icons/plus.mjs:
 lucide/dist/esm/icons/power.mjs:
 lucide/dist/esm/icons/settings.mjs:

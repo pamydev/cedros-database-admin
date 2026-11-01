@@ -63,6 +63,17 @@ const createWindow = () => {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
+
+  // So that the user don't think he is on a web page
+  mainWindow.webContents.on("before-input-event", (event, input) => {
+    if (input.type !== "keyDown") return;
+    const isF5 = input.key === "F5";
+    const isReload =
+      input.key.toLowerCase() === "r" && (input.control || input.meta);
+    if (isF5 || isReload) {
+      event.preventDefault();
+    }
+  });
 };
 
 // This method will be called when Electron has finished
