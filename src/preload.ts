@@ -37,7 +37,7 @@ export const database = {
     ): Promise<string[] | undefined> =>
       ipcRenderer.invoke(ipcChannels.mongify.get_collections, args0),
 
-    sendQuery: (args0: IMongifySendQueryArgs): Promise<{ result: any }> =>
+    sendQuery: (args0: IMongifySendQueryArgs): Promise<any> =>
       ipcRenderer.invoke(ipcChannels.mongify.send_query, args0),
   },
 

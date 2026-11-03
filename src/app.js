@@ -539,6 +539,75 @@ var $buttonPrimary = class _$buttonPrimary extends Constructos {
     return this.component;
   }
 };
+var $buttonSecondary = class _$buttonSecondary extends Constructos {
+  // ========================================
+  /**
+   * 
+   * @param {object} [elements]
+   * @param {any} [elements.onclick]  
+   * @param {any} [elements.style]  
+   * @param {any} [elements.icon]  
+   * @param {any} [elements.content]  
+   * @param {object} [options]
+   * @param {string} [options.identifier]
+   */
+  constructor(elements, options) {
+    super();
+    this.identifier = this._getIdentifier(options ? options.identifier || "notSet" : "notSet");
+    const digestedPropsToString = this._mutableToString(elements);
+    this.component = this.code(
+      digestedPropsToString
+    );
+    this._saveUsingMutable(
+      `buttonSecondary-win-${this.identifier}`,
+      elements,
+      options,
+      _$buttonSecondary
+    );
+  }
+  /**
+   * Generate the HTML code for this constructo
+   * @param {*} props - The properties object containing all prop values
+   * @returns {string} The HTML template string with interpolated values
+   * @protected
+   */
+  code(props) {
+    return `
+  <button     id="buttonSecondary-win-${this.identifier}"
+    class="secondary"
+    onclick="${(props == null ? void 0 : props.onclick) || ""}"
+    style="${(props == null ? void 0 : props.style) || ""}">
+    ${(props == null ? void 0 : props.icon) || ""} ${(props == null ? void 0 : props.content) || ""}
+  </button>
+`;
+  }
+  /**
+   * Create Winnetou Constructo
+   * @param  {string} output The string id where constructo will be placed. It is a query selector type
+   * @param  {object} [options] Options to control how the construct is inserted. Optional.
+   * @param  {boolean} [options.clear] Clean the node before inserting the construct
+   * @param  {boolean} [options.reverse] Place the construct in front of other constructs
+   */
+  create(output, options) {
+    this.attachToDOM(
+      this.component,
+      output,
+      options
+    );
+    return {
+      ids: {
+        buttonSecondary: `buttonSecondary-win-${this.identifier}`
+      }
+    };
+  }
+  /**
+   * Get the constructo as a string
+   * @returns {string} The component HTML string
+   */
+  constructoString() {
+    return this.component;
+  }
+};
 var $inputForm = class _$inputForm extends Constructos {
   // ========================================
   /**
@@ -1569,6 +1638,14 @@ var Plus = [
 var Power = [
   ["path", { d: "M12 2v10" }],
   ["path", { d: "M18.4 6.6a9 9 0 1 1-12.77.04" }]
+];
+
+// ../../node_modules/lucide/dist/esm/icons/refresh-ccw.mjs
+var RefreshCcw = [
+  ["path", { d: "M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" }],
+  ["path", { d: "M3 3v5h5" }],
+  ["path", { d: "M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" }],
+  ["path", { d: "M16 16h5v5" }]
 ];
 
 // ../../node_modules/lucide/dist/esm/icons/settings.mjs
@@ -3110,14 +3187,19 @@ var selectedPosition = 0;
 var totalItems = 0;
 var suggestionsIsVisible = false;
 var collectionsList = /* @__PURE__ */ new Map();
+var wipeCollectionsList = (arg0) => {
+  const identifier = `${arg0.projectId}-${arg0.databaseId}`;
+  collectionsList.delete(identifier);
+  return true;
+};
 var getCollectionsList = async (args0) => {
   const identifier = `${args0.projectId}-${args0.databaseId}`;
   if (collectionsList.has(identifier)) return collectionsList.get(identifier);
-  let res = (await window.database.mongify.sendQuery({
+  let res = await window.database.mongify.sendQuery({
     command: "db.listCollections()",
     databaseId: args0.databaseId,
     projectId: args0.projectId
-  })).result;
+  });
   collectionsList.set(identifier, res);
   return res;
 };
@@ -3333,11 +3415,23 @@ var renderMongifyCodeDiv = (arg0) => {
     title: db.database_name,
     type: db.type
   });
-  const { output } = codeDivResponse;
+  const { output, right } = codeDivResponse;
+  const refreshSuggestions = new $buttonSecondary({
+    content: createIcon(RefreshCcw, { simple: true }),
+    onclick: W.fx(() => {
+      wipeCollectionsList({
+        databaseId: db.databaseId,
+        projectId: db.projectId
+      });
+      console.log("ok");
+    })
+  }).create(right).ids.buttonSecondary;
+  updateMessageBoxWhenCursorEnterElement({
+    elementId: refreshSuggestions,
+    messageText: "Update suggestions"
+  });
   const codeEditor = new $codeEditor().create(output);
   const codeEditorContentId = codeEditor.ids.contentEditable;
-  const codeEditorDivId = codeEditor.ids.codeEditor;
-  let leftAltPressed = false;
   document.getElementById(codeEditorContentId).addEventListener("keydown", async (e) => {
     if (e.repeat) return;
     const sendShortcut = e.key === "Enter" && (e.metaKey || e.ctrlKey);
@@ -3610,6 +3704,7 @@ lucide/dist/esm/icons/info.mjs:
 lucide/dist/esm/icons/logs.mjs:
 lucide/dist/esm/icons/plus.mjs:
 lucide/dist/esm/icons/power.mjs:
+lucide/dist/esm/icons/refresh-ccw.mjs:
 lucide/dist/esm/icons/settings.mjs:
 lucide/dist/esm/lucide.mjs:
   (**

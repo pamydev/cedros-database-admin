@@ -1,9 +1,17 @@
 import { IDatabasesColl } from "@projectTypes/contracts";
 import { createCodeDiv } from "../codeDiv/codeDiv";
-import { $codeEditor } from "@common";
+import { $buttonSecondary, $codeEditor } from "@common";
 import { printMongifyResult } from "./mongify.result";
-import { suggestions, suggestionSelect } from "./suggestions";
+import {
+  suggestions,
+  suggestionSelect,
+  wipeCollectionsList,
+} from "./suggestions";
 import { colorizeAndFormat } from "./colorizeAndFormat";
+import { createIcon } from "@icons";
+import { RefreshCcw } from "lucide";
+import { updateMessageBoxWhenCursorEnterElement } from "@helpers/messageBox.helper";
+import { W } from "winnetoujs";
 
 export const renderMongifyCodeDiv = (arg0: {
   db: IDatabasesColl;
@@ -17,13 +25,27 @@ export const renderMongifyCodeDiv = (arg0: {
     type: db.type,
   });
 
-  const { output } = codeDivResponse;
+  const { output, right } = codeDivResponse;
+
+  const refreshSuggestions = new $buttonSecondary({
+    content: createIcon(RefreshCcw, { simple: true }),
+    onclick: W.fx(() => {
+      wipeCollectionsList({
+        databaseId: db.databaseId,
+        projectId: db.projectId,
+      });
+      console.log("ok");
+    }),
+  }).create(right).ids.buttonSecondary;
+
+  updateMessageBoxWhenCursorEnterElement({
+    elementId: refreshSuggestions,
+    messageText: "Update suggestions",
+  });
 
   const codeEditor = new $codeEditor().create(output);
   const codeEditorContentId = codeEditor.ids.contentEditable;
-  const codeEditorDivId = codeEditor.ids.codeEditor;
 
-  let leftAltPressed = false;
   document
     .getElementById(codeEditorContentId)
     .addEventListener("keydown", async (e) => {

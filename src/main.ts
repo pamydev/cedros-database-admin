@@ -70,7 +70,10 @@ const createWindow = () => {
     const isF5 = input.key === "F5";
     const isReload =
       input.key.toLowerCase() === "r" && (input.control || input.meta);
-    if (isF5 || isReload) {
+    const isEsc =
+      input.key.toLocaleLowerCase() === "esc" ||
+      input.key.toLocaleLowerCase() === "escape";
+    if (isF5 || isReload || isEsc) {
       event.preventDefault();
     }
   });

@@ -55,6 +55,15 @@ let totalItems = 0;
 let suggestionsIsVisible = false;
 let collectionsList = new Map<string, string[]>();
 
+export const wipeCollectionsList = (arg0: {
+  projectId: string;
+  databaseId: string;
+}) => {
+  const identifier = `${arg0.projectId}-${arg0.databaseId}`;
+  collectionsList.delete(identifier);
+  return true;
+};
+
 const getCollectionsList = async (args0: {
   projectId: string;
   databaseId: string;
@@ -62,13 +71,11 @@ const getCollectionsList = async (args0: {
   const identifier = `${args0.projectId}-${args0.databaseId}`;
   if (collectionsList.has(identifier)) return collectionsList.get(identifier);
 
-  let res = (
-    await window.database.mongify.sendQuery({
-      command: "db.listCollections()",
-      databaseId: args0.databaseId,
-      projectId: args0.projectId,
-    })
-  ).result as string[];
+  let res = (await window.database.mongify.sendQuery({
+    command: "db.listCollections()",
+    databaseId: args0.databaseId,
+    projectId: args0.projectId,
+  })) as string[];
 
   collectionsList.set(identifier, res);
   return res;
