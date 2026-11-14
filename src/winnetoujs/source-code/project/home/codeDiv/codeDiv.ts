@@ -255,7 +255,7 @@ export const createCodeDiv = (arg0: {
 
   let res = createCodeDivHeader({ output, type, title });
 
-  document.getElementById(output).addEventListener("click", () =>
+  document.getElementById(output).addEventListener("pointerdown", () =>
     incrementZIndexToCodeDivBecomeToFrontOnClick({
       codeDivId: output,
     }),

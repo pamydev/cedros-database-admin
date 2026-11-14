@@ -19,7 +19,8 @@ if (text.endsWith("\n")) {
 [ok] redimensionar o codeEditor
 
 parei aqui:
-[] quando clica em um container com position:absolute tem que aumentar o z-index dele
+2026-11-14 [ok] quando clica em um container com position:absolute tem que aumentar o z-index dele
+2026-11-14 [ok] tem que ser no pointer down
 [] a tabela ainda nao esta funcionando totalmente, tem erro na montagem, testar com "users"
 
 [] fazer tudo funcionar tambem com aspas simples

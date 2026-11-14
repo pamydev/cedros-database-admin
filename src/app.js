@@ -2704,7 +2704,7 @@ var createCodeDiv = (arg0) => {
   }).create(panelOutput).ids.div;
   let res = createCodeDivHeader({ output, type, title });
   document.getElementById(output).addEventListener(
-    "click",
+    "pointerdown",
     () => incrementZIndexToCodeDivBecomeToFrontOnClick({
       codeDivId: output
     })
